@@ -1,9 +1,2 @@
-### Thesis Overview
-This thesis aims to develop a protoype, non-invasive, PPG-based glucose monitoring sensor with firmware for signal preprocessing, 1D convolutional neural networks, and wireless communcation.
-
-
-## Current Work
-Validate literature-based NIR wavelength ranges for glucose detection using a reflectance and transmission mode setup for comparing wavelength-specific glucose sensitivity and SNR.
-
-
-## Future Work
+## Thesis Overview
+This thesis aims to develop a prototype, non-invasive, PPG-based glucose monitoring sensor with firmware for signal preprocessing, 1D convolutional neural networks, and wireless communication. The start of this thesis work will involve validating literature-based NIR wavelengths for glucose detection using a reflectance and transmission mode experimental setup and aqueous glucose solutions for comparing wavelength-specific glucose sensitivity and SNR. An ML model will also be developed and trained on public datasets for PPG signals with blood glucose levels labeled. Using the previously validated NIR wavelength a prototype NIR/PPG sensor which will then use an edge ML model to estimate blood glucose level on samples. 
