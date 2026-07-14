@@ -1,6 +1,71 @@
 import pmcx
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+
+#aborption spectra extracted from Prahl
+
+
+#Plot configuration
+fig, axes = plt.subplots(2, 2, layout = "constrained")
+fig.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
+
+
+#Water absorption spectra from 382.5-750 nm, Pope 1993
+df_Pope_1993 = pd.read_csv("R_M_Pope_water_absorption_1993.csv")
+Pope_1993_wavelength_nm = df_Pope_1993.iloc[:,0]
+Pope_1993_mu_a_water_cm = df_Pope_1993.iloc[:,1]
+Pope_1993_mu_a_water_mm = Pope_1993_mu_a_water_cm / 10
+
+axes[0,0].plot(Pope_1993_wavelength_nm, Pope_1993_mu_a_water_mm)
+axes[0,0].set_xlabel("Wavelength (nm)")
+axes[0,0].set_xticks(np.arange(400,750,25), minor = True)
+axes[0,0].set_ylabel("Absorption (1/mm)")
+axes[0,0].set_title(r"$\mu_{a,water}$ from 400-750 nm" "\n R. M. Pope, 1993")
+
+
+#Water absorption spectra from 667-2500 nm, Lou 1993
+df_Lou_1993 = pd.read_csv("L_Kou_water_absorption_1993.csv")
+Lou_1993_wavelength_nm = df_Lou_1993.iloc[:,0]
+Lou_1993_mu_a_water_cm = df_Lou_1993.iloc[:,1]
+Lou_1993_mu_a_water_mm = Lou_1993_mu_a_water_cm / 10
+
+axes[0,1].plot(Lou_1993_wavelength_nm, Lou_1993_mu_a_water_mm)
+axes[0,1].set_xlabel("Wavelength (nm)")
+axes[0,1].set_xticks(np.arange(750,2500,125), minor = True)
+axes[0,1].set_ylabel("Absorption (1/mm)")
+axes[0,1].set_title(r"$\mu_{a,water}$ from 667-2500nm" "\n L. Kou, 1993")
+
+
+
+
+
+
+#Water absorption spectra from 380-700 nm, Pope 1997
+df_Pope_1997 = pd.read_csv("R_M_Pope_water_absorption_1997.csv")
+Pope_1997_wavelength_nm = df_Pope_1997.iloc[:,0]
+Pope_1997_mu_a_water_cm = df_Pope_1997.iloc[:,1]
+Pope_1997_mu_a_water_mm = Pope_1997_mu_a_water_cm / 10;
+
+axes[1,0].plot(Pope_1997_wavelength_nm, Pope_1997_mu_a_water_mm);
+axes[1,0].set_xlabel("Wavelength (nm)")
+axes[1,0].set_xticks(np.arange(400,750,25), minor = True)
+axes[1,0].set_ylabel("Absorption (1/mm)")
+axes[1,0].set_title(r"$\mu_{a,water}$ from 380-700nm" "\n R. M. Pope, 1997");
+
+#Portion of water absorption spectra from 667-750 nm, Pope 
+
+
+
+
+
+
+plt.show()
+
+
+#Hemoglobin
+
+#Deoxygninated Hemoglobin
 
 
 # Format: [mu_a, mu_s, g, n]
@@ -23,10 +88,11 @@ prop=[
 
 Nx, Ny, Nz= 60, 60, 60
 
-vol=np.zeros((Nx,Ny,Nz),dtype=np.uint8)
-vol[:,:,0:3]=1
-vol[:,:,3:20]=2
-vol[:,:,20:]=3
+vol=np.zeros([Nx,Ny,Nz])
+vol[:,:,0:3]=1;
+vol[:,:,3:20]=2;
+vol[:,:,20:60]=3;
+
 
 sim_config={
     "nphoton": 10000,
@@ -45,9 +111,9 @@ sim_config={
 }
 
 #Run simulation
-sim_out=pmcx.run(sim_config)
+#sim_out=pmcx.run(sim_config)
 
-print(sim_out.keys())
-flux=sim_out["flux"];
+#print(sim_out.keys())
+#flux=sim_out["flux"];
 
 #flo_plot=imshow(np.log10())
