@@ -1,4 +1,7 @@
-﻿lambda (nm),absorption (1/cm)
+﻿# L. Kou, D. Labrie, and P. Chylek, “Refractive indices of water and ice in the 0.65- to 2.5-μm spectral range,” Appl. Opt., vol. 32, no. 19, pp. 3531–3540, 
+# Jul. 1993, doi: 10.1364/AO.32.003531.
+
+lambda (nm),absorption (1/cm)
 2500,100.53096
 2487,94.487784
 2475,86.822193

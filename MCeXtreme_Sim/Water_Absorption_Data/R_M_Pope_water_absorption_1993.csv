@@ -1,4 +1,6 @@
-﻿lambda (nm),absorption (1/cm)
+﻿# R. M. Pope, “Optical absorption of pure water and sea water using the integrating cavity absorption meter,”
+# Ph.D. dissertation, Dept. Phys., Texas A&M Univ., College Station, TX, USA, 1993.
+lambda (nm),absorption (1/cm)
 382.5,0.000102
 385,0.000095
 387.5,0.000091
