@@ -2,6 +2,7 @@ Misc/
 Microcontroller_NN/
 Thesis_Papers/
 MCeXtreme_sim/.MCVenv
+MCeXtreme_sim/Water_Absorption_Data
 Datasets/
 
 LTspice_sims/**/*.log
