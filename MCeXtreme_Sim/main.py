@@ -48,7 +48,7 @@ Bosschaart_2014_mu_a_oxy_mm  = df_Bosschaart_2014["mu_a_oxy_mm-1"]
 Bosschaart_2014_mu_a_deoxy_mm = df_Bosschaart_2014["mu_a_deoxy_mm-1"]
 
 axes[0, 1].plot(Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_oxy_mm)
-axes[0, 1].set_title(r"$\mu_{a, Hb}$ from 250-2000 nm""\nBosschaart, 2014")
+axes[0, 1].set_title(r"$\mu_{a, Hb_{O_2}}$ from 250-2000 nm""\nBosschaart, 2014")
 axes[0, 1].set_xlabel("Wavelength (nm)")
 axes[0, 1].set_xticks(np.arange(200, 2001, 100), minor = True)
 axes[0, 1].set_ylabel("Absorption (1/mm)")
