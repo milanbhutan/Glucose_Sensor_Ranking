@@ -3,25 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-#aborption spectra extracted from Prahl
 
 
-#Plot configuration
-fig, axes = plt.subplots(2, 1, layout = "constrained")
+# Plot configuration
+fig, axes = plt.subplots(2, 4, layout = "constrained")
 fig.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
-
-
-# #Water absorption spectra from 382.5-750 nm, Pope 1993
-# df_Pope_1993 = pd.read_csv("R_M_Pope_water_absorption_1993.csv", comment = "#")
-# Pope_1993_wavelength_nm = df_Pope_1993["lambda (nm)"]
-# Pope_1993_mu_a_water_cm = df_Pope_1993["absorption (1/cm)"]
-# Pope_1993_mu_a_water_mm = Pope_1993_mu_a_water_cm / 10
-
-# axes[0,0].plot(Pope_1993_wavelength_nm, Pope_1993_mu_a_water_mm)
-# axes[0,0].set_xlabel("Wavelength (nm)")
-# axes[0,0].set_xticks(np.arange(400,750,25), minor = True)
-# axes[0,0].set_ylabel("Absorption (1/mm)")
-# axes[0,0].set_title(r"$\mu_{a,water}$ from 400-750 nm" "\n R. M. Pope, 1993")
 
 
 #Water absorption spectra from 667-2500 nm, Lou 1993
@@ -30,24 +16,11 @@ Lou_1993_wavelength_nm = df_Lou_1993["lambda (nm)"]
 Lou_1993_mu_a_water_cm = df_Lou_1993["absorption (1/cm)"]
 Lou_1993_mu_a_water_mm = Lou_1993_mu_a_water_cm / 10
 
-axes[0].plot(Lou_1993_wavelength_nm, Lou_1993_mu_a_water_mm)
-axes[0].set_xlabel("Wavelength (nm)")
-axes[0].set_xticks(np.arange(750, 2500, 125), minor = True)
-axes[0].set_ylabel("Absorption (1/mm)")
-axes[0].set_title(r"$\mu_{a,water}$ from 667-2500nm" "\n L. Kou, 1993")
-
-
-# #Water absorption spectra from 380-700 nm, Pope 1997
-# df_Pope_1997 = pd.read_csv("R_M_Pope_water_absorption_1997.csv", comment = "#")
-# Pope_1997_wavelength_nm = df_Pope_1997["lambda (nm)"]
-# Pope_1997_mu_a_water_cm = df_Pope_1997["absorption (1/cm)"]
-# Pope_1997_mu_a_water_mm = Pope_1997_mu_a_water_cm / 10;
-
-# axes[1,0].plot(Pope_1997_wavelength_nm, Pope_1997_mu_a_water_mm);
-# axes[1,0].set_xlabel("Wavelength (nm)")
-# axes[1,0].set_xticks(np.arange(400,750,25), minor = True)
-# axes[1,0].set_ylabel("Absorption (1/mm)")
-# axes[1,0].set_title(r"$\mu_{a,water}$ from 380-700nm" "\n R. M. Pope, 1997");
+axes[0, 0].plot(Lou_1993_wavelength_nm, Lou_1993_mu_a_water_mm)
+axes[0, 0].set_xlabel("Wavelength (nm)")
+axes[0, 0].set_xticks(np.arange(750, 2500, 125), minor = True)
+axes[0, 0].set_ylabel("Absorption (1/mm)")
+axes[0, 0].set_title(r"$\mu_{a,water}$ from 667-2500nm" "\n L. Kou, 1993")
 
 
 #Water absorption from 171-2000nm, Fewell 2019
@@ -56,32 +29,29 @@ Fewell_2019_wavelength_nm = df_Fewell_2019["wavelength (nm)"]
 Fewell_2019_mu_a_water_m = df_Fewell_2019["pure water value"]
 Fewell_2019_mu_a_water_mm = Fewell_2019_mu_a_water_m / 1000
 
-axes[1].plot(Fewell_2019_wavelength_nm, Fewell_2019_mu_a_water_mm)
-axes[1].set_xlabel("Wavelength (nm)")
-axes[1].set_xticks(np.arange(500, 2000, 100), minor = True)
-axes[1].set_ylabel("Absorption (1/mm)")
-axes[1].set_title(r"$\mu_{a,water}$ from 400 to 2000 nm" "\nM. P. Fewell, 2019");
-
-
-
-
-#Hemoglobin
-
-#Deoxygninated Hemoglobin
+axes[1, 0].plot(Fewell_2019_wavelength_nm, Fewell_2019_mu_a_water_mm)
+axes[1, 0].set_xlabel("Wavelength (nm)")
+axes[1, 0].set_xticks(np.arange(500, 2000, 100), minor = True)
+axes[1, 0].set_ylabel("Absorption (1/mm)")
+axes[1, 0].set_title(r"$\mu_{a,water}$ from 400 to 2000 nm" "\nM. P. Fewell, 2019");
 
 
 
 
 
 
+#Hemoglobin and Deoxyginated Hemoglobin absorption spectra from 250-2000nm, Bosschart 2014
+#Blank entries in data were removed beforehand
+df_Bosschaart_2014 = pd.read_csv("Blood_Absorption_Data/Bosschaart_blood_absorption_2014.csv", comment = "#")
+Bosschaart_2014_wavelength_nm = df_Bosschaart_2014["wavelength_nm"]
+Bosschaart_2014_mu_a_oxy_mm  = df_Bosschaart_2014["mu_a_oxy_mm-1"]
+Bosschaart_2014_mu_a_deoxy_mm = df_Bosschaart_2014["mu_a_deoxy_mm-1"]
 
-
-
-
-
-
-
-
+axes[0, 1].plot(Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_oxy_mm)
+axes[0, 1].set_title(r"$\mu_{a, Hb}$ from 250-2000 nm""\nBosschaart, 2014")
+axes[0, 1].set_xlabel("Wavelength (nm)")
+axes[0, 1].set_xticks(np.arange(200, 2001, 100), minor = True)
+axes[0, 1].set_ylabel("Absorption (1/mm)")
 
 
 plt.show()
