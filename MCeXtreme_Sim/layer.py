@@ -57,7 +57,7 @@ if __name__ == "__main__":
     axes[1, 0].set_title(r"$\mu_{a,water}$ from 400 to 2000 nm" "\nM. P. Fewell 2019")
 
     axes[0, 1].plot(Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_oxy_mm)
-    axes[0, 1].set_title(r"$\mu_{a, Hb_{O_2}}$ from 250-2000 nm""\nBosschaart, 2014")
+    axes[0, 1].set_title(r"$\mu_{a, Hb_{O_2}}$ from 250-2000 nm""\nBosschaart 2014")
     axes[0, 1].set_xlabel("Wavelength (nm)")
     axes[0, 1].set_ylabel("Absorption (1/mm)")
 
@@ -183,14 +183,3 @@ def mu_s_layer(
             mu_s = 0
             print("invalid layer")
     return mu_s
-
-# def g(
-
-        
-# ):
-
-
-# def n_layer(
-
-        
-# ):
