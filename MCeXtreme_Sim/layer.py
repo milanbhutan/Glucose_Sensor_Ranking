@@ -161,14 +161,14 @@ def mu_a_layer (
     + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
+    + (0.30 * ((8.53 * np.exp(-(norm_wavelength_nm - 164)/66.2)) + 0.0244)) # baseline tissue absorption
     )
     return total_mu_a
 
 def mu_s_layer(
     lay: str, 
     g: float
-) -> np.array:
-    norm_wavelength_nm = np.arange(0, 2001, 1)
+) -> pd.Series:
     match(lay):
         case("epidermis"):
             mu_s_rd = 6.87 * (norm_wavelength_nm[1:] / 500) ** -1.161
@@ -182,4 +182,5 @@ def mu_s_layer(
         case _:
             mu_s = 0
             print("invalid layer")
-    return mu_s
+    mu_s_ser = pd.Series(data = mu_s, index = norm_wavelength_nm[1:])
+    return mu_s_ser
