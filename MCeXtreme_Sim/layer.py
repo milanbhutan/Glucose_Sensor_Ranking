@@ -161,7 +161,7 @@ def mu_a_layer (
     + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + (0.30 * ((8.53 * np.exp(-(norm_wavelength_nm - 164)/66.2)) + 0.0244)) # baseline tissue absorption
+    + ((1 - (B + W + F + M)) * ((8.53 * np.exp(-(norm_wavelength_nm - 164)/66.2)) + 0.0244)) # baseline tissue absorption
     )
     return total_mu_a
 
