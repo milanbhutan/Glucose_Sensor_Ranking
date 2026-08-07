@@ -147,7 +147,7 @@ if __name__ == "__main__":
 # Per layer: (B * S * mu_a_HbO2) + (B * (1-S) * mu_a_Hb) + (W * mu_a_water) + (F * mu_a_fat) + (M * mu_a_melanin)
 # where B, S, W, F, and M represent blood, oxygen, water, fat, and melanin compostion of tissue respectively
 
-def mu_a_layer (
+def mu_a_epi (
     B: float,
     S: float,
     W: float,
@@ -161,7 +161,43 @@ def mu_a_layer (
     + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + ((1 - (B + W + F + M)) * ((8.53 * np.exp(-(norm_wavelength_nm - 164)/66.2)) + 0.0244)) # baseline tissue absorption
+    + ((1 - (B + W + F + M)) * ((8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2)) + 0.0244)) # baseline tissue absorption
+    )
+    return total_mu_a
+
+def mu_a_derm (
+    B: float,
+    S: float,
+    W: float,
+    F: float,
+    M: float
+
+) -> pd.Series:
+    total_mu_a = ( 
+    (B * S * Bosschaart_2014_interp_oxy_ser)
+    + (B * (1-S) * Bosschaart_2014_interp_deoxy_ser)
+    + (W * Fewell_2019_interp_ser) 
+    + (F * Veen_2004_interp_ser) 
+    + (M * Jacques_1998_interp_ser)
+    + ((1 - (B + W + F + M)) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
+    )
+    return total_mu_a
+
+def mu_a_sub (
+    B: float,
+    S: float,
+    W: float,
+    F: float,
+    M: float
+
+) -> pd.Series:
+    total_mu_a = ( 
+    (B * S * Bosschaart_2014_interp_oxy_ser)
+    + (B * (1-S) * Bosschaart_2014_interp_deoxy_ser)
+    + (W * Fewell_2019_interp_ser) 
+    + (F * Veen_2004_interp_ser) 
+    + (M * Jacques_1998_interp_ser)
+    + ((1 - (B + W + F + M)) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
     )
     return total_mu_a
 

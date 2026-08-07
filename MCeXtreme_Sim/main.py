@@ -18,9 +18,9 @@ epidermis = {
 dermis = {
     "blood" : 0.0020,
     "oxygen_saturation" : 0.39,
-    "water" : 0.65, # was 0.65
+    "water" : 0.65,
     "fat" : 0,
-    "melansome" : 0.001
+    "melansome" : 0
 }
 
 subcutaneous = {
@@ -28,14 +28,14 @@ subcutaneous = {
     "oxygen_saturation" : 0.60,
     "water" : 0.2184,
     "fat" : 0.6433,
-    "melansome" : 0.001
+    "melansome" : 0
 }
 
 norm_wavelength_nm = np.arange(0, 2001, 1)
 
-epidermis_mu_a_sim = layer.mu_a_layer(epidermis["blood"], epidermis["oxygen_saturation"], epidermis["water"], epidermis["fat"], epidermis["melansome"])
-dermis_mu_a_sim = layer.mu_a_layer(dermis["blood"], dermis["oxygen_saturation"], dermis["water"], dermis["fat"], dermis["melansome"])
-subcutaneous_mu_a_sim = layer.mu_a_layer(subcutaneous["blood"], subcutaneous["oxygen_saturation"], subcutaneous["water"], subcutaneous["fat"], subcutaneous["melansome"])
+epidermis_mu_a_sim = layer.mu_a_epi(epidermis["blood"], epidermis["oxygen_saturation"], epidermis["water"], epidermis["fat"], epidermis["melansome"])
+dermis_mu_a_sim = layer.mu_a_derm(dermis["blood"], dermis["oxygen_saturation"], dermis["water"], dermis["fat"], dermis["melansome"])
+subcutaneous_mu_a_sim = layer.mu_a_sub(subcutaneous["blood"], subcutaneous["oxygen_saturation"], subcutaneous["water"], subcutaneous["fat"], subcutaneous["melansome"])
 
 # For scattering coefficent
 # epidermis_g = 0.9
@@ -118,7 +118,7 @@ df_Ganesan_2016_mu_s = (
 gan_subcutaneous_mu_s_exp = df_Ganesan_2016_mu_s["mu_s_prime_mm^-1"]
 
 
-lower_wavelength_bound = 650
+lower_wavelength_bound = 600
 
 # Calculating RMSE
 epidermis_mu_a_exp_align, epidermis_mu_a_sim_align = epidermis_mu_a_exp.align(epidermis_mu_a_sim[lower_wavelength_bound:1060], join = "inner")
