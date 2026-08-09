@@ -33,11 +33,11 @@ Veen_2004_wavelength_nm = df_Veen_2004["nm"]
 Veen_2004_mu_a_fat_m = df_Veen_2004["mu_a"]
 Veen_2004_mu_a_fat_mm = Veen_2004_mu_a_fat_m / 1000
 
-# Melanin Absorption Spectra from 200 - 2000 from Jacques 1998
+# melanosome absorption spectra from 200 - 2000 from Jacques 1998
 # Need to find lower and upper wavelength range
 Jacques_1998_wavelength_nm = np.arange(200, 2001, 1)
-Jacques_1998_mu_a_melanin_cm = (1.7*10**12)*(Jacques_1998_wavelength_nm)**-3.48
-Jacques_1998_mu_a_melanin_mm = Jacques_1998_mu_a_melanin_cm / 10
+Jacques_1998_mu_a_melanosome_cm = (1.7*10**12)*(Jacques_1998_wavelength_nm)**-3.48
+Jacques_1998_mu_a_melanosome_mm = Jacques_1998_mu_a_melanosome_cm / 10
 
 if __name__ == "__main__":
 
@@ -71,8 +71,8 @@ if __name__ == "__main__":
     axes[0, 2].set_xlabel("Wavelength (nm)")
     axes[0, 2].set_ylabel("Absorption (1/mm)")
 
-    axes[1, 2].plot(Jacques_1998_wavelength_nm, Jacques_1998_mu_a_melanin_mm)
-    axes[1, 2].set_title(r"$\mu_{a, melanin}$ for 200 - 2000 nm""\nJacques 1998")
+    axes[1, 2].plot(Jacques_1998_wavelength_nm, Jacques_1998_mu_a_melanosome_mm)
+    axes[1, 2].set_title(r"$\mu_{a, melanosome}$ for 200 - 2000 nm""\nJacques 1998")
     axes[1, 2].set_xlabel("Wavelength (nm)")
     axes[1, 2].set_ylabel("Absorption (1/mm)")
 
@@ -88,7 +88,7 @@ Fewell_2019_interp_np = np.interp(norm_wavelength_nm, Fewell_2019_wavelength_nm,
 Bosschaart_2014_interp_oxy_np = np.interp(norm_wavelength_nm, Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_oxy_mm, left = 0, right = 0)
 Bosschaart_2014_interp_deoxy_np = np.interp(norm_wavelength_nm, Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_deoxy_mm, left = 0, right = 0)
 Veen_2004_interp_np = np.interp(norm_wavelength_nm, Veen_2004_wavelength_nm, Veen_2004_mu_a_fat_mm, left = 0, right = 0)
-Jacques_1998_interp_np = np.interp(norm_wavelength_nm, Jacques_1998_wavelength_nm, Jacques_1998_mu_a_melanin_mm, left = 0, right = 0)
+Jacques_1998_interp_np = np.interp(norm_wavelength_nm, Jacques_1998_wavelength_nm, Jacques_1998_mu_a_melanosome_mm, left = 0, right = 0)
 
 # Converting interpolated absorption values from NumPy to Series objects since we will need to keep track of the wavelength index for each absoprtion value
 L_Kou_1993_interp_ser = pd.Series(data = L_Kou_1993_interp_np, index = norm_wavelength_nm)
@@ -99,53 +99,242 @@ Veen_2004_interp_ser = pd.Series(data = Veen_2004_interp_np, index = norm_wavele
 Jacques_1998_interp_ser = pd.Series(data = Jacques_1998_interp_np, index = norm_wavelength_nm)
 
 
-# Plotting the interpolated Series data from 200 - 2000nm in 1nm increments
+# Plotting the interpolated Series data from 600 - 1100nm in 1nm increments
+lower_wavelenghth_bound = 600
+upper_wavelength_bound = 1100
 
-if __name__ == "__main__":
-    fig_i, axes_i = plt.subplots(2,3, layout = "constrained")
-    fig_i.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
-    fig_i.suptitle("Interpolated Tissue Constituent Absorption Spectra from 200-2000 nm")
+# Using Jacques 2013 generic tissue model
+# Per layer: (B * S * mu_a_HbO2) + (B * (1-S) * mu_a_Hb) + (W * mu_a_water) + (F * mu_a_fat) + (M * mu_a_melanosome) + baseline
+# where B, S, W, F, and M represent blood, oxygen, water, fat, and melanosome compostion of tissue respectively
 
-    axes_i[0, 0].plot(norm_wavelength_nm[200 : 2000], L_Kou_1993_interp_ser[200 : 2000])
-    axes_i[0, 0].set_xlabel("Wavelength (nm)")
-    axes_i[0, 0].set_ylabel("Absorption (1/mm)")
-    axes_i[0, 0].set_title(r"$\mu_{a,water}$" "\n L. Kou 1993")
+epidermis_Jacques = {
+    "blood" : 0,
+    "oxygen_saturation" : 0,
+    "water" : 0.20,
+    "fat" : 0,
+    "melanosome" : 0.025
+}
+
+dermis_Jacques = {
+    "blood" : 0.0020,
+    "oxygen_saturation" : 0.39,
+    "water" : 0.65,
+    "fat" : 0,
+    "melanosome" : 0
+}
+
+subcutaneous_Jacques = {
+    "blood" : 0.0054,
+    "oxygen_saturation" : 0.76,
+    "water" : 0.11,
+    "fat" : 0.69,
+    "melanosome" : 0
+}
+
+subcutaneous_Ganesan = {
+    "blood" : 0.00634,
+    "oxygen_saturation" : 0.60,
+    "water" : 0.2184,
+    "fat" : 0.6433,
+    "melanosome" : 0
+}
+
+# Basline absorption effect
+baseline_epi = (8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2) + 0.0244)
+baseline_epi_frac = (1 
+                     - epidermis_Jacques["blood"] 
+                     - epidermis_Jacques["fat"] 
+                     - epidermis_Jacques["water"] 
+                     - epidermis_Jacques["melanosome"]
+                     ) 
+
+baseline_derm = (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
+baseline_derm_frac = (1 
+                     - dermis_Jacques["blood"] 
+                     - dermis_Jacques["fat"] 
+                     - dermis_Jacques["water"] 
+                     - dermis_Jacques["melanosome"]
+                     ) 
+
+baseline_sub = (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
+baseline_sub_frac = (1 
+                     - subcutaneous_Jacques["blood"] 
+                     - subcutaneous_Jacques["fat"] 
+                     - subcutaneous_Jacques["water"] 
+                     - subcutaneous_Jacques["melanosome"]
+                     ) 
+
+# =========================================
+# Weighted tissue constituent absorption spectra for per layer in three layer tissue model
+# =========================================
+
+# Epidermis
+mu_a_water_epi = (
+                 epidermis_Jacques["water"] 
+                 * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 )
+mu_a_oxy_Hb_epi = ( 
+                  epidermis_Jacques["blood"] 
+                  * epidermis_Jacques["oxygen_saturation"] 
+                  * Bosschaart_2014_interp_oxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                  )
+mu_a_deoxy_epi = (
+                 epidermis_Jacques["blood"]
+                 * (1 - epidermis_Jacques["oxygen_saturation"]) 
+                 * Bosschaart_2014_interp_deoxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 )
+mu_a_fat_epi = (
+               epidermis_Jacques["fat"] 
+               * Veen_2004_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+               )
+mu_a_melanosome_epi = (
+                      epidermis_Jacques["melanosome"] 
+                      * Jacques_1998_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                      )
+mu_a_baseline_epi = (
+                    baseline_epi_frac
+                    * baseline_epi[lower_wavelenghth_bound : upper_wavelength_bound ]
+                    )
+# Dermis
+mu_a_water_derm = (
+                 dermis_Jacques["water"] 
+                 * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 )
+mu_a_oxy_Hb_derm = ( 
+                  dermis_Jacques["blood"] 
+                  * dermis_Jacques["oxygen_saturation"] 
+                  * Bosschaart_2014_interp_oxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                  )
+mu_a_deoxy_derm = (
+                 dermis_Jacques["blood"]
+                 * (1 - dermis_Jacques["oxygen_saturation"]) 
+                 * Bosschaart_2014_interp_deoxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 )
+mu_a_fat_derm = (
+               dermis_Jacques["fat"] 
+               * Veen_2004_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+               )
+mu_a_melanosome_derm = (
+                      dermis_Jacques["melanosome"] 
+                      * Jacques_1998_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                      )
+mu_a_baseline_derm = (
+                    baseline_derm_frac
+                    * baseline_derm[lower_wavelenghth_bound : upper_wavelength_bound ]
+                    )
+
+# Subcutaneous
+mu_a_water_sub = (
+                 subcutaneous_Jacques["water"] 
+                 * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 )
+mu_a_oxy_Hb_sub = ( 
+                  subcutaneous_Jacques["blood"] 
+                  * subcutaneous_Jacques["oxygen_saturation"] 
+                  * Bosschaart_2014_interp_oxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                  )
+mu_a_deoxy_sub = (
+                 subcutaneous_Jacques["blood"]
+                 * (1 - subcutaneous_Jacques["oxygen_saturation"]) 
+                 * Bosschaart_2014_interp_deoxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 )
+mu_a_fat_sub = (
+               subcutaneous_Jacques["fat"] 
+               * Veen_2004_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+               )
+mu_a_melanosome_sub = (
+                      subcutaneous_Jacques["melanosome"] 
+                      * Jacques_1998_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                      )
+mu_a_baseline_sub = (
+                    baseline_sub_frac
+                    * baseline_sub[lower_wavelenghth_bound : upper_wavelength_bound ]
+                    )
 
 
-    axes_i[1, 0].plot(norm_wavelength_nm[200 : 2000], Fewell_2019_interp_ser[200 : 2000])
-    axes_i[1, 0].set_xlabel("Wavelength (nm)")
-    axes_i[1, 0].set_ylabel("Absorption (1/mm)")
-    axes_i[1, 0].set_title(r"$\mu_{a,water}$" "\nM. P. Fewell 2019")
+fig_i, axes_i = plt.subplots(1,3, layout = "constrained")
+fig_i.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
+fig_i.suptitle("Weighted Tissue Constituent Absorption Spectra from 600-1100 nm")
 
+for ax in axes_i:
+    ax.set_xlabel("Wavelength (nm)")
+    ax.set_ylabel("Absorption (1/mm)")
 
-    axes_i[0, 1].plot(norm_wavelength_nm[200 : 2000], Bosschaart_2014_interp_oxy_ser[200 : 2000])
-    axes_i[0, 1].set_title(r"$\mu_{a, Hb_{O_2}}$""\nBosschaart, 2014")
-    axes_i[0, 1].set_xlabel("Wavelength (nm)")
-    axes_i[0, 1].set_ylabel("Absorption (1/mm)")
+# Epidermis
+axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_water_epi, 
+                    label = r"$\mu_{a,water}$" "\nM. P. Fewell 2019"
+                    )
+axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_oxy_Hb_epi, 
+                    label = r"$\mu_{a, Hb_{O_2}}$""\nBosschaart, 2014"
+                    )
+axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_deoxy_epi, 
+                    label = r"$\mu_{a, Hb}$""\nBosschaart, 2014"
+                    )
+axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_fat_epi, 
+                    label = r"$\mu_{a, fat}$""\nVeen 2004"
+                    )
+axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_melanosome_epi, 
+                    label = r"$\mu_{a, melanosome}$""\nJacques 1998"
+                    )
+axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_baseline_epi, 
+                    label = "baseline""\nMoca 2018",
+                    color = "pink"
+                    )
+# Dermis
+axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_water_derm 
+                    )
+axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_oxy_Hb_derm 
+                    )
+axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_deoxy_derm
+                    )
+axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_fat_derm
+                    )
+axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_melanosome_derm
+                    )
+axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_baseline_derm,
+                    color = "pink"
+                    )
 
+# Subcutaneous
+axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_water_sub
+                    )
+axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_oxy_Hb_sub
+                    )
+axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_deoxy_sub
+                    )
+axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_fat_sub
+                    )
+axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_melanosome_sub
+                    )
+axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+                    mu_a_baseline_sub,
+                    color = "pink"
+                    )
 
-    axes_i[1, 1].plot(norm_wavelength_nm[200 : 2000], Bosschaart_2014_interp_deoxy_ser[200 : 2000])
-    axes_i[1, 1].set_title(r"$\mu_{a, Hb}$""\nBosschaart, 2014")
-    axes_i[1, 1].set_xlabel("Wavelength (nm)")
-    axes_i[1, 1].set_ylabel("Absorption (1/mm)")
+fig_i.legend()
 
-    axes_i[0, 2].plot(norm_wavelength_nm[200 : 2000], Veen_2004_interp_ser[200 : 2000])
-    axes_i[0, 2].set_title(r"$\mu_{a, fat}$""\nVeen 2004")
-    axes_i[0, 2].set_xlabel("Wavelength (nm)")
-    axes_i[0, 2].set_ylabel("Absorption (1/mm)")
-
-
-    axes_i[1, 2].plot(norm_wavelength_nm[200 : 2000], Jacques_1998_interp_ser[200 : 2000])
-    axes_i[1, 2].set_title(r"$\mu_{a, melanin}$""\nJacques 1998")
-    axes_i[1, 2].set_xlabel("Wavelength (nm)")
-    axes_i[1, 2].set_ylabel("Absorption (1/mm)")
-
-    plt.show()
 
 
 # Using Jacques 2013 generic tissue model
-# Per layer: (B * S * mu_a_HbO2) + (B * (1-S) * mu_a_Hb) + (W * mu_a_water) + (F * mu_a_fat) + (M * mu_a_melanin)
-# where B, S, W, F, and M represent blood, oxygen, water, fat, and melanin compostion of tissue respectively
+# Per layer: (B * S * mu_a_HbO2) + (B * (1-S) * mu_a_Hb) + (W * mu_a_water) + (F * mu_a_fat) + (M * mu_a_melanosome) + baseline
+# where B, S, W, F, and M represent blood, oxygen, water, fat, and melanosome compostion of tissue respectively
 
 def mu_a_epi (
     B: float,

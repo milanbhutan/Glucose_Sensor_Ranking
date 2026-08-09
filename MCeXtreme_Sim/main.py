@@ -6,36 +6,35 @@ import layer
 from sklearn.metrics import mean_squared_error
 
 
-# From Jacques 2013
-epidermis = {
-    "blood" : 0,
-    "oxygen_saturation" : 0,
-    "water" : 0.20,
-    "fat" : 0,
-    "melansome" : 0.025
-}
-
-dermis = {
-    "blood" : 0.0020,
-    "oxygen_saturation" : 0.39,
-    "water" : 0.65,
-    "fat" : 0,
-    "melansome" : 0
-}
-
-subcutaneous = {
-    "blood" : 0.00634,
-    "oxygen_saturation" : 0.60,
-    "water" : 0.2184,
-    "fat" : 0.6433,
-    "melansome" : 0
-}
-
 norm_wavelength_nm = np.arange(0, 2001, 1)
 
-epidermis_mu_a_sim = layer.mu_a_epi(epidermis["blood"], epidermis["oxygen_saturation"], epidermis["water"], epidermis["fat"], epidermis["melansome"])
-dermis_mu_a_sim = layer.mu_a_derm(dermis["blood"], dermis["oxygen_saturation"], dermis["water"], dermis["fat"], dermis["melansome"])
-subcutaneous_mu_a_sim = layer.mu_a_sub(subcutaneous["blood"], subcutaneous["oxygen_saturation"], subcutaneous["water"], subcutaneous["fat"], subcutaneous["melansome"])
+epidermis_mu_a_sim = layer.mu_a_epi(layer.epidermis_Jacques["blood"], 
+                                    layer.epidermis_Jacques["oxygen_saturation"], 
+                                    layer.epidermis_Jacques["water"], 
+                                    layer.epidermis_Jacques["fat"], 
+                                    layer.epidermis_Jacques["melanosome"]
+                                    )
+
+dermis_mu_a_sim = layer.mu_a_derm(layer.dermis_Jacques["blood"], 
+                                  layer.dermis_Jacques["oxygen_saturation"], 
+                                  layer.dermis_Jacques["water"], 
+                                  layer.dermis_Jacques["fat"], 
+                                  layer.dermis_Jacques["melanosome"]
+                                  )
+
+subcutaneous_mu_a_sim = layer.mu_a_sub(layer.subcutaneous_Jacques["blood"], 
+                                       layer.subcutaneous_Jacques["oxygen_saturation"], 
+                                       layer.subcutaneous_Jacques["water"], 
+                                       layer.subcutaneous_Jacques["fat"], 
+                                       layer.subcutaneous_Jacques["melanosome"]
+                                       )
+
+subcutaneous_mu_a_sim_Ganesan = layer.mu_a_sub(layer.subcutaneous_Ganesan["blood"], 
+                                               layer.subcutaneous_Ganesan["oxygen_saturation"],
+                                               layer.subcutaneous_Ganesan["water"],
+                                               layer.subcutaneous_Ganesan["fat"],
+                                               layer.subcutaneous_Ganesan["melanosome"]
+                                               )
 
 # For scattering coefficent
 # epidermis_g = 0.9
@@ -169,19 +168,20 @@ for ax in axes_mu_a:
     ax.tick_params(axis = "both", labelsize = 18)
 
 # Simulated absorption spectra plots
-axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength_bound:1060], epidermis_mu_a_sim[lower_wavelength_bound:1060], label = "Analytical Model")
+axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength_bound:1060], epidermis_mu_a_sim[lower_wavelength_bound:1060], label = "Analytical Models", color = "red")
 axes_mu_a[0].set_title(r"$\mu_a$ epidermis", fontsize = 18)
 
-axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength_bound:1060], dermis_mu_a_sim[lower_wavelength_bound:1060])
+axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength_bound:1060], dermis_mu_a_sim[lower_wavelength_bound:1060], color = "red")
 axes_mu_a[1].set_title(r"$\mu_a$ dermis", fontsize = 18)
 
-axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength_bound:1060], subcutaneous_mu_a_sim[lower_wavelength_bound:1060])
+axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength_bound:1060], subcutaneous_mu_a_sim[lower_wavelength_bound:1060], color = "red")
+axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength_bound:1060], subcutaneous_mu_a_sim_Ganesan[lower_wavelength_bound:1060], color = "red")
 axes_mu_a[2].set_title(r"$\mu_a$ subcutaneous", fontsize = 18)
 
 # Experimental absorption spectra plots
-axes_mu_a[0].plot(df_Shimojo_epi_mu_a.loc[lower_wavelength_bound:1060], label = "Shimojo 2020")
-axes_mu_a[1].plot(df_Shimojo_derm_mu_a.loc[lower_wavelength_bound:1060])
-axes_mu_a[2].plot(df_Shimojo_sub_mu_a.loc[lower_wavelength_bound:1060])
+axes_mu_a[0].plot(df_Shimojo_epi_mu_a.loc[lower_wavelength_bound:1060], label = "Shimojo 2020", color = "orange")
+axes_mu_a[1].plot(df_Shimojo_derm_mu_a.loc[lower_wavelength_bound:1060], color = "orange")
+axes_mu_a[2].plot(df_Shimojo_sub_mu_a.loc[lower_wavelength_bound:1060], color = "orange")
 axes_mu_a[2].plot(df_Ganesan_2016_mu_a.loc[lower_wavelength_bound:1000], label = "Ganesan 2016")
 
 fig_mu_a.legend(fontsize = 10)
