@@ -36,10 +36,13 @@ subcutaneous_mu_a_sim_Ganesan = layer.mu_a_sub(layer.subcutaneous_Ganesan["blood
                                                layer.subcutaneous_Ganesan["melanosome"]
                                                )
 
+
+
 # For scattering coefficent
 # epidermis_g = 0.9
 # dermis_g = 0.9
 # subcutaneous_g = 0.9
+
 
 # For reduced scattering coefficent
 epidermis_g = 0
@@ -57,75 +60,116 @@ subcutaneous_n = 1.4
 
 # Obtain data for experimental absorption and scattering spectras for three-layer tissue model from Shimojo 2020
 
+# Absorption Data
 df_Shimojo_epi_mu_a = (
-    pd.read_csv("Exp_Absorption/epidermis_absorption.csv", comment = "#")
+    pd.read_csv("Exp_Absorption/shimojo_epidermis_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 epidermis_mu_a_exp = df_Shimojo_epi_mu_a["coefficient_mm^-1"]
 
+df_Salomatina_epi_mu_a = (
+    pd.read_csv("Exp_Absorption/salomatina_epidermis_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
 df_Shimojo_derm_mu_a = (
-    pd.read_csv("Exp_Absorption/dermis_absorption.csv", comment = "#")
+    pd.read_csv("Exp_Absorption/shimojo_dermis_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 dermis_mu_a_exp = df_Shimojo_derm_mu_a["coefficient_mm^-1"]
 
+df_Jonasson_derm_mu_a = (
+    pd.read_csv("Exp_Absorption/jonasson_lower_dermis_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
+df_Salomatina_derm_mu_a = (
+    pd.read_csv("Exp_Absorption/salomatina_dermis_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
 df_Shimojo_sub_mu_a = (
-    pd.read_csv("Exp_Absorption/subcutaneous_absorption.csv", comment = "#")
+    pd.read_csv("Exp_Absorption/shimojo_subcutaneous_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 subcutaneous_mu_a_exp = df_Shimojo_sub_mu_a["coefficient_mm^-1"]
 
-
-df_Shimojo_epi_mu_s = (
-    pd.read_csv("Exp_Scattering/epidermis_reduced_scattering.csv", comment = "#")
-    .set_index("wavelength_nm")
-    .sort_index()
-)
-epidermis_mu_s_exp = df_Shimojo_epi_mu_s["coefficient_mm^-1"]
-
-df_Shimojo_derm_mu_s = (
-    pd.read_csv("Exp_Scattering/dermis_reduced_scattering.csv", comment = "#")
-    .set_index("wavelength_nm")
-    .sort_index()
-)
-dermis_mu_s_exp = df_Shimojo_derm_mu_s["coefficient_mm^-1"]
-
-df_Shimojo_sub_mu_s = (
-    pd.read_csv("Exp_Scattering/subcutaneous_reduced_scattering.csv", comment = "#")
-    .set_index("wavelength_nm")
-    .sort_index()
-)
-subcutaneous_mu_s_exp = df_Shimojo_sub_mu_s["coefficient_mm^-1"]
-
-
-# Ganesan 2016 subcutaneous data
 df_Ganesan_2016_mu_a = (
-    pd.read_csv("Exp_Absorption/ganesan_2016_subcutaneous_absorption.csv", comment = "#")
+    pd.read_csv("Exp_Absorption/ganesan_subcutaneous_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 gan_subcutaneous_mu_a_exp = df_Ganesan_2016_mu_a["mu_a_mm^-1"]
 
+df_Salomatina_sub_mu_a = (
+    pd.read_csv("Exp_Absorption/salomatina_subcutaneous_fat_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
+# Scattering Data
+df_Shimojo_epi_mu_s = (
+    pd.read_csv("Exp_Scattering/shimojo_epidermis_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+epidermis_mu_s_exp = df_Shimojo_epi_mu_s["coefficient_mm^-1"]
+
+df_Salomatina_epi_mu_s = (
+    pd.read_csv("Exp_Scattering/salomatina_2006_epidermis_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
+df_Shimojo_derm_mu_s = (
+    pd.read_csv("Exp_Scattering/shimojo_dermis_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+dermis_mu_s_exp = df_Shimojo_derm_mu_s["coefficient_mm^-1"]
+
+df_Salomatina_derm_mu_s = (
+    pd.read_csv("Exp_Scattering/salomatina_2006_dermis_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
+df_Shimojo_sub_mu_s = (
+    pd.read_csv("Exp_Scattering/shimojo_subcutaneous_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+subcutaneous_mu_s_exp = df_Shimojo_sub_mu_s["coefficient_mm^-1"]
+
 df_Ganesan_2016_mu_s = (
-    pd.read_csv("Exp_Scattering/ganesan_2016_subcutaneous_reduced_scattering.csv", comment = "#")
+    pd.read_csv("Exp_Scattering/ganesan_subcutaneous_reduced_scattering.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 gan_subcutaneous_mu_s_exp = df_Ganesan_2016_mu_s["mu_s_prime_mm^-1"]
 
+df_Salomatina_sub_mu_s = (
+    pd.read_csv("Exp_Scattering/salomatina_2006_subcutaneous_fat_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
 
-lower_wavelength_bound = 600
+lower_wavelength = 600
+upper_wavelength = 1060
 
 # Calculating RMSE
-epidermis_mu_a_exp_align, epidermis_mu_a_sim_align = epidermis_mu_a_exp.align(epidermis_mu_a_sim[lower_wavelength_bound:1060], join = "inner")
-dermis_mu_a_exp_align, dermis_mu_a_sim_align = dermis_mu_a_exp.align(dermis_mu_a_sim[lower_wavelength_bound:1060], join = "inner")
-subcutaneous_mu_a_exp_align, subcutaneous_mu_a_sim_align = subcutaneous_mu_a_exp.align(subcutaneous_mu_a_sim[lower_wavelength_bound:1060], join = "inner")
-epidermis_mu_s_exp_align, epidermis_mu_s_sim_align = epidermis_mu_s_exp.align(epidermis_mu_s_sim[lower_wavelength_bound:1060], join = "inner")
-dermis_mu_s_exp_align, dermis_mu_s_sim_align = dermis_mu_s_exp.align(dermis_mu_s_sim[lower_wavelength_bound:1060], join = "inner")
-subcutaneous_mu_s_exp_align, subcutaneous_mu_s_sim_align = subcutaneous_mu_s_exp.align(subcutaneous_mu_s_sim[lower_wavelength_bound:1060], join = "inner")
+epidermis_mu_a_exp_align, epidermis_mu_a_sim_align = epidermis_mu_a_exp.align(epidermis_mu_a_sim[lower_wavelength:upper_wavelength], join = "inner")
+dermis_mu_a_exp_align, dermis_mu_a_sim_align = dermis_mu_a_exp.align(dermis_mu_a_sim[lower_wavelength:upper_wavelength], join = "inner")
+subcutaneous_mu_a_exp_align, subcutaneous_mu_a_sim_align = subcutaneous_mu_a_exp.align(subcutaneous_mu_a_sim[lower_wavelength:upper_wavelength], join = "inner")
+epidermis_mu_s_exp_align, epidermis_mu_s_sim_align = epidermis_mu_s_exp.align(epidermis_mu_s_sim[lower_wavelength:upper_wavelength], join = "inner")
+dermis_mu_s_exp_align, dermis_mu_s_sim_align = dermis_mu_s_exp.align(dermis_mu_s_sim[lower_wavelength:upper_wavelength], join = "inner")
+subcutaneous_mu_s_exp_align, subcutaneous_mu_s_sim_align = subcutaneous_mu_s_exp.align(subcutaneous_mu_s_sim[lower_wavelength:upper_wavelength], join = "inner")
 
 print(epidermis_mu_a_exp_align)
 print("====")
@@ -168,21 +212,27 @@ for ax in axes_mu_a:
     ax.tick_params(axis = "both", labelsize = 18)
 
 # Simulated absorption spectra plots
-axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength_bound:1060], epidermis_mu_a_sim[lower_wavelength_bound:1060], label = "Analytical Models", color = "red")
+axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], epidermis_mu_a_sim[lower_wavelength:upper_wavelength], label = "Analytical Models", color = "red")
 axes_mu_a[0].set_title(r"$\mu_a$ epidermis", fontsize = 18)
 
-axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength_bound:1060], dermis_mu_a_sim[lower_wavelength_bound:1060], color = "red")
+axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], dermis_mu_a_sim[lower_wavelength:upper_wavelength], color = "red")
 axes_mu_a[1].set_title(r"$\mu_a$ dermis", fontsize = 18)
 
-axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength_bound:1060], subcutaneous_mu_a_sim[lower_wavelength_bound:1060], color = "red")
-axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength_bound:1060], subcutaneous_mu_a_sim_Ganesan[lower_wavelength_bound:1060], color = "red")
+axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], subcutaneous_mu_a_sim[lower_wavelength:upper_wavelength], color = "red")
+axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], subcutaneous_mu_a_sim_Ganesan[lower_wavelength:upper_wavelength], color = "red")
 axes_mu_a[2].set_title(r"$\mu_a$ subcutaneous", fontsize = 18)
 
 # Experimental absorption spectra plots
-axes_mu_a[0].plot(df_Shimojo_epi_mu_a.loc[lower_wavelength_bound:1060], label = "Shimojo 2020", color = "orange")
-axes_mu_a[1].plot(df_Shimojo_derm_mu_a.loc[lower_wavelength_bound:1060], color = "orange")
-axes_mu_a[2].plot(df_Shimojo_sub_mu_a.loc[lower_wavelength_bound:1060], color = "orange")
-axes_mu_a[2].plot(df_Ganesan_2016_mu_a.loc[lower_wavelength_bound:1000], label = "Ganesan 2016")
+axes_mu_a[0].plot(df_Shimojo_epi_mu_a.loc[lower_wavelength:upper_wavelength], label = "Shimojo 2020", color = "orange", linestyle = "--")
+axes_mu_a[0].plot(df_Salomatina_epi_mu_a.loc[lower_wavelength:upper_wavelength], label = "Salomatina 2006", color = "green", linestyle = "--")
+
+axes_mu_a[1].plot(df_Shimojo_derm_mu_a.loc[lower_wavelength:upper_wavelength], color = "orange", linestyle = "--")
+axes_mu_a[1].plot(df_Jonasson_derm_mu_a.loc[lower_wavelength:upper_wavelength], color = "purple", linestyle = "--")
+axes_mu_a[1].plot(df_Salomatina_derm_mu_a.loc[lower_wavelength:upper_wavelength], color = "green", linestyle = "--")
+
+axes_mu_a[2].plot(df_Shimojo_sub_mu_a.loc[lower_wavelength:upper_wavelength], color = "orange", linestyle = "--")
+axes_mu_a[2].plot(df_Ganesan_2016_mu_a.loc[lower_wavelength:upper_wavelength], color = "blue", label = "Ganesan 2016", linestyle = "--")
+axes_mu_a[2].plot(df_Salomatina_sub_mu_a.loc[lower_wavelength:upper_wavelength], color = "green", linestyle = "--")
 
 fig_mu_a.legend(fontsize = 10)
 
@@ -198,20 +248,25 @@ for ax in axes_mu_s:
     ax.tick_params(axis = "both", labelsize = 18)
 
 # Simulated reduced scattering coefficients
-axes_mu_s[0].plot(norm_wavelength_nm[lower_wavelength_bound:1060], epidermis_mu_s_sim[lower_wavelength_bound:1060], label = "Analytical Model")
+axes_mu_s[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], epidermis_mu_s_sim[lower_wavelength:upper_wavelength], label = "Analytical Model")
 axes_mu_s[0].set_title(r"$\mu_s^'$ epidermis", fontsize = 18)
 
-axes_mu_s[1].plot(norm_wavelength_nm[lower_wavelength_bound:1060], dermis_mu_s_sim[lower_wavelength_bound:1060])
+axes_mu_s[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], dermis_mu_s_sim[lower_wavelength:upper_wavelength])
 axes_mu_s[1].set_title(r"$\mu^'_s$ dermis", fontsize = 18)
 
-axes_mu_s[2].plot(norm_wavelength_nm[lower_wavelength_bound:1060], subcutaneous_mu_s_sim[lower_wavelength_bound:1060])
+axes_mu_s[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], subcutaneous_mu_s_sim[lower_wavelength:upper_wavelength])
 axes_mu_s[2].set_title(r"$\mu^'_s$ subcutaneous tissue", fontsize = 18)
 
 # Experimental reduced scattering coefficients
-axes_mu_s[0].plot(df_Shimojo_epi_mu_s.loc[lower_wavelength_bound:1060], label = "Experimental Data: Shimojo 2020")
-axes_mu_s[1].plot(df_Shimojo_derm_mu_s.loc[lower_wavelength_bound:1060])
-axes_mu_s[2].plot(df_Shimojo_sub_mu_s.loc[lower_wavelength_bound:1060])
-axes_mu_s[2].plot(df_Ganesan_2016_mu_s.loc[lower_wavelength_bound:1000], label = "Ganesan 2016")
+axes_mu_s[0].plot(df_Shimojo_epi_mu_s.loc[lower_wavelength:upper_wavelength], label = "Shimojo 2020",color = "orange", linestyle = "--")
+axes_mu_s[0].plot(df_Salomatina_epi_mu_s.loc[lower_wavelength:upper_wavelength], label = "Salomatina 2006", color = "green", linestyle = "--")
+
+axes_mu_s[1].plot(df_Shimojo_derm_mu_s.loc[lower_wavelength:upper_wavelength],color = "orange", linestyle = "--")
+axes_mu_s[1].plot(df_Salomatina_derm_mu_s.loc[lower_wavelength:upper_wavelength], color = "green", linestyle = "--")
+
+axes_mu_s[2].plot(df_Shimojo_sub_mu_s.loc[lower_wavelength:upper_wavelength], color = "orange", linestyle = "--")
+axes_mu_s[2].plot(df_Ganesan_2016_mu_s.loc[lower_wavelength:upper_wavelength],color = "purple", label = "Ganesan 2016", linestyle = "--")
+axes_mu_s[2].plot(df_Salomatina_sub_mu_s.loc[lower_wavelength:upper_wavelength], color = "green", linestyle = "--")
 
 fig_mu_s.legend(fontsize = 10)
 
