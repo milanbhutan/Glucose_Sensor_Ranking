@@ -110,14 +110,70 @@ upper_wavelength_bound = 1100
 epidermis_Jacques = {
     "blood" : 0,
     "oxygen_saturation" : 0,
-    "water" : 0.20,
+    "water" : 0,
     "fat" : 0,
     "melanosome" : 0.025,
+}
+
+epidermis_Jolivot_low_mel ={
+    "blood" : 0,
+    "oxygen_saturation" : 0,
+    "water" : 0,
+    "fat" : 0,
+    "melanosome": 0.013
+}
+
+epidermis_Jolivot_SPT_II ={
+    "blood" : 0,
+    "oxygen_saturation" : 0,
+    "water" : 0,
+    "fat" : 0,
+    "melanosome": 0.101 # was 0.45
+}
+
+epidermis_Jolivot_SPT_III ={
+    "blood" : 0,
+    "oxygen_saturation" : 0,
+    "water" : 0,
+    "fat" : 0,
+    "melanosome": 0.187 # was 0.45
+}
+
+epidermis_Jolivot_SPT_IV ={
+    "blood" : 0,
+    "oxygen_saturation" : 0,
+    "water" : 0,
+    "fat" : 0,
+    "melanosome": 0.265 # was 0.45
+}
+
+epidermis_Jolivot_SPT_V ={
+    "blood" : 0,
+    "oxygen_saturation" : 0,
+    "water" : 0,
+    "fat" : 0,
+    "melanosome": 0.358 # was 0.45
+}
+
+epidermis_Jolivot_SPT_VI = {
+    "blood" : 0,
+    "oxygen_saturation" : 0,
+    "water" : 0,
+    "fat" : 0,
+    "melanosome": 0.447 # was 0.45
 }
 
 dermis_Jacques = {
     "blood" : 0.0020,
     "oxygen_saturation" : 0.39,
+    "water" : 0.65,
+    "fat" : 0,
+    "melanosome" : 0,
+}
+
+lower_dermis_Jonasson = {
+    "blood" : 0.0075,
+    "oxygen_saturation" : 0.50,
     "water" : 0.65,
     "fat" : 0,
     "melanosome" : 0,
@@ -139,6 +195,8 @@ subcutaneous_Ganesan = {
     "melanosome" : 0,
 }
 
+
+
 # Basline absorption effect
 baseline_epi = (8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2) + 0.0244)
 baseline_epi_frac = (1 
@@ -148,7 +206,7 @@ baseline_epi_frac = (1
                      - epidermis_Jacques["melanosome"]
                      ) 
 
-baseline_derm = (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
+baseline_derm = (dermis_Jacques["water"] / 0.65 ) * (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
 baseline_derm_frac = (1 
                      - dermis_Jacques["blood"] 
                      - dermis_Jacques["fat"] 
@@ -156,7 +214,7 @@ baseline_derm_frac = (1
                      - dermis_Jacques["melanosome"]
                      ) 
 
-baseline_sub = (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
+baseline_sub = ((subcutaneous_Jacques["water"] / 0.65 )) * (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
 baseline_sub_frac = (1 
                      - subcutaneous_Jacques["blood"] 
                      - subcutaneous_Jacques["fat"] 
@@ -171,7 +229,7 @@ baseline_sub_frac = (1
 # Epidermis
 mu_a_water_epi = (
                  epidermis_Jacques["water"] 
-                 * L_Kou_1993_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                  )
 mu_a_oxy_Hb_epi = ( 
                   epidermis_Jacques["blood"] 
@@ -198,7 +256,7 @@ mu_a_baseline_epi = (
 # Dermis
 mu_a_water_derm = (
                  dermis_Jacques["water"] 
-                 * L_Kou_1993_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                  )
 mu_a_oxy_Hb_derm = ( 
                   dermis_Jacques["blood"] 
@@ -226,7 +284,7 @@ mu_a_baseline_derm = (
 # Subcutaneous
 mu_a_water_sub = (
                  subcutaneous_Jacques["water"] 
-                 * L_Kou_1993_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                  )
 mu_a_oxy_Hb_sub = ( 
                   subcutaneous_Jacques["blood"] 
@@ -265,15 +323,15 @@ for ax in axes_i:
 axes_i[0].set_title("Epidermis", fontsize = 18)
 axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
                     mu_a_water_epi, 
-                    label = r"$\mu_{a,water}$" "\nL. Kou. 1993",
+                    label = r"$\mu_{a,water}$" "\nFewell 2019",
                     )
 axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
                     mu_a_oxy_Hb_epi, 
-                    label = r"$\mu_{a, Hb_{O_2}}$""\nBosschaart, 2014",
+                    label = r"$\mu_{a, Hb_{O_2}}$""\nBosschaart 2014",
                     )
 axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
                     mu_a_deoxy_epi, 
-                    label = r"$\mu_{a, Hb}$""\nBosschaart, 2014",
+                    label = r"$\mu_{a, Hb}$""\nBosschaart 2014",
                     )
 axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
                     mu_a_fat_epi, 
@@ -351,7 +409,7 @@ def mu_a_epi (
     total_mu_a = ( 
     (B * S * Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * Bosschaart_2014_interp_deoxy_ser)
-    + (W * L_Kou_1993_interp_ser) 
+    + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
     + ((1 - (B + W + F + M)) * ((8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2)) + 0.0244)) # baseline tissue absorption
@@ -369,10 +427,10 @@ def mu_a_derm (
     total_mu_a = ( 
     (B * S * Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * Bosschaart_2014_interp_deoxy_ser)
-    + (W * L_Kou_1993_interp_ser) 
+    + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + ((1 - (B + W + F + M)) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
+    + ((1 - (B + W + F + M)) * (W / 0.65) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
     )
     return total_mu_a
 
@@ -387,10 +445,10 @@ def mu_a_sub (
     total_mu_a = ( 
     (B * S * Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * Bosschaart_2014_interp_deoxy_ser)
-    + (W * L_Kou_1993_interp_ser) 
+    + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + ((1 - (B + W + F + M)) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
+    + ((1 - (B + W + F + M)) * (W / 0.65) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
     )
     return total_mu_a
 
@@ -406,7 +464,7 @@ def mu_s_layer(
             mu_s_rd = 4.53 * (norm_wavelength_nm[1:] / 500) ** -1.292
             mu_s = mu_s_rd/(1-g)
         case("subcutaneous"):
-            mu_s_rd = 1.37 * (norm_wavelength_nm[1:] / 500) ** -0.385
+            mu_s_rd = 1.84 * (norm_wavelength_nm[1:] / 500) ** -0.672
             mu_s = mu_s_rd/(1-g)
         case _:
             mu_s = 0
