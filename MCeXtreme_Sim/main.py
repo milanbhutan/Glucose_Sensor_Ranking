@@ -445,7 +445,7 @@ prop = [
 ]
 
 
-Nx, Ny, Nz = 60, 60, 60
+Nx, Ny, Nz = 160, 160, 60
 
 vol = np.zeros([Nx, Ny, Nz])
 vol[:,:,0:3] = 1
@@ -454,13 +454,13 @@ vol[:,:,13:60] = 3
 
 
 sim_config = {
-    "nphoton": 1e7, # 1e9: 57 seconds
+    "nphoton": 1e8, # 1e9: 57 seconds
     "vol": vol,
     "prop": prop,
-    "srcpos": [30, 30, 0],
+    "srcpos": [40, 30, 0],
     "srcdir": [0, 0, 1],
-    "detdir": [0, 0, 1, 1],
-    "detpos": [[50, 30, 0, 10]],
+    "detdir": [0, 0, 1, 20],
+    "detpos": [[120, 30, 0, 20]],
     "tstart": 0,
     "tend": 10e-9,
     "tstep": 1e-9,
@@ -487,24 +487,20 @@ replay_config["debuglevel"] = "M"
 replay_out = pmcx.run(replay_config)
 
 
-
 jacobian_traj = replay_out["traj"]
 jacobian_PMDF = replay_out["flux"]
 
-PMDF = np.sum(jacobian_PMDF, axis = 3)
-PMDF_epi = np.sum(PMDF[vol == 1])
-PMDF_derm = np.sum(PMDF[vol == 2])
-PMDF_sub = np.sum(PMDF[vol == 3])
 
-PMDF_total = PMDF_epi + PMDF_derm + PMDF_sub
 
-PMDF_epi_per = 100 * (PMDF_epi / PMDF_total)
-PMDF_derm_per = 100 * (PMDF_derm / PMDF_total)
-PMDF_sub_per = 100 * (PMDF_sub / PMDF_total)
+# photon_ID = jacobian_traj[0, :].view(np.uint32)
+# photon_ID_unique = np.unique(photon_ID)
 
-print(f"{PMDF_epi_per:.2f} %")
-print(f"{PMDF_derm_per:.2f} %")
-print(f"{PMDF_sub_per:.2f} %")
+
+# jacobian_traj_1_mask = photon_ID == photon_ID_unique[0] 
+# print(jacobian_traj_1_mask)
+# jacobian_traj_1 = jacobian_traj[:, jacobian_traj_1_mask]
+
+# print(jacobian_traj_1)
 
 # avg_path = pmcx.meanpath(sim_out["detp"], np.asarray(prop))
 # print(avg_path)
@@ -530,37 +526,40 @@ axes_flux[0].arrow(sim_config["detpos"][0][0], sim_config["detpos"][0][2] - 1, 0
 axes_flux[0].legend()
 axes_flux[0].imshow(np.log10(np.abs(flux_1_yslice.T) + 1e-20))
 
-jacobian_1 = jacobian_PMDF[:, :, :, 0]
+jacobian_1 = np.sum(jacobian_PMDF, axis = 3)
 jacobian_1_slice = jacobian_1[:, 30, :]
+axes_flux[1].set_title("Spatial Photon Sensitivity")
+axes_flux[1].set_xlabel("x-axis (voxels)")
+axes_flux[1].set_ylabel("z-axis (voxels)")
+axes_flux[1].axhline(3, linestyle = "--", color = "black")
+axes_flux[1].axhline(13, linestyle = "--", color = "black")
+axes_flux[1].text(1, 1.5, "epidermis")
+axes_flux[1].text(1, 8, "dermis")
+axes_flux[1].text(1, 30, "subcutaneous")
+axes_flux[1].arrow(sim_config["srcpos"][0], sim_config["srcpos"][2] - 1, 0, 2, head_width = 1, head_length = 1, color = "red", label = "source")
+axes_flux[1].arrow(sim_config["detpos"][0][0], sim_config["detpos"][0][2] - 1, 0, 2, head_width = 1, head_length = 1, color = "blue", label = "detector" )
 
-# jacobian_y = jacobian_y * (jacobian_y == 0)
-
+axes_flux[1].legend()
 axes_flux[1].imshow(np.log10(np.abs(jacobian_1_slice.T) + 1e-20))
 
 
+# axes_flux[2].scatter(jacobian_traj[1, 0:100000], jacobian_traj[3, 0:100000])
+# axes_flux[2].invert_yaxis()
 
+PMDF = np.sum(jacobian_PMDF, axis = 3)
+PMDF_epi = np.sum(PMDF[vol == 1])
+PMDF_derm = np.sum(PMDF[vol == 2])
+PMDF_sub = np.sum(PMDF[vol == 3])
 
+PMDF_total = PMDF_epi + PMDF_derm + PMDF_sub
 
+PMDF_epi_per = 100 * (PMDF_epi / PMDF_total)
+PMDF_derm_per = 100 * (PMDF_derm / PMDF_total)
+PMDF_sub_per = 100 * (PMDF_sub / PMDF_total)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+print(f"{PMDF_epi_per:.2f} %")
+print(f"{PMDF_derm_per:.2f} %")
+print(f"{PMDF_sub_per:.2f} %")
 
 
 
