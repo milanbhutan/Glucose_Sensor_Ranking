@@ -156,6 +156,12 @@ df_Simpson_derm_mu_a = (
     .sort_index()
 )
 
+df_Shimojo_derm_mu_a = (
+    pd.read_csv("Exp_Absorption/shimojo_dermis_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
 df_Ganesan_sub_mu_a = (
     pd.read_csv("Exp_Absorption/ganesan_subcutaneous_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
@@ -332,11 +338,6 @@ axes_mu_a[2].set_title(r"$\mu_a$ subcutaneous", fontsize = 18)
 
 
 # Experimental absorption spectra plots
-axes_mu_a[0].plot(df_Shimojo_epi_mu_a.loc[lower_wavelength:upper_wavelength], 
-                  color = "cyan", 
-                  label = "Shimojo 2020",
-                  linestyle = "--")
-
 axes_mu_a[0].plot(df_Wan_epi_mu_a.loc[lower_wavelength:upper_wavelength], 
                   color = "orange", 
                   label = "Wan 1981: Dark Skin",
