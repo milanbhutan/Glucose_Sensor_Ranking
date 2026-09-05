@@ -18,11 +18,13 @@ for i in range(200):
     dermis_blood = rng.uniform(0.002, 0.0075)
     dermis_oxygen_saturation = rng.uniform(0.39, 0.50)
     dermis_water = rng.uniform(0.60, 0.70)
+    dermis_gamma = rng.uniform(0.3, 0.7)
     dermis_mu_a_sim_set.append(layer.mu_a_derm(dermis_blood, 
                                     dermis_oxygen_saturation, 
                                     dermis_water, 
                                     layer.dermis_Jacques["fat"], 
-                                    layer.dermis_Jacques["melanosome"]
+                                    layer.dermis_Jacques["melanosome"],
+                                    dermis_gamma,
     )
     )
 
@@ -311,13 +313,22 @@ axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength],
                   dermis_mu_a_sim_Jacques[lower_wavelength:upper_wavelength], 
                   color = "red")
 
+mu_a_derm_660 = []
+mu_a_derm_940 = []
+
 for i in dermis_mu_a_sim_set:
     axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
             i[lower_wavelength:upper_wavelength], 
             color = "red",
             alpha = 0.08
             )
+    mu_a_derm_660.append(i[660])
+    mu_a_derm_940.append(i[940])
 
+print(max(mu_a_derm_660))
+print(min(mu_a_derm_660))
+print(max(mu_a_derm_940))
+print(min(mu_a_derm_940))
 
 axes_mu_a[1].set_title(r"$\mu_a$ dermis",  fontsize = 18)
 
@@ -342,10 +353,17 @@ axes_mu_a[0].plot(df_Wan_epi_mu_a.loc[lower_wavelength:upper_wavelength],
                   color = "orange", 
                   label = "Wan 1981: Dark Skin",
                   linestyle = "--")
+axes_mu_a[0].plot(df_Shimojo_epi_mu_a.loc[lower_wavelength:upper_wavelength], 
+                  color = "black", 
+                  label = "Shimojo 2020",
+                  linestyle = "--")
 
 axes_mu_a[1].plot(df_Simpson_derm_mu_a.loc[lower_wavelength:upper_wavelength], 
                   color = "green",
                   linestyle = "--")
+# axes_mu_a[1].plot(df_Shimojo_derm_mu_a.loc[lower_wavelength:upper_wavelength], 
+#                   color = "black",
+#                   linestyle = "--")
 
 axes_mu_a[2].plot(df_Ganesan_sub_mu_a.loc[lower_wavelength:upper_wavelength], 
                   color = "black", 
@@ -355,6 +373,7 @@ axes_mu_a[2].plot(df_Simpson_sub_mu_a.loc[lower_wavelength:upper_wavelength],
                   color = "green", 
                   label = "Simpson 1998", 
                   linestyle = "--")
+
 
 fig_mu_a.legend(fontsize = 10)
 

@@ -408,13 +408,16 @@ def mu_a_epi (
     M: float,
 
 ) -> pd.Series:
+    R = 1 - (B + W + F + M)
+    if(R < 0):
+        R = 0
     total_mu_a = ( 
     (B * S * Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * Bosschaart_2014_interp_deoxy_ser)
     + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + ((1 - (B + W + F + M)) * ((8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2)) + 0.0244)) # baseline tissue absorption
+    + (R * ((8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2)) + 0.0244)) # baseline tissue absorption
     )
     return total_mu_a
 
@@ -424,15 +427,19 @@ def mu_a_derm (
     W: float,
     F: float,
     M: float,
+    gamma: float = 0.7 # was 0.50
 
 ) -> pd.Series:
+    R = 1 - (B + W + F + M)
+    if(R < 0):
+        R = 0
     total_mu_a = ( 
     (B * S * Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * Bosschaart_2014_interp_deoxy_ser)
     + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + ((1 - (B + W + F + M)) * 0.5 * (W / 0.65) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
+    + (R * gamma * (W / 0.65) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
     )
     return total_mu_a
 
@@ -442,15 +449,19 @@ def mu_a_sub (
     W: float,
     F: float,
     M: float,
+    gamma: float = 0.25, # was 0.25
 
 ) -> pd.Series:
+    R = 1 - (B + W + F + M)
+    if(R < 0):
+        R = 0
     total_mu_a = ( 
     (B * S * Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * Bosschaart_2014_interp_deoxy_ser)
     + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + ((1 - (B + W + F + M)) * 0.25 * (W / 0.65) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
+    + (R * gamma * (W / 0.65) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
     )
     return total_mu_a
 
