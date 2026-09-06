@@ -3,7 +3,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import layer
+import error_analysis as err
 from sklearn.metrics import mean_squared_error
+
+
+lower_wavelength = 600 # original: 600
+upper_wavelength = 1060
 
 # Generate random tissue compositions here
 
@@ -47,7 +52,7 @@ for i in range(200):
 norm_wavelength_nm = np.arange(0, 2001, 1)
 
 
-epidermis_mu_a_sim_Jacques = layer.mu_a_epi(layer.epidermis_Jacques["blood"], 
+epidermis_mu_a_sim = layer.mu_a_epi(layer.epidermis_Jacques["blood"], 
                                     layer.epidermis_Jacques["oxygen_saturation"], 
                                     layer.epidermis_Jacques["water"], 
                                     layer.epidermis_Jacques["fat"], 
@@ -89,7 +94,7 @@ epidermis_mu_a_sim_Jolivot_SPT_VI = layer.mu_a_epi(layer.epidermis_Jolivot_SPT_V
                                     layer.epidermis_Jolivot_SPT_VI["melanosome"]
                                     )
 
-dermis_mu_a_sim_Jacques = layer.mu_a_derm(layer.dermis_Jacques["blood"], 
+dermis_mu_a_sim = layer.mu_a_derm(layer.dermis_Jacques["blood"], 
                                   layer.dermis_Jacques["oxygen_saturation"], 
                                   layer.dermis_Jacques["water"], 
                                   layer.dermis_Jacques["fat"], 
@@ -103,7 +108,7 @@ subcutaneous_mu_a_sim_Jacques = layer.mu_a_sub(layer.subcutaneous_Jacques["blood
                                        layer.subcutaneous_Jacques["melanosome"]
                                        )
 
-subcutaneous_mu_a_sim_Ganesan = layer.mu_a_sub(layer.subcutaneous_Ganesan["blood"], 
+subcutaneous_mu_a_sim = layer.mu_a_sub(layer.subcutaneous_Ganesan["blood"], 
                                                layer.subcutaneous_Ganesan["oxygen_saturation"],
                                                layer.subcutaneous_Ganesan["water"],
                                                layer.subcutaneous_Ganesan["fat"],
@@ -169,6 +174,7 @@ df_Ganesan_sub_mu_a = (
     .set_index("wavelength_nm")
     .sort_index()
 )
+mu_a_sub_Ganesan = df_Ganesan_sub_mu_a.loc[lower_wavelength:upper_wavelength]
 
 df_Simpson_sub_mu_a = (
     pd.read_csv("Exp_Absorption/simpson_subcutaneous_absorption.csv", comment = "#")
@@ -217,37 +223,6 @@ df_Simpson_sub_red_mu_s = (
 
 
 
-lower_wavelength = 600 # original: 600
-upper_wavelength = 1060
-
-# # Calculating RMSE
-# epidermis_mu_a_exp_align, epidermis_mu_a_sim_align = epidermis_mu_a_exp.align(epidermis_mu_a_sim[lower_wavelength:upper_wavelength], join = "inner")
-# dermis_mu_a_exp_align, dermis_mu_a_sim_align = dermis_mu_a_exp.align(dermis_mu_a_sim[lower_wavelength:upper_wavelength], join = "inner")
-# subcutaneous_mu_a_exp_align, subcutaneous_mu_a_sim_align = subcutaneous_mu_a_exp.align(subcutaneous_mu_a_sim[lower_wavelength:upper_wavelength], join = "inner")
-# epidermis_mu_s_exp_align, epidermis_mu_s_red_sim_align = epidermis_mu_s_exp.align(epidermis_mu_s_red_sim[lower_wavelength:upper_wavelength], join = "inner")
-# dermis_mu_s_exp_align, dermis_mu_s_red_sim_align = dermis_mu_s_exp.align(dermis_mu_s_red_sim[lower_wavelength:upper_wavelength], join = "inner")
-# subcutaneous_mu_s_exp_align, subcutaneous_mu_s_red_sim_align = subcutaneous_mu_s_exp.align(subcutaneous_mu_s_red_sim[lower_wavelength:upper_wavelength], join = "inner")
-
-# epi_mu_a_RMSE = np.sqrt(mean_squared_error(epidermis_mu_a_exp_align, epidermis_mu_a_sim_align))
-# derm_mu_a_RMSE = np.sqrt(mean_squared_error(dermis_mu_a_exp_align, dermis_mu_a_sim_align))
-# sub_mu_a_RMSE = np.sqrt(mean_squared_error(subcutaneous_mu_a_exp_align, subcutaneous_mu_a_sim_align))
-# epi_mu_s_RMSE = np.sqrt(mean_squared_error(epidermis_mu_s_exp_align, epidermis_mu_s_red_sim_align))
-# derm_mu_s_RMSE = np.sqrt(mean_squared_error(dermis_mu_s_exp_align, dermis_mu_s_red_sim_align))
-# sub_mu_s_RMSE = np.sqrt(mean_squared_error(subcutaneous_mu_s_exp_align, subcutaneous_mu_s_red_sim_align))
-
-# epi_mu_a_NRMSE = epi_mu_a_RMSE / (epidermis_mu_a_exp_align.max() - epidermis_mu_a_exp_align.min()) * 100
-# derm_mu_a_NRMSE = derm_mu_a_RMSE / (dermis_mu_a_exp_align.max() - dermis_mu_a_exp_align.min()) * 100
-# sub_mu_a_NRMSE = sub_mu_a_RMSE / (subcutaneous_mu_a_exp_align.max() - subcutaneous_mu_a_exp_align.min()) * 100
-# epi_mu_s_NRMSE = epi_mu_s_RMSE / (epidermis_mu_s_exp_align.max() - epidermis_mu_s_exp_align.min()) * 100
-# derm_mu_s_NRMSE = derm_mu_s_RMSE / (dermis_mu_s_exp_align.max() - dermis_mu_s_exp_align.min()) * 100
-# sub_mu_s_NRMSE = sub_mu_s_RMSE / (subcutaneous_mu_s_exp_align.max() - subcutaneous_mu_s_exp_align.min()) * 100
-
-# print(f"Epidermis Absorption NRMSE: {epi_mu_a_NRMSE} %")
-# print(f"Dermis Absorption NRMSE: {derm_mu_a_NRMSE} %")
-# print(f"Subcutaneous Absorption NRMSE: {sub_mu_a_NRMSE} %")
-# print(f"Epidermis Reduced Scattering NRMSE: {epi_mu_s_NRMSE} %")
-# print(f"Dermis Reduced Scattering NRMSE: {derm_mu_s_NRMSE} %")
-# print(f"Subcutaneous Reduced Scattering NRMSE: {sub_mu_s_NRMSE} %")
 
 
 # ===============================================
@@ -267,11 +242,11 @@ for ax in axes_mu_a:
 
 # Simulated absorption spectra plots
 axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  epidermis_mu_a_sim_Jacques[lower_wavelength:upper_wavelength], 
+                  epidermis_mu_a_sim[lower_wavelength:upper_wavelength], 
                   label = "Analytical Models", 
                   color = "red")
 axes_mu_a[0].text(lower_wavelength, 
-                  epidermis_mu_a_sim_Jacques[lower_wavelength], 
+                  epidermis_mu_a_sim[lower_wavelength], 
                   "M=2.5%", 
                   color = "red")
 
@@ -310,7 +285,7 @@ for i in epidermis_mu_a_sim_set:
 axes_mu_a[0].set_title(r"$\mu_a$ epidermis", fontsize = 18)
 
 axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  dermis_mu_a_sim_Jacques[lower_wavelength:upper_wavelength], 
+                  dermis_mu_a_sim[lower_wavelength:upper_wavelength], 
                   color = "red")
 
 mu_a_derm_660 = []
@@ -320,30 +295,29 @@ for i in dermis_mu_a_sim_set:
     axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
             i[lower_wavelength:upper_wavelength], 
             color = "red",
-            alpha = 0.08
+            alpha = 0.02
             )
     mu_a_derm_660.append(i[660])
     mu_a_derm_940.append(i[940])
-
-print(max(mu_a_derm_660))
-print(min(mu_a_derm_660))
-print(max(mu_a_derm_940))
-print(min(mu_a_derm_940))
-
 axes_mu_a[1].set_title(r"$\mu_a$ dermis",  fontsize = 18)
 
 
 
 axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  subcutaneous_mu_a_sim_Ganesan[lower_wavelength:upper_wavelength], 
+                  subcutaneous_mu_a_sim[lower_wavelength:upper_wavelength], 
                   color = "red")
 
+mu_a_sub_650 = []
+mu_a_sub_RMSEs = []
 for i in subcutaneous_mu_a_sim_set:
     axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
             i[lower_wavelength:upper_wavelength], 
             color = "red",
-            alpha = 0.08
+            alpha = 0.02
             )
+    mu_a_sub_RMSE = err.RMSE(i[lower_wavelength:upper_wavelength], mu_a_sub_Ganesan)
+    mu_a_sub_RMSEs.append(mu_a_sub_RMSE)
+    mu_a_sub_650.append(i[650])
 
 axes_mu_a[2].set_title(r"$\mu_a$ subcutaneous", fontsize = 18)
 
@@ -373,6 +347,11 @@ axes_mu_a[2].plot(df_Simpson_sub_mu_a.loc[lower_wavelength:upper_wavelength],
                   color = "green", 
                   label = "Simpson 1998", 
                   linestyle = "--")
+axes_mu_a[2].scatter(x = 650, 
+                     y = 0.006,
+                     color = "pink",
+                     label = "Weber 2009",
+                     s = 100)
 
 
 fig_mu_a.legend(fontsize = 10)
@@ -436,8 +415,14 @@ axes_mu_s[2].plot(df_Ganesan_sub_red_mu_s.loc[lower_wavelength:upper_wavelength]
 
 fig_mu_s.legend(fontsize = 10)
 
-
-
+print(f"Maximum mu_a_derm_660nm: {max(mu_a_derm_660)}")
+print(f"Minimum mu_a_derm_660nm: {min(mu_a_derm_660)}")
+print(f"Maximum mu_a_derm_940nm: {max(mu_a_derm_940)}")
+print(f"Minimum mu_a_derm_940nm: {min(mu_a_derm_940)}")
+print(f"Maximum mu_a_sub_650nm: {max(mu_a_sub_650)}")
+print(f"Minimum mu_a_sub_650nm: {min(mu_a_sub_650)}")
+print(f"Maximum mu_a_sub_RMSE: {max(mu_a_sub_RMSEs)}")
+print(f"Minimum mu_a_sub_RMSE: {min(mu_a_sub_RMSEs)}")
 
 # # Comment out to plot tissue spectras
 # # plt.close("all")
@@ -451,9 +436,9 @@ fig_mu_s.legend(fontsize = 10)
 
 # # Format: [mu_a, mu_s, g, n]
 # air_optic_params= [0.01, 0.01, 1, 1]
-# epidermis_optic_params = [epidermis_mu_a_sim_Jacques[sim_wavelength_nm], epidermis_mu_s_sim[sim_wavelength_nm], epidermis_g, epidermis_n]
-# dermis_optic_params = [dermis_mu_a_sim_Jacques[sim_wavelength_nm], dermis_mu_s_sim[sim_wavelength_nm], dermis_g, dermis_n]
-# subcutaneous_optic_params = [subcutaneous_mu_a_sim_Ganesan[sim_wavelength_nm], subcutaneous_mu_s_sim[sim_wavelength_nm], subcutaneous_g, subcutaneous_n]
+# epidermis_optic_params = [epidermis_mu_a_sim[sim_wavelength_nm], epidermis_mu_s_sim[sim_wavelength_nm], epidermis_g, epidermis_n]
+# dermis_optic_params = [dermis_mu_a_sim[sim_wavelength_nm], dermis_mu_s_sim[sim_wavelength_nm], dermis_g, dermis_n]
+# subcutaneous_optic_params = [subcutaneous_mu_a_sim[sim_wavelength_nm], subcutaneous_mu_s_sim[sim_wavelength_nm], subcutaneous_g, subcutaneous_n]
 
 
 # # Define simulation values
