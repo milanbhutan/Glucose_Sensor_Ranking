@@ -107,7 +107,10 @@ upper_wavelength_bound = 1100
 # Per layer: (B * S * mu_a_HbO2) + (B * (1-S) * mu_a_Hb) + (W * mu_a_water) + (F * mu_a_fat) + (M * mu_a_melanosome) + baseline
 # where B, S, W, F, and M represent blood, oxygen, water, fat, and melanosome compostion of tissue respectively
 
-epidermis_Jacques = {
+derm_gamma = 0.7 # was 0.50
+sub_gamma = 0.25
+
+epi_Jacques = {
     "blood" : 0,
     "oxygen_saturation" : 0,
     "water" : 0,
@@ -115,7 +118,7 @@ epidermis_Jacques = {
     "melanosome" : 0.025,
 }
 
-epidermis_Jolivot_low_mel ={
+epi_Jolivot_low_mel ={
     "blood" : 0,
     "oxygen_saturation" : 0,
     "water" : 0,
@@ -123,7 +126,7 @@ epidermis_Jolivot_low_mel ={
     "melanosome": 0.013
 }
 
-epidermis_Jolivot_SPT_II ={
+epi_Jolivot_SPT_II ={
     "blood" : 0,
     "oxygen_saturation" : 0,
     "water" : 0,
@@ -131,7 +134,7 @@ epidermis_Jolivot_SPT_II ={
     "melanosome": 0.101
 }
 
-epidermis_Jolivot_SPT_III ={
+epi_Jolivot_SPT_III ={
     "blood" : 0,
     "oxygen_saturation" : 0,
     "water" : 0,
@@ -139,7 +142,7 @@ epidermis_Jolivot_SPT_III ={
     "melanosome": 0.187
 }
 
-epidermis_Jolivot_SPT_IV ={
+epi_Jolivot_SPT_IV ={
     "blood" : 0,
     "oxygen_saturation" : 0,
     "water" : 0,
@@ -147,7 +150,7 @@ epidermis_Jolivot_SPT_IV ={
     "melanosome": 0.265
 }
 
-epidermis_Jolivot_SPT_V ={
+epi_Jolivot_SPT_V ={
     "blood" : 0,
     "oxygen_saturation" : 0,
     "water" : 0,
@@ -155,7 +158,7 @@ epidermis_Jolivot_SPT_V ={
     "melanosome": 0.358
 }
 
-epidermis_Jolivot_SPT_VI = {
+epi_Jolivot_SPT_VI = {
     "blood" : 0,
     "oxygen_saturation" : 0,
     "water" : 0,
@@ -163,36 +166,40 @@ epidermis_Jolivot_SPT_VI = {
     "melanosome": 0.447
 }
 
-dermis_Jacques = {
+derm_Jacques = {
     "blood" : 0.0020,  
     "oxygen_saturation" : 0.39,
     "water" : 0.65,
     "fat" : 0,
     "melanosome" : 0,
+    "gamma" : derm_gamma
 }
 
-lower_dermis_Jonasson = {
+lower_derm_Jonasson = {
     "blood" : 0.0075,  
     "oxygen_saturation" : 0.50, 
     "water" : 0.0, # Jonasson neglects water
     "fat" : 0,
     "melanosome" : 0,
+    "gamma" : derm_gamma,
 }
 
-subcutaneous_Jacques = {
+sub_Jacques = {
     "blood" : 0.0054,
     "oxygen_saturation" : 0.76,
     "water" : 0.11,
     "fat" : 0.69,
     "melanosome" : 0,
+    "gamma" : derm_gamma,
 }
 
-subcutaneous_Ganesan = {
+sub_Ganesan = {
     "blood" : 0.00634,
     "oxygen_saturation" : 0.60,
     "water" : 0.2184,
     "fat" : 0.6433,
     "melanosome" : 0,
+    "gamma" : sub_gamma,
 }
 
 
@@ -200,26 +207,26 @@ subcutaneous_Ganesan = {
 # Basline absorption effect
 baseline_epi = (8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2) + 0.0244)
 baseline_epi_frac = (1 
-                     - epidermis_Jacques["blood"] 
-                     - epidermis_Jacques["fat"] 
-                     - epidermis_Jacques["water"] 
-                     - epidermis_Jacques["melanosome"]
+                     - epi_Jacques["blood"] 
+                     - epi_Jacques["fat"] 
+                     - epi_Jacques["water"] 
+                     - epi_Jacques["melanosome"]
                      ) 
 
-baseline_derm = 0.5 * (dermis_Jacques["water"] / 0.65 ) * (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
+baseline_derm = 0.5 * (derm_Jacques["water"] / 0.65 ) * (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
 baseline_derm_frac = (1 
-                     - dermis_Jacques["blood"] 
-                     - dermis_Jacques["fat"] 
-                     - dermis_Jacques["water"] 
-                     - dermis_Jacques["melanosome"]
+                     - derm_Jacques["blood"] 
+                     - derm_Jacques["fat"] 
+                     - derm_Jacques["water"] 
+                     - derm_Jacques["melanosome"]
                      ) 
 
-baseline_sub = 0.25 * ((subcutaneous_Jacques["water"] / 0.65 )) * (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
+baseline_sub = 0.25 * ((sub_Jacques["water"] / 0.65 )) * (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
 baseline_sub_frac = (1 
-                     - subcutaneous_Jacques["blood"] 
-                     - subcutaneous_Jacques["fat"] 
-                     - subcutaneous_Jacques["water"] 
-                     - subcutaneous_Jacques["melanosome"]
+                     - sub_Jacques["blood"] 
+                     - sub_Jacques["fat"] 
+                     - sub_Jacques["water"] 
+                     - sub_Jacques["melanosome"]
                      ) 
 
 # =========================================
@@ -228,25 +235,25 @@ baseline_sub_frac = (1
 
 # Epidermis
 mu_a_water_epi = (
-                 epidermis_Jacques["water"] 
+                 epi_Jacques["water"] 
                  * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                  )
 mu_a_oxy_Hb_epi = ( 
-                  epidermis_Jacques["blood"] 
-                  * epidermis_Jacques["oxygen_saturation"] 
+                  epi_Jacques["blood"] 
+                  * epi_Jacques["oxygen_saturation"] 
                   * Bosschaart_2014_interp_oxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                   )
 mu_a_deoxy_epi = (
-                 epidermis_Jacques["blood"]
-                 * (1 - epidermis_Jacques["oxygen_saturation"]) 
+                 epi_Jacques["blood"]
+                 * (1 - epi_Jacques["oxygen_saturation"]) 
                  * Bosschaart_2014_interp_deoxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                  )
 mu_a_fat_epi = (
-               epidermis_Jacques["fat"] 
+               epi_Jacques["fat"] 
                * Veen_2004_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                )
 mu_a_melanosome_epi = (
-                      epidermis_Jacques["melanosome"] 
+                      epi_Jacques["melanosome"] 
                       * Jacques_1998_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                       )
 mu_a_baseline_epi = (
@@ -255,25 +262,25 @@ mu_a_baseline_epi = (
                     )
 # Dermis
 mu_a_water_derm = (
-                 dermis_Jacques["water"] 
+                 derm_Jacques["water"] 
                  * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                  )
 mu_a_oxy_Hb_derm = ( 
-                  dermis_Jacques["blood"] 
-                  * dermis_Jacques["oxygen_saturation"] 
+                  derm_Jacques["blood"] 
+                  * derm_Jacques["oxygen_saturation"] 
                   * Bosschaart_2014_interp_oxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                   )
 mu_a_deoxy_derm = (
-                 dermis_Jacques["blood"]
-                 * (1 - dermis_Jacques["oxygen_saturation"]) 
+                 derm_Jacques["blood"]
+                 * (1 - derm_Jacques["oxygen_saturation"]) 
                  * Bosschaart_2014_interp_deoxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                  )
 mu_a_fat_derm = (
-               dermis_Jacques["fat"] 
+               derm_Jacques["fat"] 
                * Veen_2004_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                )
 mu_a_melanosome_derm = (
-                      dermis_Jacques["melanosome"] 
+                      derm_Jacques["melanosome"] 
                       * Jacques_1998_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                       )
 mu_a_baseline_derm = (
@@ -283,25 +290,25 @@ mu_a_baseline_derm = (
 
 # Subcutaneous
 mu_a_water_sub = (
-                 subcutaneous_Jacques["water"] 
+                 sub_Jacques["water"] 
                  * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                  )
 mu_a_oxy_Hb_sub = ( 
-                  subcutaneous_Jacques["blood"] 
-                  * subcutaneous_Jacques["oxygen_saturation"] 
+                  sub_Jacques["blood"] 
+                  * sub_Jacques["oxygen_saturation"] 
                   * Bosschaart_2014_interp_oxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                   )
 mu_a_deoxy_sub = (
-                 subcutaneous_Jacques["blood"]
-                 * (1 - subcutaneous_Jacques["oxygen_saturation"]) 
+                 sub_Jacques["blood"]
+                 * (1 - sub_Jacques["oxygen_saturation"]) 
                  * Bosschaart_2014_interp_deoxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                  )
 mu_a_fat_sub = (
-               subcutaneous_Jacques["fat"] 
+               sub_Jacques["fat"] 
                * Veen_2004_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                )
 mu_a_melanosome_sub = (
-                      subcutaneous_Jacques["melanosome"] 
+                      sub_Jacques["melanosome"] 
                       * Jacques_1998_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
                       )
 mu_a_baseline_sub = (
@@ -427,7 +434,7 @@ def mu_a_derm (
     W: float,
     F: float,
     M: float,
-    gamma: float = 0.7 # was 0.50
+    gamma: float = derm_gamma
 
 ) -> pd.Series:
     R = 1 - (B + W + F + M)
@@ -449,7 +456,7 @@ def mu_a_sub (
     W: float,
     F: float,
     M: float,
-    gamma: float = 0.25, # was 0.25
+    gamma: float = sub_gamma,
 
 ) -> pd.Series:
     R = 1 - (B + W + F + M)

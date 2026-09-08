@@ -5,6 +5,7 @@ import pandas as pd
 import layer
 import error_analysis as err
 from sklearn.metrics import mean_squared_error
+from scipy.optimize import least_squares
 
 
 lower_wavelength = 600 # original: 600
@@ -14,22 +15,62 @@ upper_wavelength = 1060
 
 rng = np.random.default_rng(45)
 
-epidermis_mu_a_sim_set = []
-dermis_mu_a_sim_set = []
-subcutaneous_mu_a_sim_set = []
+epi_mu_a_sim_set = []
+derm_mu_a_sim_set = []
+sub_mu_a_sim_set = []
 
+derm_params = [
+    "blood",
+    "oxygen_saturation",
+    "water",
+    "gamma"
+]
+
+sub_params = [
+    "blood",
+    "oxygen_saturation",
+    "water",
+    "fat",
+    "gamma",
+]
+
+# derm_comp_upper = {
+#     "blood" : 0.0075,
+#     "oxygen_saturation" : 0.50,    
+#     "water" : 0.70,
+#     "fat" : n/a,
+
+# }
+
+sub_comp_upper = {
+    "blood" : 0.0075,
+    "oxygen_saturation" : 0.76,    
+    "water" : 0.30,
+    "fat" : 0.70,
+    "gamma" : 0.3,
+
+}
+
+sub_comp_lower = {
+    "blood" : 0.005,
+    "oxygen_saturation" : 0.50,    
+    "water" : 0.10,
+    "fat" : 0.60,
+    "gamma" : 0.2,
+
+}
 
 for i in range(200):
-    dermis_blood = rng.uniform(0.002, 0.0075)
-    dermis_oxygen_saturation = rng.uniform(0.39, 0.50)
-    dermis_water = rng.uniform(0.60, 0.70)
-    dermis_gamma = rng.uniform(0.3, 0.7)
-    dermis_mu_a_sim_set.append(layer.mu_a_derm(dermis_blood, 
-                                    dermis_oxygen_saturation, 
-                                    dermis_water, 
-                                    layer.dermis_Jacques["fat"], 
-                                    layer.dermis_Jacques["melanosome"],
-                                    dermis_gamma,
+    derm_blood = rng.uniform(0.002, 0.0075)
+    derm_oxygen_saturation = rng.uniform(0.39, 0.50)
+    derm_water = rng.uniform(0.60, 0.70)
+    derm_gamma = rng.uniform(0.3, 0.7)
+    derm_mu_a_sim_set.append(layer.mu_a_derm(derm_blood, 
+                                    derm_oxygen_saturation, 
+                                    derm_water, 
+                                    layer.derm_Jacques["fat"], 
+                                    layer.derm_Jacques["melanosome"],
+                                    derm_gamma,
     )
     )
 
@@ -38,11 +79,13 @@ for i in range(200):
     sub_oxygen_saturation = rng.uniform(0.50, 0.76)
     sub_water = rng.uniform(0.10, 0.30)
     sub_fat = rng.uniform(0.60, 0.70)
-    subcutaneous_mu_a_sim_set.append(layer.mu_a_sub(sub_blood, 
+    sub_gamma = rng.uniform(0.2, 0.3)
+    sub_mu_a_sim_set.append(layer.mu_a_sub(sub_blood, 
                                     sub_oxygen_saturation, 
                                     sub_water, 
                                     sub_fat, 
-                                    layer.subcutaneous_Jacques["melanosome"]
+                                    layer.sub_Jacques["melanosome"],
+                                    sub_gamma
     )
     )
 
@@ -52,93 +95,93 @@ for i in range(200):
 norm_wavelength_nm = np.arange(0, 2001, 1)
 
 
-epidermis_mu_a_sim = layer.mu_a_epi(layer.epidermis_Jacques["blood"], 
-                                    layer.epidermis_Jacques["oxygen_saturation"], 
-                                    layer.epidermis_Jacques["water"], 
-                                    layer.epidermis_Jacques["fat"], 
-                                    layer.epidermis_Jacques["melanosome"]
+epi_mu_a_sim = layer.mu_a_epi(layer.epi_Jacques["blood"], 
+                                    layer.epi_Jacques["oxygen_saturation"], 
+                                    layer.epi_Jacques["water"], 
+                                    layer.epi_Jacques["fat"], 
+                                    layer.epi_Jacques["melanosome"]
                                     )
 
-epidermis_mu_a_sim_Jolivot_SPT_II = layer.mu_a_epi(layer.epidermis_Jolivot_SPT_II["blood"], 
-                                    layer.epidermis_Jolivot_SPT_II["oxygen_saturation"], 
-                                    layer.epidermis_Jolivot_SPT_II["water"], 
-                                    layer.epidermis_Jolivot_SPT_II["fat"], 
-                                    layer.epidermis_Jolivot_SPT_II["melanosome"]
+epi_mu_a_sim_Jolivot_SPT_II = layer.mu_a_epi(layer.epi_Jolivot_SPT_II["blood"], 
+                                    layer.epi_Jolivot_SPT_II["oxygen_saturation"], 
+                                    layer.epi_Jolivot_SPT_II["water"], 
+                                    layer.epi_Jolivot_SPT_II["fat"], 
+                                    layer.epi_Jolivot_SPT_II["melanosome"]
                                     )
 
-epidermis_mu_a_sim_Jolivot_SPT_III = layer.mu_a_epi(layer.epidermis_Jolivot_SPT_III["blood"], 
-                                    layer.epidermis_Jolivot_SPT_III["oxygen_saturation"], 
-                                    layer.epidermis_Jolivot_SPT_III["water"], 
-                                    layer.epidermis_Jolivot_SPT_III["fat"], 
-                                    layer.epidermis_Jolivot_SPT_III["melanosome"]
+epi_mu_a_sim_Jolivot_SPT_III = layer.mu_a_epi(layer.epi_Jolivot_SPT_III["blood"], 
+                                    layer.epi_Jolivot_SPT_III["oxygen_saturation"], 
+                                    layer.epi_Jolivot_SPT_III["water"], 
+                                    layer.epi_Jolivot_SPT_III["fat"], 
+                                    layer.epi_Jolivot_SPT_III["melanosome"]
                                     )
 
-epidermis_mu_a_sim_Jolivot_SPT_IV = layer.mu_a_epi(layer.epidermis_Jolivot_SPT_IV["blood"], 
-                                    layer.epidermis_Jolivot_SPT_IV["oxygen_saturation"], 
-                                    layer.epidermis_Jolivot_SPT_IV["water"], 
-                                    layer.epidermis_Jolivot_SPT_IV["fat"], 
-                                    layer.epidermis_Jolivot_SPT_IV["melanosome"]
+epi_mu_a_sim_Jolivot_SPT_IV = layer.mu_a_epi(layer.epi_Jolivot_SPT_IV["blood"], 
+                                    layer.epi_Jolivot_SPT_IV["oxygen_saturation"], 
+                                    layer.epi_Jolivot_SPT_IV["water"], 
+                                    layer.epi_Jolivot_SPT_IV["fat"], 
+                                    layer.epi_Jolivot_SPT_IV["melanosome"]
                                     )
 
-epidermis_mu_a_sim_Jolivot_SPT_V = layer.mu_a_epi(layer.epidermis_Jolivot_SPT_V["blood"], 
-                                    layer.epidermis_Jolivot_SPT_V["oxygen_saturation"], 
-                                    layer.epidermis_Jolivot_SPT_V["water"], 
-                                    layer.epidermis_Jolivot_SPT_V["fat"], 
-                                    layer.epidermis_Jolivot_SPT_V["melanosome"]
+epi_mu_a_sim_Jolivot_SPT_V = layer.mu_a_epi(layer.epi_Jolivot_SPT_V["blood"], 
+                                    layer.epi_Jolivot_SPT_V["oxygen_saturation"], 
+                                    layer.epi_Jolivot_SPT_V["water"], 
+                                    layer.epi_Jolivot_SPT_V["fat"], 
+                                    layer.epi_Jolivot_SPT_V["melanosome"]
                                     )
 
-epidermis_mu_a_sim_Jolivot_SPT_VI = layer.mu_a_epi(layer.epidermis_Jolivot_SPT_VI["blood"], 
-                                    layer.epidermis_Jolivot_SPT_VI["oxygen_saturation"], 
-                                    layer.epidermis_Jolivot_SPT_VI["water"], 
-                                    layer.epidermis_Jolivot_SPT_VI["fat"], 
-                                    layer.epidermis_Jolivot_SPT_VI["melanosome"]
+epi_mu_a_sim_Jolivot_SPT_VI = layer.mu_a_epi(layer.epi_Jolivot_SPT_VI["blood"], 
+                                    layer.epi_Jolivot_SPT_VI["oxygen_saturation"], 
+                                    layer.epi_Jolivot_SPT_VI["water"], 
+                                    layer.epi_Jolivot_SPT_VI["fat"], 
+                                    layer.epi_Jolivot_SPT_VI["melanosome"]
                                     )
 
-dermis_mu_a_sim = layer.mu_a_derm(layer.dermis_Jacques["blood"], 
-                                  layer.dermis_Jacques["oxygen_saturation"], 
-                                  layer.dermis_Jacques["water"], 
-                                  layer.dermis_Jacques["fat"], 
-                                  layer.dermis_Jacques["melanosome"]
+derm_mu_a_sim = layer.mu_a_derm(layer.derm_Jacques["blood"], 
+                                  layer.derm_Jacques["oxygen_saturation"], 
+                                  layer.derm_Jacques["water"], 
+                                  layer.derm_Jacques["fat"], 
+                                  layer.derm_Jacques["melanosome"]
                                   )
 
-subcutaneous_mu_a_sim_Jacques = layer.mu_a_sub(layer.subcutaneous_Jacques["blood"], 
-                                       layer.subcutaneous_Jacques["oxygen_saturation"], 
-                                       layer.subcutaneous_Jacques["water"], 
-                                       layer.subcutaneous_Jacques["fat"], 
-                                       layer.subcutaneous_Jacques["melanosome"]
+sub_mu_a_sim_Jacques = layer.mu_a_sub(layer.sub_Jacques["blood"], 
+                                       layer.sub_Jacques["oxygen_saturation"], 
+                                       layer.sub_Jacques["water"], 
+                                       layer.sub_Jacques["fat"], 
+                                       layer.sub_Jacques["melanosome"]
                                        )
 
-subcutaneous_mu_a_sim = layer.mu_a_sub(layer.subcutaneous_Ganesan["blood"], 
-                                               layer.subcutaneous_Ganesan["oxygen_saturation"],
-                                               layer.subcutaneous_Ganesan["water"],
-                                               layer.subcutaneous_Ganesan["fat"],
-                                               layer.subcutaneous_Ganesan["melanosome"]
+sub_mu_a_sim = layer.mu_a_sub(layer.sub_Ganesan["blood"], 
+                                               layer.sub_Ganesan["oxygen_saturation"],
+                                               layer.sub_Ganesan["water"],
+                                               layer.sub_Ganesan["fat"],
+                                               layer.sub_Ganesan["melanosome"]
                                                )
 
 
 
 # For scattering coefficent
-epidermis_g = 0.9
-dermis_g = 0.9
-subcutaneous_g = 0.9
+epi_g = 0.9
+derm_g = 0.9
+sub_g = 0.9
 
-epidermis_mu_s_sim = layer.mu_s_layer("epidermis", epidermis_g)
-dermis_mu_s_sim = layer.mu_s_layer("dermis", dermis_g)
-subcutaneous_mu_s_sim = layer.mu_s_layer("subcutaneous", subcutaneous_g)
+epi_mu_s_sim = layer.mu_s_layer("epidermis", epi_g)
+derm_mu_s_sim = layer.mu_s_layer("dermis", derm_g)
+sub_mu_s_sim = layer.mu_s_layer("subcutaneous", sub_g)
 
 # For reduced scattering coefficent
-epidermis_g_red = 0
-dermis_g_red = 0
-subcutaneous_g_red = 0
+epi_g_red = 0
+derm_g_red = 0
+sub_g_red = 0
 
-epidermis_mu_s_red_sim = layer.mu_s_layer("epidermis", epidermis_g_red)
-dermis_mu_s_red_sim = layer.mu_s_layer("dermis", dermis_g_red)
-subcutaneous_mu_s_red_sim = layer.mu_s_layer("subcutaneous", subcutaneous_g_red)
+epi_mu_s_red_sim = layer.mu_s_layer("epidermis", epi_g_red)
+derm_mu_s_red_sim = layer.mu_s_layer("dermis", derm_g_red)
+sub_mu_s_red_sim = layer.mu_s_layer("subcutaneous", sub_g_red)
 
 
-epidermis_n = 1.4
-dermis_n = 1.4
-subcutaneous_n = 1.4
+epi_n = 1.4
+derm_n = 1.4
+sub_n = 1.4
 
 
 # Obtain data for experimental absorption and scattering spectras for three-layer tissue model from Shimojo 2020
@@ -174,7 +217,7 @@ df_Ganesan_sub_mu_a = (
     .set_index("wavelength_nm")
     .sort_index()
 )
-mu_a_sub_Ganesan = df_Ganesan_sub_mu_a.loc[lower_wavelength:upper_wavelength]
+mu_a_sub_Ganesan = df_Ganesan_sub_mu_a.loc[lower_wavelength:upper_wavelength, "mu_a_mm^-1"]
 
 df_Simpson_sub_mu_a = (
     pd.read_csv("Exp_Absorption/simpson_subcutaneous_absorption.csv", comment = "#")
@@ -242,40 +285,40 @@ for ax in axes_mu_a:
 
 # Simulated absorption spectra plots
 axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  epidermis_mu_a_sim[lower_wavelength:upper_wavelength], 
+                  epi_mu_a_sim[lower_wavelength:upper_wavelength], 
                   label = "Analytical Models", 
                   color = "red")
 axes_mu_a[0].text(lower_wavelength, 
-                  epidermis_mu_a_sim[lower_wavelength], 
+                  epi_mu_a_sim[lower_wavelength], 
                   "M=2.5%", 
                   color = "red")
 
 axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  epidermis_mu_a_sim_Jolivot_SPT_II[lower_wavelength:upper_wavelength], 
+                  epi_mu_a_sim_Jolivot_SPT_II[lower_wavelength:upper_wavelength], 
                   color = "red")
 
 
 axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  epidermis_mu_a_sim_Jolivot_SPT_III[lower_wavelength:upper_wavelength], 
+                  epi_mu_a_sim_Jolivot_SPT_III[lower_wavelength:upper_wavelength], 
                   color = "red")
 
 axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  epidermis_mu_a_sim_Jolivot_SPT_IV[lower_wavelength:upper_wavelength], 
+                  epi_mu_a_sim_Jolivot_SPT_IV[lower_wavelength:upper_wavelength], 
                   color = "red")
 
 axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  epidermis_mu_a_sim_Jolivot_SPT_V[lower_wavelength:upper_wavelength], 
+                  epi_mu_a_sim_Jolivot_SPT_V[lower_wavelength:upper_wavelength], 
                   color = "red")
 
 axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  epidermis_mu_a_sim_Jolivot_SPT_VI[lower_wavelength:upper_wavelength], 
+                  epi_mu_a_sim_Jolivot_SPT_VI[lower_wavelength:upper_wavelength], 
                   color = "red")
 axes_mu_a[0].text(lower_wavelength - 22, 
-                  epidermis_mu_a_sim_Jolivot_SPT_VI[lower_wavelength], 
+                  epi_mu_a_sim_Jolivot_SPT_VI[lower_wavelength], 
                   "M=44.7%", 
                   color = "red")
 
-for i in epidermis_mu_a_sim_set:
+for i in epi_mu_a_sim_set:
     axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
             i[lower_wavelength:upper_wavelength], 
             color = "red",
@@ -285,13 +328,13 @@ for i in epidermis_mu_a_sim_set:
 axes_mu_a[0].set_title(r"$\mu_a$ epidermis", fontsize = 18)
 
 axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  dermis_mu_a_sim[lower_wavelength:upper_wavelength], 
+                  derm_mu_a_sim[lower_wavelength:upper_wavelength], 
                   color = "red")
 
 mu_a_derm_660 = []
 mu_a_derm_940 = []
 
-for i in dermis_mu_a_sim_set:
+for i in derm_mu_a_sim_set:
     axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
             i[lower_wavelength:upper_wavelength], 
             color = "red",
@@ -304,12 +347,12 @@ axes_mu_a[1].set_title(r"$\mu_a$ dermis",  fontsize = 18)
 
 
 axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  subcutaneous_mu_a_sim[lower_wavelength:upper_wavelength], 
+                  sub_mu_a_sim[lower_wavelength:upper_wavelength], 
                   color = "red")
 
 mu_a_sub_650 = []
 mu_a_sub_RMSEs = []
-for i in subcutaneous_mu_a_sim_set:
+for i in sub_mu_a_sim_set:
     axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
             i[lower_wavelength:upper_wavelength], 
             color = "red",
@@ -370,7 +413,7 @@ for ax in axes_mu_s:
 
 # Simulated reduced scattering coefficients
 axes_mu_s[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  epidermis_mu_s_red_sim[lower_wavelength:upper_wavelength], 
+                  epi_mu_s_red_sim[lower_wavelength:upper_wavelength], 
                   label = "Jacques 2013 Model", 
                   color = "red")
 axes_mu_s[0].set_title(r"$\mu_s^'$ epidermis", fontsize = 18)
@@ -378,12 +421,12 @@ axes_mu_s[0].set_title(r"$\mu_s^'$ epidermis", fontsize = 18)
 
 
 axes_mu_s[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  dermis_mu_s_red_sim[lower_wavelength:upper_wavelength], 
+                  derm_mu_s_red_sim[lower_wavelength:upper_wavelength], 
                   color = "red")
 axes_mu_s[1].set_title(r"$\mu^'_s$ dermis", fontsize = 18)
 
 axes_mu_s[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  subcutaneous_mu_s_red_sim[lower_wavelength:upper_wavelength], 
+                  sub_mu_s_red_sim[lower_wavelength:upper_wavelength], 
                   color = "red")
 axes_mu_s[2].set_title(r"$\mu^'_s$ subcutaneous tissue", fontsize = 18)
 
@@ -424,6 +467,35 @@ print(f"Minimum mu_a_sub_650nm: {min(mu_a_sub_650)}")
 print(f"Maximum mu_a_sub_RMSE: {max(mu_a_sub_RMSEs)}")
 print(f"Minimum mu_a_sub_RMSE: {min(mu_a_sub_RMSEs)}")
 
+# Find tissue compostion which matches Ganesan 2016
+result = least_squares(
+    err.residual, 
+    [layer.sub_Ganesan["blood"],
+     layer.sub_Ganesan["oxygen_saturation"],
+     layer.sub_Ganesan["water"],
+     layer.sub_Ganesan["fat"],
+     0.25],
+    args = (mu_a_sub_Ganesan, layer.mu_a_sub,),
+    bounds =([sub_comp_lower[p] for p in sub_params],
+             [sub_comp_upper[p] for p in sub_params])
+    )
+
+print(result.x)
+
+sub_mu_a_sim_fitted = layer.mu_a_sub(result.x[0], 
+                                    result.x[1],
+                                    result.x[2],
+                                    result.x[3],
+                                    layer.sub_Ganesan["melanosome"],
+                                    gamma = result.x[4]
+                                    )
+
+axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
+                  sub_mu_a_sim_fitted[lower_wavelength:upper_wavelength],
+                  label = "model guess",
+                  color = "brown")
+
+
 # # Comment out to plot tissue spectras
 # # plt.close("all")
 
@@ -436,17 +508,17 @@ print(f"Minimum mu_a_sub_RMSE: {min(mu_a_sub_RMSEs)}")
 
 # # Format: [mu_a, mu_s, g, n]
 # air_optic_params= [0.01, 0.01, 1, 1]
-# epidermis_optic_params = [epidermis_mu_a_sim[sim_wavelength_nm], epidermis_mu_s_sim[sim_wavelength_nm], epidermis_g, epidermis_n]
-# dermis_optic_params = [dermis_mu_a_sim[sim_wavelength_nm], dermis_mu_s_sim[sim_wavelength_nm], dermis_g, dermis_n]
-# subcutaneous_optic_params = [subcutaneous_mu_a_sim[sim_wavelength_nm], subcutaneous_mu_s_sim[sim_wavelength_nm], subcutaneous_g, subcutaneous_n]
+# epi_optic_params = [epi_mu_a_sim[sim_wavelength_nm], epi_mu_s_sim[sim_wavelength_nm], epi_g, epi_n]
+# derm_optic_params = [derm_mu_a_sim[sim_wavelength_nm], derm_mu_s_sim[sim_wavelength_nm], derm_g, derm_n]
+# sub_optic_params = [sub_mu_a_sim[sim_wavelength_nm], sub_mu_s_sim[sim_wavelength_nm], sub_g, sub_n]
 
 
 # # Define simulation values
 # prop = [
 #     air_optic_params,
-#     epidermis_optic_params,
-#     dermis_optic_params,
-#     subcutaneous_optic_params
+#     epi_optic_params,
+#     derm_optic_params,
+#     sub_optic_params
 # ]
 
 

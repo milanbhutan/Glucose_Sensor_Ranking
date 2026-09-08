@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import layer
+from typing import Callable
 from sklearn.metrics import mean_squared_error
 
 def RMSE(
@@ -9,4 +11,21 @@ def RMSE(
     y_data1_align, y_data2_align = y_data1.align(y_data2, join = "inner")
     RMSE = np.sqrt(mean_squared_error(y_data1_align, y_data2_align))
     return RMSE
+
+def residual(
+    params: np.ndarray, 
+    exp_data: pd.Series,
+    f: Callable 
+) -> pd.Series:
+    sim_data = f(
+        B = params[0], 
+        S = params[1], 
+        W = params[2], 
+        F = params[3], 
+        M = 0.0,
+        gamma = params[4],
+        )
+    exp_data_align, sim_data_align = sim_data.align(exp_data, join = "inner")
+    residual_error = exp_data_align - sim_data_align
+    return residual_error
 
