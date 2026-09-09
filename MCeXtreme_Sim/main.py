@@ -34,58 +34,70 @@ sub_params = [
     "gamma",
 ]
 
-# derm_comp_upper = {
-#     "blood" : 0.0075,
-#     "oxygen_saturation" : 0.50,    
-#     "water" : 0.70,
-#     "fat" : n/a,
+derm_comp_upper = {
+    "blood" : 0.015,
+    "oxygen_saturation" : 0.65,    
+    "water" : 0.75,
+    "gamma" : 0.8
 
-# }
+}
+
+derm_comp_lower = {
+    "blood" : 0.002,
+    "oxygen_saturation" : 0.39,    
+    "water" : 0.65,
+    "gamma" : 0.2
+
+}
 
 sub_comp_upper = {
-    "blood" : 0.0075,
-    "oxygen_saturation" : 0.76,    
+    "blood" : 0.010,
+    "oxygen_saturation" : 0.80,    
     "water" : 0.30,
-    "fat" : 0.70,
+    "fat" : 0.80,
     "gamma" : 0.3,
 
 }
 
 sub_comp_lower = {
-    "blood" : 0.005,
+    "blood" : 0.002,
     "oxygen_saturation" : 0.50,    
     "water" : 0.10,
-    "fat" : 0.60,
+    "fat" : 0.55,
     "gamma" : 0.2,
 
 }
 
 for i in range(200):
-    derm_blood = rng.uniform(0.002, 0.0075)
-    derm_oxygen_saturation = rng.uniform(0.39, 0.50)
-    derm_water = rng.uniform(0.60, 0.70)
-    derm_gamma = rng.uniform(0.3, 0.7)
-    derm_mu_a_sim_set.append(layer.mu_a_derm(derm_blood, 
-                                    derm_oxygen_saturation, 
-                                    derm_water, 
-                                    layer.derm_Jacques["fat"], 
-                                    layer.derm_Jacques["melanosome"],
-                                    derm_gamma,
+    derm_blood = rng.uniform(derm_comp_lower["blood"], derm_comp_upper["blood"])
+    derm_oxygen_saturation = rng.uniform(derm_comp_lower["oxygen_saturation"], derm_comp_upper["oxygen_saturation"])
+    derm_water = rng.uniform(derm_comp_lower["water"], derm_comp_upper["water"])
+    derm_gamma = rng.uniform(derm_comp_lower["gamma"], derm_comp_upper["gamma"])
+    derm_mu_a_sim_set.append(
+        layer.mu_a_derm(
+            derm_blood, 
+            derm_oxygen_saturation, 
+            derm_water, 
+            layer.derm_Jacques["fat"], 
+            layer.derm_Jacques["melanosome"],
+            derm_gamma,
     )
     )
 
 for i in range(200):
-    sub_blood = rng.uniform(0.005, 0.007)
-    sub_oxygen_saturation = rng.uniform(0.50, 0.76)
-    sub_water = rng.uniform(0.10, 0.30)
-    sub_fat = rng.uniform(0.60, 0.70)
-    sub_gamma = rng.uniform(0.2, 0.3)
-    sub_mu_a_sim_set.append(layer.mu_a_sub(sub_blood, 
-                                    sub_oxygen_saturation, 
-                                    sub_water, 
-                                    sub_fat, 
-                                    layer.sub_Jacques["melanosome"],
-                                    sub_gamma
+    sub_blood = rng.uniform(sub_comp_lower["blood"], sub_comp_upper["blood"])
+    sub_oxygen_saturation = rng.uniform(sub_comp_lower["oxygen_saturation"], sub_comp_upper["oxygen_saturation"])
+    sub_water = rng.uniform(sub_comp_lower["water"], sub_comp_upper["water"])
+    sub_fat = rng.uniform(sub_comp_lower["fat"], sub_comp_upper["fat"])
+    sub_gamma = rng.uniform(sub_comp_lower["gamma"], sub_comp_upper["gamma"])
+    sub_mu_a_sim_set.append(
+        layer.mu_a_sub(
+            sub_blood, 
+            sub_oxygen_saturation, 
+            sub_water, 
+            sub_fat, 
+            layer.sub_Jacques["melanosome"],
+            sub_gamma
     )
     )
 
@@ -205,6 +217,7 @@ df_Simpson_derm_mu_a = (
     .set_index("wavelength_nm")
     .sort_index()
 )
+mu_a_derm_Simpson = df_Simpson_derm_mu_a.loc[lower_wavelength:upper_wavelength, "caucasian_dermis_mu_a_mm^-1"]
 
 df_Shimojo_derm_mu_a = (
     pd.read_csv("Exp_Absorption/shimojo_dermis_absorption.csv", comment = "#")
@@ -224,7 +237,7 @@ df_Simpson_sub_mu_a = (
     .set_index("wavelength_nm")
     .sort_index()
 )
-
+mu_a_sub_Simpson = df_Simpson_sub_mu_a.loc[lower_wavelength:upper_wavelength, "caucasian_subdermis_mu_a_mm^-1"]
 
 # Scattering Data
 df_Shimojo_epi_red_mu_s = (
@@ -458,18 +471,18 @@ axes_mu_s[2].plot(df_Ganesan_sub_red_mu_s.loc[lower_wavelength:upper_wavelength]
 
 fig_mu_s.legend(fontsize = 10)
 
-print(f"Maximum mu_a_derm_660nm: {max(mu_a_derm_660)}")
-print(f"Minimum mu_a_derm_660nm: {min(mu_a_derm_660)}")
-print(f"Maximum mu_a_derm_940nm: {max(mu_a_derm_940)}")
-print(f"Minimum mu_a_derm_940nm: {min(mu_a_derm_940)}")
-print(f"Maximum mu_a_sub_650nm: {max(mu_a_sub_650)}")
-print(f"Minimum mu_a_sub_650nm: {min(mu_a_sub_650)}")
-print(f"Maximum mu_a_sub_RMSE: {max(mu_a_sub_RMSEs)}")
-print(f"Minimum mu_a_sub_RMSE: {min(mu_a_sub_RMSEs)}")
+# print(f"Maximum mu_a_derm_660nm: {max(mu_a_derm_660)}")
+# print(f"Minimum mu_a_derm_660nm: {min(mu_a_derm_660)}")
+# print(f"Maximum mu_a_derm_940nm: {max(mu_a_derm_940)}")
+# print(f"Minimum mu_a_derm_940nm: {min(mu_a_derm_940)}")
+# print(f"Maximum mu_a_sub_650nm: {max(mu_a_sub_650)}")
+# print(f"Minimum mu_a_sub_650nm: {min(mu_a_sub_650)}")
+# print(f"Maximum mu_a_sub_RMSE: {max(mu_a_sub_RMSEs)}")
+# print(f"Minimum mu_a_sub_RMSE: {min(mu_a_sub_RMSEs)}")
 
 # Find tissue compostion which matches Ganesan 2016
-result = least_squares(
-    err.residual, 
+result_Ganesan = least_squares(
+    err.residual_sub, 
     [layer.sub_Ganesan["blood"],
      layer.sub_Ganesan["oxygen_saturation"],
      layer.sub_Ganesan["water"],
@@ -480,19 +493,103 @@ result = least_squares(
              [sub_comp_upper[p] for p in sub_params])
     )
 
-print(result.x)
+print(
+    f"===Tissue Composition Prediction of Ganesan 2016===\n"
+    f"Blood: {result_Ganesan.x[0]:.4f}\n"
+    f"Oxygen Saturation: {result_Ganesan.x[1]:.4f}\n"
+    f"Water: {result_Ganesan.x[2]:.4f}\n"
+    f"Fat: {result_Ganesan.x[3]:.4f}\n"
+    f"Melanin: 0.0\n"
+    f"Gamma: {result_Ganesan.x[4]:.4f}\n"
+    )
 
-sub_mu_a_sim_fitted = layer.mu_a_sub(result.x[0], 
-                                    result.x[1],
-                                    result.x[2],
-                                    result.x[3],
-                                    layer.sub_Ganesan["melanosome"],
-                                    gamma = result.x[4]
-                                    )
+mu_a_sub_Ganesan_fitted = layer.mu_a_sub(
+    B = result_Ganesan.x[0], 
+    S = result_Ganesan.x[1],
+    W = result_Ganesan.x[2],
+    F = result_Ganesan.x[3],
+    M = layer.sub_Ganesan["melanosome"],
+    gamma = result_Ganesan.x[4]
+    )
 
 axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  sub_mu_a_sim_fitted[lower_wavelength:upper_wavelength],
+                  mu_a_sub_Ganesan_fitted[lower_wavelength:upper_wavelength],
                   label = "model guess",
+                  color = "brown")
+
+# Find tissue compostion which matches Simpson 1998, subcutaneous layer
+# Simpson 1998 compostion not know so using Ganesan 2016 composition as an initial guess
+result_Simpson_sub = least_squares(
+    err.residual_sub, 
+    [layer.sub_Ganesan["blood"],
+     layer.sub_Ganesan["oxygen_saturation"],
+     layer.sub_Ganesan["water"],
+     layer.sub_Ganesan["fat"],
+     0.25
+     ],
+    args = (mu_a_sub_Simpson, layer.mu_a_sub,),
+    bounds =([sub_comp_lower[p] for p in sub_params],
+             [sub_comp_upper[p] for p in sub_params])
+    )
+
+print(
+    f"===Tissue Composition Prediction of Simpson 1998, Subcutaneous===\n"
+    f"Blood: {result_Simpson_sub.x[0]:.4f}\n"
+    f"Oxygen Saturation: {result_Simpson_sub.x[1]:.4f}\n"
+    f"Water: {result_Simpson_sub.x[2]:.4f}\n"
+    f"Fat: {result_Simpson_sub.x[3]:.4f}\n"
+    f"Melanin: 0.0\n"
+    f"Gamma: {result_Simpson_sub.x[4]:.4f}\n"
+    )
+
+mu_a_sub_Simpson_fitted = layer.mu_a_sub(
+    B = result_Simpson_sub.x[0], 
+    S = result_Simpson_sub.x[1],
+    W = result_Simpson_sub.x[2],
+    F = result_Simpson_sub.x[3],
+    M = 0.0,
+    gamma = result_Simpson_sub.x[4]
+    )
+
+axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
+                  mu_a_sub_Simpson_fitted[lower_wavelength:upper_wavelength],
+                  color = "brown")
+
+
+# Find tissue compostion which matches Simpson 1998, dermis layer
+# Simpson 1998 compostion not know so using Jacques 2013 composition as an initial guess
+result_Simpson_derm = least_squares(
+    err.residual_derm, 
+    [layer.derm_Jacques["blood"],
+     layer.derm_Jacques["oxygen_saturation"],
+     layer.derm_Jacques["water"],
+     layer.derm_Jacques["gamma"],
+     ],
+    args = (mu_a_derm_Simpson, layer.mu_a_derm,),
+    bounds =([derm_comp_lower[p] for p in derm_params],
+             [derm_comp_upper[p] for p in derm_params])
+    )
+
+print(
+    f"===Tissue Composition Prediction of Simpson 1998, Dermis===\n"
+    f"Blood: {result_Simpson_derm.x[0]:.4f}\n"
+    f"Oxygen Saturation: {result_Simpson_derm.x[1]:.4f}\n"
+    f"Water: {result_Simpson_derm.x[2]:.4f}\n"
+    f"Melanin: 0.0\n"
+    f"Gamma: {result_Simpson_sub.x[3]:.4f}\n"
+    )
+
+mu_a_derm_Simpson_fitted = layer.mu_a_derm(
+    B = result_Simpson_derm.x[0], 
+    S = result_Simpson_derm.x[1],
+    W = result_Simpson_derm.x[2],
+    F = 0.0,
+    M = 0.0,
+    gamma = result_Simpson_derm.x[3]
+    )
+
+axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
+                  mu_a_derm_Simpson_fitted[lower_wavelength:upper_wavelength],
                   color = "brown")
 
 
