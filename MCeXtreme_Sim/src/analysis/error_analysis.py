@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import layer
+import tissue_model.layer as layer
 from typing import Callable
 from sklearn.metrics import mean_squared_error
 
