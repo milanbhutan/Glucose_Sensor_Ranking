@@ -38,7 +38,7 @@ derm_comp_upper = {
     "blood" : 0.015,
     "oxygen_saturation" : 0.65,    
     "water" : 0.75,
-    "gamma" : 0.8
+    "gamma" : 1 # original: 0.8
 
 }
 
@@ -46,7 +46,7 @@ derm_comp_lower = {
     "blood" : 0.002,
     "oxygen_saturation" : 0.39,    
     "water" : 0.65,
-    "gamma" : 0.2
+    "gamma" : 0.1 # original: 0.2
 
 }
 
@@ -55,7 +55,7 @@ sub_comp_upper = {
     "oxygen_saturation" : 0.80,    
     "water" : 0.30,
     "fat" : 0.80,
-    "gamma" : 0.3,
+    "gamma" : 1, # original: 0.3
 
 }
 
@@ -63,8 +63,8 @@ sub_comp_lower = {
     "blood" : 0.002,
     "oxygen_saturation" : 0.50,    
     "water" : 0.10,
-    "fat" : 0.55,
-    "gamma" : 0.2,
+    "fat" : 0.3, #original: 0.55
+    "gamma" : 0.1, #original: 0.2
 
 }
 
@@ -73,16 +73,17 @@ for i in range(200):
     derm_oxygen_saturation = rng.uniform(derm_comp_lower["oxygen_saturation"], derm_comp_upper["oxygen_saturation"])
     derm_water = rng.uniform(derm_comp_lower["water"], derm_comp_upper["water"])
     derm_gamma = rng.uniform(derm_comp_lower["gamma"], derm_comp_upper["gamma"])
-    derm_mu_a_sim_set.append(
-        layer.mu_a_derm(
-            derm_blood, 
-            derm_oxygen_saturation, 
-            derm_water, 
-            layer.derm_Jacques["fat"], 
-            layer.derm_Jacques["melanosome"],
-            derm_gamma,
-    )
-    )
+    if(1 - (derm_blood + derm_water) > 0):
+        derm_mu_a_sim_set.append(
+            layer.mu_a_derm(
+                B = derm_blood, 
+                S = derm_oxygen_saturation, 
+                W = derm_water, 
+                F = 0, 
+                M = 0,
+                gamma = derm_gamma,
+        )
+        )
 
 for i in range(200):
     sub_blood = rng.uniform(sub_comp_lower["blood"], sub_comp_upper["blood"])
@@ -90,17 +91,17 @@ for i in range(200):
     sub_water = rng.uniform(sub_comp_lower["water"], sub_comp_upper["water"])
     sub_fat = rng.uniform(sub_comp_lower["fat"], sub_comp_upper["fat"])
     sub_gamma = rng.uniform(sub_comp_lower["gamma"], sub_comp_upper["gamma"])
-    sub_mu_a_sim_set.append(
-        layer.mu_a_sub(
-            sub_blood, 
-            sub_oxygen_saturation, 
-            sub_water, 
-            sub_fat, 
-            layer.sub_Jacques["melanosome"],
-            sub_gamma
-    )
-    )
-
+    if(1 - (sub_blood + sub_water + sub_fat) > 0): # Remove samples with a negative baseline fraction
+        sub_mu_a_sim_set.append(
+            layer.mu_a_sub(
+                B = sub_blood, 
+                S = sub_oxygen_saturation, 
+                W = sub_water, 
+                F = sub_fat, 
+                M = 0,
+                gamma = sub_gamma
+        )
+        )
 # End of generating random tissue compositions
 
 
@@ -335,7 +336,7 @@ for i in epi_mu_a_sim_set:
     axes_mu_a[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
             i[lower_wavelength:upper_wavelength], 
             color = "red",
-            alpha = 0.08
+            alpha = 0.02
             )
 
 axes_mu_a[0].set_title(r"$\mu_a$ epidermis", fontsize = 18)
@@ -355,6 +356,7 @@ for i in derm_mu_a_sim_set:
             )
     mu_a_derm_660.append(i[660])
     mu_a_derm_940.append(i[940])
+    #get max between 900nm - 950nm
 axes_mu_a[1].set_title(r"$\mu_a$ dermis",  fontsize = 18)
 
 
@@ -408,10 +410,6 @@ axes_mu_a[2].scatter(x = 650,
                      color = "pink",
                      label = "Weber 2009",
                      s = 100)
-
-
-fig_mu_a.legend(fontsize = 10)
-
 
 
 
@@ -514,7 +512,7 @@ mu_a_sub_Ganesan_fitted = layer.mu_a_sub(
 
 axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
                   mu_a_sub_Ganesan_fitted[lower_wavelength:upper_wavelength],
-                  label = "model guess",
+                  label = "Model Prediction",
                   color = "brown")
 
 # Find tissue compostion which matches Simpson 1998, subcutaneous layer
@@ -576,7 +574,7 @@ print(
     f"Oxygen Saturation: {result_Simpson_derm.x[1]:.4f}\n"
     f"Water: {result_Simpson_derm.x[2]:.4f}\n"
     f"Melanin: 0.0\n"
-    f"Gamma: {result_Simpson_sub.x[3]:.4f}\n"
+    f"Gamma: {result_Simpson_derm.x[3]:.4f}\n"
     )
 
 mu_a_derm_Simpson_fitted = layer.mu_a_derm(
@@ -592,6 +590,100 @@ axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength],
                   mu_a_derm_Simpson_fitted[lower_wavelength:upper_wavelength],
                   color = "brown")
 
+fig_mu_a.legend(fontsize = 10)
+
+# 930 nm lipid absorption feature
+axes_mu_a[2].vlines(
+    x = 930,
+    ymin = 0.01,
+    ymax = 0.020,
+    linestyle=":",
+    linewidth = 1.5,
+    color = "black"
+)
+
+axes_mu_a[2].text(
+    900,
+    0.020,
+    "930 nm\nC-H overtone",
+    ha = "center",
+    va = "bottom",
+    fontsize = 10
+)
+
+# 970 nm water absorption feature
+axes_mu_a[1].vlines(
+    x = 970,
+    ymin = 0.027,
+    ymax = 0.05,
+    linestyle=":",
+    linewidth = 1.5,
+    color = "black"
+)
+
+axes_mu_a[1].text(
+    970,
+    0.05,
+    "970 nm\nH$_2$O O-H overtone",
+    ha = "center",
+    va = "bottom",
+    fontsize = 10
+)
+
+axes_mu_a[2].vlines(
+    x = 970,
+    ymin = 0.01,
+    ymax = 0.025,
+    linestyle=":",
+    linewidth = 1.5,
+    color = "black"
+)
+
+axes_mu_a[2].text(
+    970,
+    0.025,
+    "970 nm\nH$_2$O O-H overtone",
+    ha = "center",
+    va = "bottom",
+    fontsize = 10
+)
+
+# Deoxy Hb absorption
+axes_mu_a[1].vlines(
+    x = 760,
+    ymin = 0.005,
+    ymax = 0.022,
+    linestyle=":",
+    linewidth=1.5,
+    color="black"
+)
+
+axes_mu_a[1].text(
+    760,
+    0.022,
+    "760 nm\nHb Electron Transfer",
+    ha = "center",
+    va = "bottom",
+    fontsize = 10
+)
+
+axes_mu_a[2].vlines(
+    x = 760,
+    ymin = 0.0025,
+    ymax = 0.014,
+    linestyle=":",
+    linewidth=1.5,
+    color="black"
+)
+
+axes_mu_a[2].text(
+    760,
+    0.014,
+    "760 nm\nHb Electron Transfer",
+    ha = "center",
+    va = "bottom",
+    fontsize = 10
+)
 
 # # Comment out to plot tissue spectras
 # # plt.close("all")
@@ -599,7 +691,6 @@ axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength],
 # # =========================================
 # # MCeXtreme Simulation
 # # =========================================
-
 
 # sim_wavelength_nm = 600
 

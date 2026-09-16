@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-
+derm_gamma = 0.5 # was 0.50
+sub_gamma = 0.25
 
 # Water absorption spectra from 667-2500 nm, L. Kou 1993
 df_L_Kou_1993 = pd.read_csv("Water_Absorption_Data/L_Kou_water_absorption_1993.csv", comment = "#")
@@ -107,8 +108,6 @@ upper_wavelength_bound = 1100
 # Per layer: (B * S * mu_a_HbO2) + (B * (1-S) * mu_a_Hb) + (W * mu_a_water) + (F * mu_a_fat) + (M * mu_a_melanosome) + baseline
 # where B, S, W, F, and M represent blood, oxygen, water, fat, and melanosome compostion of tissue respectively
 
-derm_gamma = 0.7 # was 0.50
-sub_gamma = 0.25
 
 epi_Jacques = {
     "blood" : 0,
@@ -319,7 +318,7 @@ mu_a_baseline_sub = (
 
 fig_i, axes_i = plt.subplots(1,3, layout = "constrained")
 fig_i.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
-fig_i.suptitle("Weighted Tissue Constituent Absorption Spectra from 600-1100 nm, Jacques 2013", fontsize = 18)
+fig_i.suptitle("Weighted Tissue Constituent Absorption Spectra from 600-1100 nm", fontsize = 18)
 
 for ax in axes_i:
     ax.set_xlabel("Wavelength (nm)", fontsize = 18)
@@ -440,13 +439,14 @@ def mu_a_derm (
     R = 1 - (B + W + F + M)
     if(R < 0):
         R = 0
+    # C_w = W / (1 - (B + F + M) ) # nested water fraction used by Moco 2018 for baseline
     total_mu_a = ( 
     (B * S * Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * Bosschaart_2014_interp_deoxy_ser)
     + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + (R * gamma * (W / 0.65) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
+    + (R * gamma  * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
     )
     return total_mu_a
 
@@ -461,14 +461,15 @@ def mu_a_sub (
 ) -> pd.Series:
     R = 1 - (B + W + F + M)
     if(R < 0):
-        R = 0
+        raise ValueError("Invalid Baseline Fraction")
+    # C_w = W / (1 - (B + F + M) ) # nested water fraction used by Moco 2018 for baseline
     total_mu_a = ( 
     (B * S * Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * Bosschaart_2014_interp_deoxy_ser)
     + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + (R * gamma * (W / 0.65) * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
+    + (R * gamma * ((1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5)) + 0.0244)) # baseline tissue absorption
     )
     return total_mu_a
 
