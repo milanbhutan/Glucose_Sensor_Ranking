@@ -5,6 +5,7 @@ import tissue_model.layer as layer
 import tissue_model.tissue_params as params
 import analysis.error_analysis as err
 import analysis.uncertainty_analysis as uncertain
+from pysr import PySRRegressor as SR
 from scipy.optimize import least_squares
 
 
@@ -35,67 +36,67 @@ epi_n = 1.4
 derm_n = 1.4
 sub_n = 1.4
 
-epi_mu_a_sim = layer.mu_a_epi(layer.epi_Jacques["blood"], 
-                                    layer.epi_Jacques["oxygen_saturation"], 
-                                    layer.epi_Jacques["water"], 
-                                    layer.epi_Jacques["fat"], 
-                                    layer.epi_Jacques["melanosome"]
+epi_mu_a_sim = layer.mu_a_epi(params.epi_Jacques["blood"], 
+                                    params.epi_Jacques["oxygen_saturation"], 
+                                    params.epi_Jacques["water"], 
+                                    params.epi_Jacques["fat"], 
+                                    params.epi_Jacques["melanosome"]
                                     )
 
-epi_mu_a_sim_Jolivot_SPT_II = layer.mu_a_epi(layer.epi_Jolivot_SPT_II["blood"], 
-                                    layer.epi_Jolivot_SPT_II["oxygen_saturation"], 
-                                    layer.epi_Jolivot_SPT_II["water"], 
-                                    layer.epi_Jolivot_SPT_II["fat"], 
-                                    layer.epi_Jolivot_SPT_II["melanosome"]
+epi_mu_a_sim_Jolivot_SPT_II = layer.mu_a_epi(params.epi_Jolivot_SPT_II["blood"], 
+                                    params.epi_Jolivot_SPT_II["oxygen_saturation"], 
+                                    params.epi_Jolivot_SPT_II["water"], 
+                                    params.epi_Jolivot_SPT_II["fat"], 
+                                    params.epi_Jolivot_SPT_II["melanosome"]
                                     )
 
-epi_mu_a_sim_Jolivot_SPT_III = layer.mu_a_epi(layer.epi_Jolivot_SPT_III["blood"], 
-                                    layer.epi_Jolivot_SPT_III["oxygen_saturation"], 
-                                    layer.epi_Jolivot_SPT_III["water"], 
-                                    layer.epi_Jolivot_SPT_III["fat"], 
-                                    layer.epi_Jolivot_SPT_III["melanosome"]
+epi_mu_a_sim_Jolivot_SPT_III = layer.mu_a_epi(params.epi_Jolivot_SPT_III["blood"], 
+                                    params.epi_Jolivot_SPT_III["oxygen_saturation"], 
+                                    params.epi_Jolivot_SPT_III["water"], 
+                                    params.epi_Jolivot_SPT_III["fat"], 
+                                    params.epi_Jolivot_SPT_III["melanosome"]
                                     )
 
-epi_mu_a_sim_Jolivot_SPT_IV = layer.mu_a_epi(layer.epi_Jolivot_SPT_IV["blood"], 
-                                    layer.epi_Jolivot_SPT_IV["oxygen_saturation"], 
-                                    layer.epi_Jolivot_SPT_IV["water"], 
-                                    layer.epi_Jolivot_SPT_IV["fat"], 
-                                    layer.epi_Jolivot_SPT_IV["melanosome"]
+epi_mu_a_sim_Jolivot_SPT_IV = layer.mu_a_epi(params.epi_Jolivot_SPT_IV["blood"], 
+                                    params.epi_Jolivot_SPT_IV["oxygen_saturation"], 
+                                    params.epi_Jolivot_SPT_IV["water"], 
+                                    params.epi_Jolivot_SPT_IV["fat"], 
+                                    params.epi_Jolivot_SPT_IV["melanosome"]
                                     )
 
-epi_mu_a_sim_Jolivot_SPT_V = layer.mu_a_epi(layer.epi_Jolivot_SPT_V["blood"], 
-                                    layer.epi_Jolivot_SPT_V["oxygen_saturation"], 
-                                    layer.epi_Jolivot_SPT_V["water"], 
-                                    layer.epi_Jolivot_SPT_V["fat"], 
-                                    layer.epi_Jolivot_SPT_V["melanosome"]
+epi_mu_a_sim_Jolivot_SPT_V = layer.mu_a_epi(params.epi_Jolivot_SPT_V["blood"], 
+                                    params.epi_Jolivot_SPT_V["oxygen_saturation"], 
+                                    params.epi_Jolivot_SPT_V["water"], 
+                                    params.epi_Jolivot_SPT_V["fat"], 
+                                    params.epi_Jolivot_SPT_V["melanosome"]
                                     )
 
-epi_mu_a_sim_Jolivot_SPT_VI = layer.mu_a_epi(layer.epi_Jolivot_SPT_VI["blood"], 
-                                    layer.epi_Jolivot_SPT_VI["oxygen_saturation"], 
-                                    layer.epi_Jolivot_SPT_VI["water"], 
-                                    layer.epi_Jolivot_SPT_VI["fat"], 
-                                    layer.epi_Jolivot_SPT_VI["melanosome"]
+epi_mu_a_sim_Jolivot_SPT_VI = layer.mu_a_epi(params.epi_Jolivot_SPT_VI["blood"], 
+                                    params.epi_Jolivot_SPT_VI["oxygen_saturation"], 
+                                    params.epi_Jolivot_SPT_VI["water"], 
+                                    params.epi_Jolivot_SPT_VI["fat"], 
+                                    params.epi_Jolivot_SPT_VI["melanosome"]
                                     )
 
-derm_mu_a_sim = layer.mu_a_derm(layer.derm_Jacques["blood"], 
-                                  layer.derm_Jacques["oxygen_saturation"], 
-                                  layer.derm_Jacques["water"], 
-                                  layer.derm_Jacques["fat"], 
-                                  layer.derm_Jacques["melanosome"]
+derm_mu_a_sim = layer.mu_a_derm(params.derm_Jacques["blood"], 
+                                  params.derm_Jacques["oxygen_saturation"], 
+                                  params.derm_Jacques["water"], 
+                                  params.derm_Jacques["fat"], 
+                                  params.derm_Jacques["melanosome"]
                                   )
 
-sub_mu_a_sim_Jacques = layer.mu_a_sub(layer.sub_Jacques["blood"], 
-                                       layer.sub_Jacques["oxygen_saturation"], 
-                                       layer.sub_Jacques["water"], 
-                                       layer.sub_Jacques["fat"], 
-                                       layer.sub_Jacques["melanosome"]
+sub_mu_a_sim_Jacques = layer.mu_a_sub(params.sub_Jacques["blood"], 
+                                       params.sub_Jacques["oxygen_saturation"], 
+                                       params.sub_Jacques["water"], 
+                                       params.sub_Jacques["fat"], 
+                                       params.sub_Jacques["melanosome"]
                                        )
 
-sub_mu_a_sim = layer.mu_a_sub(layer.sub_Ganesan["blood"], 
-                                               layer.sub_Ganesan["oxygen_saturation"],
-                                               layer.sub_Ganesan["water"],
-                                               layer.sub_Ganesan["fat"],
-                                               layer.sub_Ganesan["melanosome"]
+sub_mu_a_sim = layer.mu_a_sub(params.sub_Ganesan["blood"], 
+                                               params.sub_Ganesan["oxygen_saturation"],
+                                               params.sub_Ganesan["water"],
+                                               params.sub_Ganesan["fat"],
+                                               params.sub_Ganesan["melanosome"]
                                                )
 
 
@@ -360,32 +361,23 @@ fig_mu_s.legend(fontsize = 10)
 # Find tissue compostion which matches Ganesan 2016
 result_Ganesan = least_squares(
     err.residual_sub, 
-    [layer.sub_Ganesan["blood"],
-     layer.sub_Ganesan["oxygen_saturation"],
-     layer.sub_Ganesan["water"],
-     layer.sub_Ganesan["fat"],
+    [params.sub_Ganesan["blood"],
+     params.sub_Ganesan["oxygen_saturation"],
+     params.sub_Ganesan["water"],
+     params.sub_Ganesan["fat"],
      0.25],
     args = (mu_a_sub_Ganesan, layer.mu_a_sub,),
-    bounds =([params.sub_comp_lower[p] for p in params.sub_params],
-             [params.sub_comp_upper[p] for p in params.sub_params])
+    bounds =([params.sub_lower_bound[p] for p in params.sub_params],
+             [params.sub_upper_bound[p] for p in params.sub_params])
     )
 
-print(
-    f"===Tissue Composition Prediction of Ganesan 2016===\n"
-    f"Blood: {result_Ganesan.x[0]:.4f}\n"
-    f"Oxygen Saturation: {result_Ganesan.x[1]:.4f}\n"
-    f"Water: {result_Ganesan.x[2]:.4f}\n"
-    f"Fat: {result_Ganesan.x[3]:.4f}\n"
-    f"Melanin: 0.0\n"
-    f"Gamma: {result_Ganesan.x[4]:.4f}\n"
-    )
 
 mu_a_sub_Ganesan_fitted = layer.mu_a_sub(
     B = result_Ganesan.x[0], 
     S = result_Ganesan.x[1],
     W = result_Ganesan.x[2],
     F = result_Ganesan.x[3],
-    M = layer.sub_Ganesan["melanosome"],
+    M = 0.0,
     gamma = result_Ganesan.x[4]
     )
 
@@ -395,28 +387,18 @@ axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength],
                   color = "brown")
 
 # Find tissue compostion which matches Simpson 1998, subcutaneous layer
-# Simpson 1998 compostion not know so using Ganesan 2016 composition as an initial guess
+# Simpson 1998 compostion not known so using Ganesan 2016 composition as an initial guess
 result_Simpson_sub = least_squares(
     err.residual_sub, 
-    [layer.sub_Ganesan["blood"],
-     layer.sub_Ganesan["oxygen_saturation"],
-     layer.sub_Ganesan["water"],
-     layer.sub_Ganesan["fat"],
+    [params.sub_Ganesan["blood"],
+     params.sub_Ganesan["oxygen_saturation"],
+     params.sub_Ganesan["water"],
+     params.sub_Ganesan["fat"],
      0.25
      ],
     args = (mu_a_sub_Simpson, layer.mu_a_sub,),
-    bounds =([params.sub_comp_lower[p] for p in params.sub_params],
-             [params.sub_comp_upper[p] for p in params.sub_params])
-    )
-
-print(
-    f"===Tissue Composition Prediction of Simpson 1998, Subcutaneous===\n"
-    f"Blood: {result_Simpson_sub.x[0]:.4f}\n"
-    f"Oxygen Saturation: {result_Simpson_sub.x[1]:.4f}\n"
-    f"Water: {result_Simpson_sub.x[2]:.4f}\n"
-    f"Fat: {result_Simpson_sub.x[3]:.4f}\n"
-    f"Melanin: 0.0\n"
-    f"Gamma: {result_Simpson_sub.x[4]:.4f}\n"
+    bounds =([params.sub_lower_bound[p] for p in params.sub_params],
+             [params.sub_upper_bound[p] for p in params.sub_params])
     )
 
 mu_a_sub_Simpson_fitted = layer.mu_a_sub(
@@ -437,23 +419,14 @@ axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength],
 # Simpson 1998 compostion not know so using Jacques 2013 composition as an initial guess
 result_Simpson_derm = least_squares(
     err.residual_derm, 
-    [layer.derm_Jacques["blood"],
-     layer.derm_Jacques["oxygen_saturation"],
-     layer.derm_Jacques["water"],
-     layer.derm_Jacques["gamma"],
+    [params.derm_Jacques["blood"],
+     params.derm_Jacques["oxygen_saturation"],
+     params.derm_Jacques["water"],
+     params.derm_Jacques["gamma"],
      ],
     args = (mu_a_derm_Simpson, layer.mu_a_derm,),
-    bounds =([params.derm_comp_lower[p] for p in params.derm_params],
-             [params.derm_comp_upper[p] for p in params.derm_params])
-    )
-
-print(
-    f"===Tissue Composition Prediction of Simpson 1998, Dermis===\n"
-    f"Blood: {result_Simpson_derm.x[0]:.4f}\n"
-    f"Oxygen Saturation: {result_Simpson_derm.x[1]:.4f}\n"
-    f"Water: {result_Simpson_derm.x[2]:.4f}\n"
-    f"Melanin: 0.0\n"
-    f"Gamma: {result_Simpson_derm.x[3]:.4f}\n"
+    bounds =([params.derm_lower_bound[p] for p in params.derm_params],
+             [params.derm_upper_bound[p] for p in params.derm_params])
     )
 
 mu_a_derm_Simpson_fitted = layer.mu_a_derm(
@@ -563,5 +536,81 @@ axes_mu_a[2].text(
     va = "bottom",
     fontsize = 10
 )
+
+# Symbolic Regression using Ganesan 2016
+mu_a_sub_Ganesan_align, sub_mu_a_sim_align = mu_a_sub_Ganesan.align(sub_mu_a_sim[lower_wavelength:upper_wavelength], join = "inner")
+mu_a_sub_Ganesan_align, baseline_sub_align = mu_a_sub_Ganesan.align(params.baseline_sub[lower_wavelength:upper_wavelength], join = "inner")
+
+alpha = (mu_a_sub_Ganesan_align -  sub_mu_a_sim_align) / (params.sub_Ganesan["baseline"] * baseline_sub_align)
+beta = (mu_a_sub_Ganesan_align -  sub_mu_a_sim_align) / params.sub_Ganesan["baseline"]
+
+
+print(mu_a_sub_Ganesan_align)
+print(sub_mu_a_sim_align)
+print(f"alpha\n {alpha[lower_wavelength:upper_wavelength]}")
+print(f"beta\n {beta[lower_wavelength:upper_wavelength]}")
+
+fig_scale, axes_scale = plt.subplots(1, 2)
+
+fig_scale.suptitle("Baseline discrepancy between analytical and experimental\n for $\mu_{a,subcutaneous}$ , Ganesan 2016")
+
+axes_scale[0].plot(alpha.index, 
+                  alpha.loc[lower_wavelength:upper_wavelength], 
+                  color = "black")
+axes_scale[1].plot(beta.index, 
+                  beta.loc[lower_wavelength:upper_wavelength], 
+                  color = "black")
+
+
+fig_symb, axes_symb = plt.subplots(1, 2)
+
+fig_symb.suptitle(r"Applying Symbolic Regression on $\mu_{a,subcutaneous} $")
+
+
+axes_symb[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
+                  sub_mu_a_sim[lower_wavelength:upper_wavelength], 
+                  color = "red")
+axes_symb[0].plot(df_Ganesan_sub_mu_a.loc[lower_wavelength:upper_wavelength], 
+                  color = "black", 
+                  label = "Ganesan 2016", 
+                  linestyle = "--")
+axes_symb[0].set_title("Before")
+
+
+axes_symb[1].set_title("After")
+
+
+fig_symb.legend(fontsize = 10)
+
+
+
+print(
+    f"===Tissue Composition Prediction of Ganesan 2016===\n"
+    f"Blood: {result_Ganesan.x[0]:.4f}\n"
+    f"Oxygen Saturation: {result_Ganesan.x[1]:.4f}\n"
+    f"Water: {result_Ganesan.x[2]:.4f}\n"
+    f"Fat: {result_Ganesan.x[3]:.4f}\n"
+    f"Melanin: 0.0\n"
+    f"Gamma: {result_Ganesan.x[4]:.4f}\n"
+    )
+
+print(
+    f"===Tissue Composition Prediction of Simpson 1998, Subcutaneous===\n"
+    f"Blood: {result_Simpson_sub.x[0]:.4f}\n"
+    f"Oxygen Saturation: {result_Simpson_sub.x[1]:.4f}\n"
+    f"Water: {result_Simpson_sub.x[2]:.4f}\n"
+    f"Fat: {result_Simpson_sub.x[3]:.4f}\n"
+    f"Melanin: 0.0\n"
+    f"Gamma: {result_Simpson_sub.x[4]:.4f}\n"
+    )
+
+print(
+    f"===Tissue Composition Prediction of Simpson 1998, Dermis===\n"
+    f"Blood: {result_Simpson_derm.x[0]:.4f}\n"
+    f"Oxygen Saturation: {result_Simpson_derm.x[1]:.4f}\n"
+    f"Water: {result_Simpson_derm.x[2]:.4f}\n"
+    f"Melanin: 0.0\n"
+    f"Gamma: {result_Simpson_derm.x[3]:.4f}\n"
+    )
 
 plt.show()
