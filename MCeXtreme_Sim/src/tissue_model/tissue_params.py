@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-derm_gamma = 0.5 # was 0.50
-sub_gamma = 0.25
+derm_gamma = 0 # was 0.50
+sub_gamma = 0
 
 norm_wavelength_nm = np.arange(0, 2001, 1)
 

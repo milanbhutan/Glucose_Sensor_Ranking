@@ -358,89 +358,89 @@ fig_mu_s.legend(fontsize = 10)
 # print(f"Maximum mu_a_sub_RMSE: {max(mu_a_sub_RMSEs)}")
 # print(f"Minimum mu_a_sub_RMSE: {min(mu_a_sub_RMSEs)}")
 
-# Find tissue compostion which matches Ganesan 2016
-result_Ganesan = least_squares(
-    err.residual_sub, 
-    [params.sub_Ganesan["blood"],
-     params.sub_Ganesan["oxygen_saturation"],
-     params.sub_Ganesan["water"],
-     params.sub_Ganesan["fat"],
-     0.25],
-    args = (mu_a_sub_Ganesan, layer.mu_a_sub,),
-    bounds =([params.sub_lower_bound[p] for p in params.sub_params],
-             [params.sub_upper_bound[p] for p in params.sub_params])
-    )
+# # Find tissue compostion which matches Ganesan 2016
+# result_Ganesan = least_squares(
+#     err.residual_sub, 
+#     [params.sub_Ganesan["blood"],
+#      params.sub_Ganesan["oxygen_saturation"],
+#      params.sub_Ganesan["water"],
+#      params.sub_Ganesan["fat"],
+#      0.25],
+#     args = (mu_a_sub_Ganesan, layer.mu_a_sub,),
+#     bounds =([params.sub_lower_bound[p] for p in params.sub_params],
+#              [params.sub_upper_bound[p] for p in params.sub_params])
+#     )
 
 
-mu_a_sub_Ganesan_fitted = layer.mu_a_sub(
-    B = result_Ganesan.x[0], 
-    S = result_Ganesan.x[1],
-    W = result_Ganesan.x[2],
-    F = result_Ganesan.x[3],
-    M = 0.0,
-    gamma = result_Ganesan.x[4]
-    )
+# mu_a_sub_Ganesan_fitted = layer.mu_a_sub(
+#     B = result_Ganesan.x[0], 
+#     S = result_Ganesan.x[1],
+#     W = result_Ganesan.x[2],
+#     F = result_Ganesan.x[3],
+#     M = 0.0,
+#     gamma = result_Ganesan.x[4]
+#     )
 
-axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  mu_a_sub_Ganesan_fitted[lower_wavelength:upper_wavelength],
-                  label = "Model Prediction",
-                  color = "brown")
+# axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
+#                   mu_a_sub_Ganesan_fitted[lower_wavelength:upper_wavelength],
+#                   label = "Model Prediction",
+#                   color = "brown")
 
-# Find tissue compostion which matches Simpson 1998, subcutaneous layer
-# Simpson 1998 compostion not known so using Ganesan 2016 composition as an initial guess
-result_Simpson_sub = least_squares(
-    err.residual_sub, 
-    [params.sub_Ganesan["blood"],
-     params.sub_Ganesan["oxygen_saturation"],
-     params.sub_Ganesan["water"],
-     params.sub_Ganesan["fat"],
-     0.25
-     ],
-    args = (mu_a_sub_Simpson, layer.mu_a_sub,),
-    bounds =([params.sub_lower_bound[p] for p in params.sub_params],
-             [params.sub_upper_bound[p] for p in params.sub_params])
-    )
+# # Find tissue compostion which matches Simpson 1998, subcutaneous layer
+# # Simpson 1998 compostion not known so using Ganesan 2016 composition as an initial guess
+# result_Simpson_sub = least_squares(
+#     err.residual_sub, 
+#     [params.sub_Ganesan["blood"],
+#      params.sub_Ganesan["oxygen_saturation"],
+#      params.sub_Ganesan["water"],
+#      params.sub_Ganesan["fat"],
+#      0.25
+#      ],
+#     args = (mu_a_sub_Simpson, layer.mu_a_sub,),
+#     bounds =([params.sub_lower_bound[p] for p in params.sub_params],
+#              [params.sub_upper_bound[p] for p in params.sub_params])
+#     )
 
-mu_a_sub_Simpson_fitted = layer.mu_a_sub(
-    B = result_Simpson_sub.x[0], 
-    S = result_Simpson_sub.x[1],
-    W = result_Simpson_sub.x[2],
-    F = result_Simpson_sub.x[3],
-    M = 0.0,
-    gamma = result_Simpson_sub.x[4]
-    )
+# mu_a_sub_Simpson_fitted = layer.mu_a_sub(
+#     B = result_Simpson_sub.x[0], 
+#     S = result_Simpson_sub.x[1],
+#     W = result_Simpson_sub.x[2],
+#     F = result_Simpson_sub.x[3],
+#     M = 0.0,
+#     gamma = result_Simpson_sub.x[4]
+#     )
 
-axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  mu_a_sub_Simpson_fitted[lower_wavelength:upper_wavelength],
-                  color = "brown")
+# axes_mu_a[2].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
+#                   mu_a_sub_Simpson_fitted[lower_wavelength:upper_wavelength],
+#                   color = "brown")
 
 
-# Find tissue compostion which matches Simpson 1998, dermis layer
-# Simpson 1998 compostion not know so using Jacques 2013 composition as an initial guess
-result_Simpson_derm = least_squares(
-    err.residual_derm, 
-    [params.derm_Jacques["blood"],
-     params.derm_Jacques["oxygen_saturation"],
-     params.derm_Jacques["water"],
-     params.derm_Jacques["gamma"],
-     ],
-    args = (mu_a_derm_Simpson, layer.mu_a_derm,),
-    bounds =([params.derm_lower_bound[p] for p in params.derm_params],
-             [params.derm_upper_bound[p] for p in params.derm_params])
-    )
+# # Find tissue compostion which matches Simpson 1998, dermis layer
+# # Simpson 1998 compostion not know so using Jacques 2013 composition as an initial guess
+# result_Simpson_derm = least_squares(
+#     err.residual_derm, 
+#     [params.derm_Jacques["blood"],
+#      params.derm_Jacques["oxygen_saturation"],
+#      params.derm_Jacques["water"],
+#      params.derm_Jacques["gamma"],
+#      ],
+#     args = (mu_a_derm_Simpson, layer.mu_a_derm,),
+#     bounds =([params.derm_lower_bound[p] for p in params.derm_params],
+#              [params.derm_upper_bound[p] for p in params.derm_params])
+#     )
 
-mu_a_derm_Simpson_fitted = layer.mu_a_derm(
-    B = result_Simpson_derm.x[0], 
-    S = result_Simpson_derm.x[1],
-    W = result_Simpson_derm.x[2],
-    F = 0.0,
-    M = 0.0,
-    gamma = result_Simpson_derm.x[3]
-    )
+# mu_a_derm_Simpson_fitted = layer.mu_a_derm(
+#     B = result_Simpson_derm.x[0], 
+#     S = result_Simpson_derm.x[1],
+#     W = result_Simpson_derm.x[2],
+#     F = 0.0,
+#     M = 0.0,
+#     gamma = result_Simpson_derm.x[3]
+#     )
 
-axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
-                  mu_a_derm_Simpson_fitted[lower_wavelength:upper_wavelength],
-                  color = "brown")
+# axes_mu_a[1].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
+#                   mu_a_derm_Simpson_fitted[lower_wavelength:upper_wavelength],
+#                   color = "brown")
 
 fig_mu_a.legend(fontsize = 10)
 
@@ -544,12 +544,6 @@ mu_a_sub_Ganesan_align, baseline_sub_align = mu_a_sub_Ganesan.align(params.basel
 alpha = (mu_a_sub_Ganesan_align -  sub_mu_a_sim_align) / (params.sub_Ganesan["baseline"] * baseline_sub_align)
 beta = (mu_a_sub_Ganesan_align -  sub_mu_a_sim_align) / params.sub_Ganesan["baseline"]
 
-
-print(mu_a_sub_Ganesan_align)
-print(sub_mu_a_sim_align)
-print(f"alpha\n {alpha[lower_wavelength:upper_wavelength]}")
-print(f"beta\n {beta[lower_wavelength:upper_wavelength]}")
-
 fig_scale, axes_scale = plt.subplots(1, 2)
 
 fig_scale.suptitle("Baseline discrepancy between analytical and experimental\n for $\mu_{a,subcutaneous}$ , Ganesan 2016")
@@ -566,6 +560,14 @@ fig_symb, axes_symb = plt.subplots(1, 2)
 
 fig_symb.suptitle(r"Applying Symbolic Regression on $\mu_{a,subcutaneous} $")
 
+model = SR(
+    binary_operators = ["*", "+", "-"],
+    unary_operators = ["exp"]
+)
+
+model.fit(alpha.index.to_numpy().reshape(-1, 1), alpha.loc[lower_wavelength:upper_wavelength])
+
+print(model)
 
 axes_symb[0].plot(norm_wavelength_nm[lower_wavelength:upper_wavelength], 
                   sub_mu_a_sim[lower_wavelength:upper_wavelength], 
@@ -575,8 +577,6 @@ axes_symb[0].plot(df_Ganesan_sub_mu_a.loc[lower_wavelength:upper_wavelength],
                   label = "Ganesan 2016", 
                   linestyle = "--")
 axes_symb[0].set_title("Before")
-
-
 axes_symb[1].set_title("After")
 
 
@@ -584,33 +584,33 @@ fig_symb.legend(fontsize = 10)
 
 
 
-print(
-    f"===Tissue Composition Prediction of Ganesan 2016===\n"
-    f"Blood: {result_Ganesan.x[0]:.4f}\n"
-    f"Oxygen Saturation: {result_Ganesan.x[1]:.4f}\n"
-    f"Water: {result_Ganesan.x[2]:.4f}\n"
-    f"Fat: {result_Ganesan.x[3]:.4f}\n"
-    f"Melanin: 0.0\n"
-    f"Gamma: {result_Ganesan.x[4]:.4f}\n"
-    )
+# print(
+#     f"===Tissue Composition Prediction of Ganesan 2016===\n"
+#     f"Blood: {result_Ganesan.x[0]:.4f}\n"
+#     f"Oxygen Saturation: {result_Ganesan.x[1]:.4f}\n"
+#     f"Water: {result_Ganesan.x[2]:.4f}\n"
+#     f"Fat: {result_Ganesan.x[3]:.4f}\n"
+#     f"Melanin: 0.0\n"
+#     f"Gamma: {result_Ganesan.x[4]:.4f}\n"
+#     )
 
-print(
-    f"===Tissue Composition Prediction of Simpson 1998, Subcutaneous===\n"
-    f"Blood: {result_Simpson_sub.x[0]:.4f}\n"
-    f"Oxygen Saturation: {result_Simpson_sub.x[1]:.4f}\n"
-    f"Water: {result_Simpson_sub.x[2]:.4f}\n"
-    f"Fat: {result_Simpson_sub.x[3]:.4f}\n"
-    f"Melanin: 0.0\n"
-    f"Gamma: {result_Simpson_sub.x[4]:.4f}\n"
-    )
+# print(
+#     f"===Tissue Composition Prediction of Simpson 1998, Subcutaneous===\n"
+#     f"Blood: {result_Simpson_sub.x[0]:.4f}\n"
+#     f"Oxygen Saturation: {result_Simpson_sub.x[1]:.4f}\n"
+#     f"Water: {result_Simpson_sub.x[2]:.4f}\n"
+#     f"Fat: {result_Simpson_sub.x[3]:.4f}\n"
+#     f"Melanin: 0.0\n"
+#     f"Gamma: {result_Simpson_sub.x[4]:.4f}\n"
+#     )
 
-print(
-    f"===Tissue Composition Prediction of Simpson 1998, Dermis===\n"
-    f"Blood: {result_Simpson_derm.x[0]:.4f}\n"
-    f"Oxygen Saturation: {result_Simpson_derm.x[1]:.4f}\n"
-    f"Water: {result_Simpson_derm.x[2]:.4f}\n"
-    f"Melanin: 0.0\n"
-    f"Gamma: {result_Simpson_derm.x[3]:.4f}\n"
-    )
+# print(
+#     f"===Tissue Composition Prediction of Simpson 1998, Dermis===\n"
+#     f"Blood: {result_Simpson_derm.x[0]:.4f}\n"
+#     f"Oxygen Saturation: {result_Simpson_derm.x[1]:.4f}\n"
+#     f"Water: {result_Simpson_derm.x[2]:.4f}\n"
+#     f"Melanin: 0.0\n"
+#     f"Gamma: {result_Simpson_derm.x[3]:.4f}\n"
+#     )
 
 plt.show()
