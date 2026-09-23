@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 import tissue_model.tissue_params as params
 
-norm_wavelength_nm = np.arange(0, 2001, 1)
-
 # Water absorption spectra from 667-2500 nm, L. Kou 1993
 df_L_Kou_1993 = pd.read_csv("Water_Absorption_Data/L_Kou_water_absorption_1993.csv", comment = "#")
 df_L_Kou_1993_wav_sorted = df_L_Kou_1993.sort_values("lambda (nm)")
@@ -84,25 +82,21 @@ if __name__ == "__main__":
 
 # interpolated tissue consituent absorption spectras
 # the below spectras will now be interpolated within 200 - 2000 nm in 1nm increments
-L_Kou_1993_interp_np = np.interp(norm_wavelength_nm, L_Kou_1993_wavelength_nm, L_Kou_1993_mu_a_water_mm, left = 0, right = 0)
-Fewell_2019_interp_np = np.interp(norm_wavelength_nm, Fewell_2019_wavelength_nm, Fewell_2019_mu_a_water_mm, left = 0, right = 0)
-Bosschaart_2014_interp_oxy_np = np.interp(norm_wavelength_nm, Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_oxy_mm, left = 0, right = 0)
-Bosschaart_2014_interp_deoxy_np = np.interp(norm_wavelength_nm, Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_deoxy_mm, left = 0, right = 0)
-Veen_2004_interp_np = np.interp(norm_wavelength_nm, Veen_2004_wavelength_nm, Veen_2004_mu_a_fat_mm, left = 0, right = 0)
-Jacques_1998_interp_np = np.interp(norm_wavelength_nm, Jacques_1998_wavelength_nm, Jacques_1998_mu_a_melanosome_mm, left = 0, right = 0)
+L_Kou_1993_interp_np = np.interp(params.norm_wavelength_nm, L_Kou_1993_wavelength_nm, L_Kou_1993_mu_a_water_mm, left = 0, right = 0)
+Fewell_2019_interp_np = np.interp(params.norm_wavelength_nm, Fewell_2019_wavelength_nm, Fewell_2019_mu_a_water_mm, left = 0, right = 0)
+Bosschaart_2014_interp_oxy_np = np.interp(params.norm_wavelength_nm, Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_oxy_mm, left = 0, right = 0)
+Bosschaart_2014_interp_deoxy_np = np.interp(params.norm_wavelength_nm, Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_deoxy_mm, left = 0, right = 0)
+Veen_2004_interp_np = np.interp(params.norm_wavelength_nm, Veen_2004_wavelength_nm, Veen_2004_mu_a_fat_mm, left = 0, right = 0)
+Jacques_1998_interp_np = np.interp(params.norm_wavelength_nm, Jacques_1998_wavelength_nm, Jacques_1998_mu_a_melanosome_mm, left = 0, right = 0)
 
 # Converting interpolated absorption values from NumPy to Series objects since we will need to keep track of the wavelength index for each absoprtion value
-L_Kou_1993_interp_ser = pd.Series(data = L_Kou_1993_interp_np, index = norm_wavelength_nm)
-Fewell_2019_interp_ser = pd.Series(data = Fewell_2019_interp_np, index = norm_wavelength_nm)
-Bosschaart_2014_interp_oxy_ser = pd.Series(data = Bosschaart_2014_interp_oxy_np, index = norm_wavelength_nm)
-Bosschaart_2014_interp_deoxy_ser = pd.Series(data = Bosschaart_2014_interp_deoxy_np, index = norm_wavelength_nm)
-Veen_2004_interp_ser = pd.Series(data = Veen_2004_interp_np, index = norm_wavelength_nm)
-Jacques_1998_interp_ser = pd.Series(data = Jacques_1998_interp_np, index = norm_wavelength_nm)
+L_Kou_1993_interp_ser = pd.Series(data = L_Kou_1993_interp_np, index = params.norm_wavelength_nm)
+Fewell_2019_interp_ser = pd.Series(data = Fewell_2019_interp_np, index = params.norm_wavelength_nm)
+Bosschaart_2014_interp_oxy_ser = pd.Series(data = Bosschaart_2014_interp_oxy_np, index = params.norm_wavelength_nm)
+Bosschaart_2014_interp_deoxy_ser = pd.Series(data = Bosschaart_2014_interp_deoxy_np, index = params.norm_wavelength_nm)
+Veen_2004_interp_ser = pd.Series(data = Veen_2004_interp_np, index = params.norm_wavelength_nm)
+Jacques_1998_interp_ser = pd.Series(data = Jacques_1998_interp_np, index = params.norm_wavelength_nm)
 
-
-# Plotting the interpolated Series data from 600 - 1100nm in 1nm increments
-lower_wavelenghth_bound = 600 # original: 600
-upper_wavelength_bound = 1100
 
 # Using Jacques 2013 generic tissue model
 # Per layer: (B * S * mu_a_HbO2) + (B * (1-S) * mu_a_Hb) + (W * mu_a_water) + (F * mu_a_fat) + (M * mu_a_melanosome) + baseline
@@ -116,84 +110,84 @@ upper_wavelength_bound = 1100
 # Epidermis
 mu_a_water_epi = (
                  params.epi_Jacques["water"] 
-                 * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 * Fewell_2019_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                  )
 mu_a_oxy_Hb_epi = ( 
                   params.epi_Jacques["blood"] 
                   * params.epi_Jacques["oxygen_saturation"] 
-                  * Bosschaart_2014_interp_oxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                  * Bosschaart_2014_interp_oxy_ser[params.lower_wavelength : params.upper_wavelength ]
                   )
 mu_a_deoxy_epi = (
                  params.epi_Jacques["blood"]
                  * (1 - params.epi_Jacques["oxygen_saturation"]) 
-                 * Bosschaart_2014_interp_deoxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 * Bosschaart_2014_interp_deoxy_ser[params.lower_wavelength : params.upper_wavelength ]
                  )
 mu_a_fat_epi = (
                params.epi_Jacques["fat"] 
-               * Veen_2004_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+               * Veen_2004_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                )
 mu_a_melanosome_epi = (
                       params.epi_Jacques["melanosome"] 
-                      * Jacques_1998_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                      * Jacques_1998_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                       )
 mu_a_baseline_epi = (
                     params.epi_Jacques["baseline"]
-                    * params.baseline_epi[lower_wavelenghth_bound : upper_wavelength_bound ]
+                    * params.baseline_epi[params.lower_wavelength : params.upper_wavelength ]
                     )
 # Dermis
 mu_a_water_derm = (
                  params.derm_Jacques["water"] 
-                 * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 * Fewell_2019_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                  )
 mu_a_oxy_Hb_derm = ( 
                   params.derm_Jacques["blood"] 
                   * params.derm_Jacques["oxygen_saturation"] 
-                  * Bosschaart_2014_interp_oxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                  * Bosschaart_2014_interp_oxy_ser[params.lower_wavelength : params.upper_wavelength ]
                   )
 mu_a_deoxy_derm = (
                  params.derm_Jacques["blood"]
                  * (1 - params.derm_Jacques["oxygen_saturation"]) 
-                 * Bosschaart_2014_interp_deoxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 * Bosschaart_2014_interp_deoxy_ser[params.lower_wavelength : params.upper_wavelength ]
                  )
 mu_a_fat_derm = (
                params.derm_Jacques["fat"] 
-               * Veen_2004_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+               * Veen_2004_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                )
 mu_a_melanosome_derm = (
                       params.derm_Jacques["melanosome"] 
-                      * Jacques_1998_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                      * Jacques_1998_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                       )
 mu_a_baseline_derm = (
                     params.derm_Jacques["baseline"]
-                    * params.baseline_derm[lower_wavelenghth_bound : upper_wavelength_bound ]
+                    * params.baseline_derm[params.lower_wavelength : params.upper_wavelength ]
                     )
 
 # Subcutaneous
 mu_a_water_sub = (
                  params.sub_Jacques["water"] 
-                 * Fewell_2019_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 * Fewell_2019_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                  )
 mu_a_oxy_Hb_sub = ( 
                   params.sub_Jacques["blood"] 
                   * params.sub_Jacques["oxygen_saturation"] 
-                  * Bosschaart_2014_interp_oxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                  * Bosschaart_2014_interp_oxy_ser[params.lower_wavelength : params.upper_wavelength ]
                   )
 mu_a_deoxy_sub = (
                  params.sub_Jacques["blood"]
                  * (1 - params.sub_Jacques["oxygen_saturation"]) 
-                 * Bosschaart_2014_interp_deoxy_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                 * Bosschaart_2014_interp_deoxy_ser[params.lower_wavelength : params.upper_wavelength ]
                  )
 mu_a_fat_sub = (
                params.sub_Jacques["fat"] 
-               * Veen_2004_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+               * Veen_2004_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                )
 mu_a_melanosome_sub = (
                       params.sub_Jacques["melanosome"] 
-                      * Jacques_1998_interp_ser[lower_wavelenghth_bound : upper_wavelength_bound ]
+                      * Jacques_1998_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                       )
 mu_a_baseline_sub = (
                     params.sub_Jacques["baseline"]
-                    * params.baseline_sub[lower_wavelenghth_bound : upper_wavelength_bound ]
+                    * params.baseline_sub[params.lower_wavelength : params.upper_wavelength ]
                     )
 
 
@@ -208,71 +202,71 @@ for ax in axes_i:
 
 # Epidermis
 axes_i[0].set_title("Epidermis", fontsize = 18)
-axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[0].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_water_epi, 
                     label = r"$\mu_{a,water}$" "\nFewell 2019",
                     )
-axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[0].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_oxy_Hb_epi, 
                     label = r"$\mu_{a, Hb_{O_2}}$""\nBosschaart 2014",
                     )
-axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[0].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_deoxy_epi, 
                     label = r"$\mu_{a, Hb}$""\nBosschaart 2014",
                     )
-axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[0].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_fat_epi, 
                     label = r"$\mu_{a, fat}$""\nVeen 2004",
                     )
-axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[0].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_melanosome_epi, 
                     label = r"$\mu_{a, melanosome}$""\nJacques 1998",
                     )
-axes_i[0].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[0].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_baseline_epi, 
                     label = "baseline""\nMoco 2018",
                     color = "pink",
                     )
 # Dermis
 axes_i[1].set_title("Dermis", fontsize = 18)
-axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[1].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_water_derm, 
                     )
-axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[1].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_oxy_Hb_derm, 
                     )
-axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[1].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_deoxy_derm,
                     )
-axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[1].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_fat_derm,
                     )
-axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[1].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_melanosome_derm,
                     )
-axes_i[1].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[1].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_baseline_derm,
                     color = "pink",
                     )
 
 # Subcutaneous
 axes_i[2].set_title("Subcutaneous", fontsize = 18)
-axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[2].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_water_sub,
                     )
-axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[2].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_oxy_Hb_sub,
                     )
-axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[2].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_deoxy_sub,
                     )
-axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[2].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_fat_sub,
                     )
-axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[2].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_melanosome_sub,
                     )
-axes_i[2].plot(norm_wavelength_nm[lower_wavelenghth_bound : upper_wavelength_bound ], 
+axes_i[2].plot(params.norm_wavelength_nm[params.lower_wavelength : params.upper_wavelength ], 
                     mu_a_baseline_sub,
                     color = "pink",
                     )
@@ -326,7 +320,7 @@ def mu_a_derm (
     + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + (R * gamma * params.baseline_derm) # baseline tissue absorption
+    + (R * gamma * params.baseline_derm[params.lower_wavelength: params.upper_wavelength]) # baseline tissue absorption
     )
     return total_mu_a
 
@@ -348,7 +342,7 @@ def mu_a_sub (
     + (W * Fewell_2019_interp_ser) 
     + (F * Veen_2004_interp_ser) 
     + (M * Jacques_1998_interp_ser)
-    + (R * gamma * params.baseline_sub) # baseline tissue absorption
+    + (R * gamma * params.baseline_sub[params.lower_wavelength: params.upper_wavelength]) # baseline tissue absorption
     )
     return total_mu_a
 
@@ -358,16 +352,16 @@ def mu_s_layer(
 ) -> pd.Series:
     match(lay):
         case("epidermis"):
-            mu_s_rd = 6.87 * (norm_wavelength_nm[1:] / 500) ** -1.161
+            mu_s_rd = 6.87 * (params.norm_wavelength_nm[1:] / 500) ** -1.161
             mu_s = mu_s_rd/(1-g)
         case("dermis"):
-            mu_s_rd = 4.53 * (norm_wavelength_nm[1:] / 500) ** -1.292
+            mu_s_rd = 4.53 * (params.norm_wavelength_nm[1:] / 500) ** -1.292
             mu_s = mu_s_rd/(1-g)
         case("subcutaneous"):
-            mu_s_rd = 1.84 * (norm_wavelength_nm[1:] / 500) ** -0.672
+            mu_s_rd = 1.84 * (params.norm_wavelength_nm[1:] / 500) ** -0.672
             mu_s = mu_s_rd/(1-g)
         case _:
             mu_s = 0
             print("invalid layer")
-    mu_s_ser = pd.Series(data = mu_s, index = norm_wavelength_nm[1:])
+    mu_s_ser = pd.Series(data = mu_s, index = params.norm_wavelength_nm[1:])
     return mu_s_ser

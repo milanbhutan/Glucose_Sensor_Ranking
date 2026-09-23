@@ -4,6 +4,8 @@ import pandas as pd
 derm_gamma = 0 # was 0.50
 sub_gamma = 0
 
+lower_wavelength = 600 # original: 600
+upper_wavelength = 1060
 norm_wavelength_nm = np.arange(0, 2001, 1)
 
 baseline_epi_np = (8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2) + 0.0244)
