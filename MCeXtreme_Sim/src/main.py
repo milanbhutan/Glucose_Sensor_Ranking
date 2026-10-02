@@ -5,16 +5,17 @@ import tissue_model.layer as layer
 import tissue_model.tissue_params as params
 import analysis.error_analysis as err
 import analysis.uncertainty_analysis as uncertain
+from pysr import PySRRegressor as SR
 import physo
 import torch
-from pysr import PySRRegressor as SR
 from scipy.optimize import least_squares
 from pathlib import Path
 
+plt.rcParams["text.usetex"] = False
+
 csv_path = Path("outputs/PySR_Best_eq.csv")
 
-PySR_runs = range(100)
-
+PySR_runs = range(20)
 
 # For scattering coefficent
 epi_g = 0.9
@@ -361,33 +362,32 @@ fig_mu_s.legend(fontsize = 10)
 # print(f"Maximum mu_a_sub_RMSE: {max(mu_a_sub_RMSEs)}")
 # print(f"Minimum mu_a_sub_RMSE: {min(mu_a_sub_RMSEs)}")
 
-# # Find tissue compostion which matches Ganesan 2016
-# result_Ganesan = least_squares(
-#     err.residual_sub, 
-#     [params.sub_Ganesan["blood"],
-#      params.sub_Ganesan["oxygen_saturation"],
-#      params.sub_Ganesan["water"],
-#      params.sub_Ganesan["fat"],
-#      0.25],
-#     args = (mu_a_sub_Ganesan, layer.mu_a_sub,),
-#     bounds =([params.sub_lower_bound[p] for p in params.sub_params],
-#              [params.sub_upper_bound[p] for p in params.sub_params])
-#     )
+# Find tissue compostion which matches Ganesan 2016
+result_Ganesan = least_squares(
+    err.residual_sub, 
+    [params.sub_Ganesan["blood"],
+     params.sub_Ganesan["oxygen_saturation"],
+     params.sub_Ganesan["water"],
+     params.sub_Ganesan["fat"],
+     ],
+    args = (mu_a_sub_Ganesan, layer.mu_a_sub,),
+    bounds =([params.sub_lower_bound[p] for p in params.sub_params],
+             [params.sub_upper_bound[p] for p in params.sub_params])
+    )
 
 
-# mu_a_sub_Ganesan_fitted = layer.mu_a_sub(
-#     B = result_Ganesan.x[0], 
-#     S = result_Ganesan.x[1],
-#     W = result_Ganesan.x[2],
-#     F = result_Ganesan.x[3],
-#     M = 0.0,
-#     gamma = result_Ganesan.x[4]
-#     )
+mu_a_sub_Ganesan_fitted = layer.mu_a_sub(
+    B = result_Ganesan.x[0], 
+    S = result_Ganesan.x[1],
+    W = result_Ganesan.x[2],
+    F = result_Ganesan.x[3],
+    M = 0.0,
+    )
 
-# axes_mu_a[2].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-#                   mu_a_sub_Ganesan_fitted[params.lower_wavelength:params.upper_wavelength],
-#                   label = "Model Prediction",
-#                   color = "brown")
+axes_mu_a[2].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
+                  mu_a_sub_Ganesan_fitted[params.lower_wavelength:params.upper_wavelength],
+                  label = "Model Prediction",
+                  color = "brown")
 
 # # Find tissue compostion which matches Simpson 1998, subcutaneous layer
 # # Simpson 1998 compostion not known so using Ganesan 2016 composition as an initial guess
@@ -561,7 +561,7 @@ axes_scale[1].plot(beta.index,
 
 fig_symb, axes_symb = plt.subplots(1, 2)
 
-fig_symb.suptitle(r"Applying Symbolic Regression on $\mu_{a,subcutaneous} $")
+fig_symb.suptitle(r"Physically Implausible $\alpha(\lambda)$ Expressions from PySR")
 
 # Will test later
 # expression, logs = physo.SR(
@@ -569,23 +569,26 @@ fig_symb.suptitle(r"Applying Symbolic Regression on $\mu_{a,subcutaneous} $")
 #     unary_operators = ["exp"]
 # )
 
-for i in PySR_runs:
-    model = SR(
-        binary_operators = ["*", "+", "-"],
-        unary_operators = ["exp"]
-    )
+# for i in PySR_runs:
+#     model = SR(
+#         binary_operators = ["*", "+", "-", "/"],
+#         unary_operators = ["exp"],
+#         elementwise_loss = """
+# loss(prediction, target) = prediction >= 0 ? (target - prediction) ^ 2 : Inf
+# """
+#     )
+#     model.fit(alpha.index.to_numpy().reshape(-1, 1), alpha.loc[params.lower_wavelength:params.upper_wavelength])
 
-    model.fit(alpha.index.to_numpy().reshape(-1, 1), alpha.loc[params.lower_wavelength:params.upper_wavelength])
-    print(model)
+#     print(model)
 
-    best = model.get_best()
-    best.to_frame().T.to_csv(
-        csv_path,
-        mode = "a",
-        header = not csv_path.exists(),
-        index = False
+#     best = model.get_best()
+#     best.to_frame().T.to_csv(
+#         csv_path,
+#         mode = "a",
+#         header = not csv_path.exists(),
+#         index = False
         
-        )
+#         )
 
 
 correction_1 = np.exp(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength] * 0.008014623) * -0.00020990851
@@ -608,7 +611,7 @@ axes_symb[0].plot(df_Ganesan_sub_mu_a.loc[params.lower_wavelength:params.upper_w
                   color = "black", 
                   label = "Ganesan 2016", 
                   linestyle = "--")
-axes_symb[0].set_title("Before")
+axes_symb[0].set_title(r"$\alpha(\lambda) = 0$")
 
 axes_symb[1].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
                   cor_sub_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
@@ -616,22 +619,21 @@ axes_symb[1].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper
 axes_symb[1].plot(df_Ganesan_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
                   color = "black", 
                   linestyle = "--")
-axes_symb[1].set_title("After")
+axes_symb[1].set_title(r"$\alpha(\lambda) < 0$")
 
 
 fig_symb.legend(fontsize = 10)
 
 
 
-# print(
-#     f"===Tissue Composition Prediction of Ganesan 2016===\n"
-#     f"Blood: {result_Ganesan.x[0]:.4f}\n"
-#     f"Oxygen Saturation: {result_Ganesan.x[1]:.4f}\n"
-#     f"Water: {result_Ganesan.x[2]:.4f}\n"
-#     f"Fat: {result_Ganesan.x[3]:.4f}\n"
-#     f"Melanin: 0.0\n"
-#     f"Gamma: {result_Ganesan.x[4]:.4f}\n"
-#     )
+print(
+    f"===Tissue Composition Prediction of Ganesan 2016===\n"
+    f"Blood: {result_Ganesan.x[0]:.4f}\n"
+    f"Oxygen Saturation: {result_Ganesan.x[1]:.4f}\n"
+    f"Water: {result_Ganesan.x[2]:.4f}\n"
+    f"Fat: {result_Ganesan.x[3]:.4f}\n"
+    f"Melanin: 0.0\n"
+    )
 
 # print(
 #     f"===Tissue Composition Prediction of Simpson 1998, Subcutaneous===\n"

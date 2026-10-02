@@ -31,7 +31,6 @@ derm_params = [
     "blood",
     "oxygen_saturation",
     "water",
-    "gamma"
 ]
 
 sub_params = [
@@ -39,7 +38,6 @@ sub_params = [
     "oxygen_saturation",
     "water",
     "fat",
-    "gamma",
 ]
 
 
@@ -240,19 +238,19 @@ derm_lower_bound = {
 }
 
 sub_upper_bound = {
-    "blood" : 0.010,
-    "oxygen_saturation" : 0.80,    
-    "water" : 0.30,
-    "fat" : 0.80,
-    "gamma" : 1, # original: 0.3
+    "blood" : 0.00813,
+    "oxygen_saturation" : 0.67,    
+    "water" : 0.304,
+    "fat" : 0.702,
+    "gamma" : 0, # original: 0.3
 
 }
 
 sub_lower_bound = {
-    "blood" : 0.002,
-    "oxygen_saturation" : 0.50,    
-    "water" : 0.10,
-    "fat" : 0.3, #original: 0.55
-    "gamma" : 0.1, #original: 0.2
+    "blood" : 0.00398,
+    "oxygen_saturation" : 0.493,    
+    "water" : 0.145,
+    "fat" : 0.599, 
+    "gamma" : 0, #original: 0.2
 
 }

@@ -74,6 +74,7 @@ if __name__ == "__main__":
     axes[1, 2].set_title(r"$\mu_{a, melanosome}$ for 200 - 2000 nm""\nJacques 1998")
     axes[1, 2].set_xlabel("Wavelength (nm)")
     axes[1, 2].set_ylabel("Absorption (1/mm)")
+    plt.show()
 
 
 
@@ -164,29 +165,29 @@ mu_a_baseline_derm = (
 
 # Subcutaneous
 mu_a_water_sub = (
-                 params.sub_Jacques["water"] 
+                 params.sub_Ganesan["water"] 
                  * Fewell_2019_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                  )
 mu_a_oxy_Hb_sub = ( 
-                  params.sub_Jacques["blood"] 
-                  * params.sub_Jacques["oxygen_saturation"] 
+                  params.sub_Ganesan["blood"] 
+                  * params.sub_Ganesan["oxygen_saturation"] 
                   * Bosschaart_2014_interp_oxy_ser[params.lower_wavelength : params.upper_wavelength ]
                   )
 mu_a_deoxy_sub = (
-                 params.sub_Jacques["blood"]
-                 * (1 - params.sub_Jacques["oxygen_saturation"]) 
+                 params.sub_Ganesan["blood"]
+                 * (1 - params.sub_Ganesan["oxygen_saturation"]) 
                  * Bosschaart_2014_interp_deoxy_ser[params.lower_wavelength : params.upper_wavelength ]
                  )
 mu_a_fat_sub = (
-               params.sub_Jacques["fat"] 
+               params.sub_Ganesan["fat"] 
                * Veen_2004_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                )
 mu_a_melanosome_sub = (
-                      params.sub_Jacques["melanosome"] 
+                      params.sub_Ganesan["melanosome"] 
                       * Jacques_1998_interp_ser[params.lower_wavelength : params.upper_wavelength ]
                       )
 mu_a_baseline_sub = (
-                    params.sub_Jacques["baseline"]
+                    params.sub_Ganesan["baseline"]
                     * params.baseline_sub[params.lower_wavelength : params.upper_wavelength ]
                     )
 

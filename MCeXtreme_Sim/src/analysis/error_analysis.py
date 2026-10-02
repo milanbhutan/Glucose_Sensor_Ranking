@@ -23,7 +23,6 @@ def residual_derm(
         W = params[2],
         F = 0.0,
         M = 0.0,
-        gamma = params[3],
         )
     exp_data_align, sim_data_align = sim_data.align(exp_data, join = "inner")
     residual_error = exp_data_align - sim_data_align
@@ -40,7 +39,6 @@ def residual_sub(
         W = params[2], 
         F = params[3], 
         M = 0.0,
-        gamma = params[4],
         )
     exp_data_align, sim_data_align = sim_data.align(exp_data, join = "inner")
     residual_error = exp_data_align - sim_data_align
