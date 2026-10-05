@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import tissue_model.tissue_params as params
-import tissue_model.layer as layer
+import tissue_model.layer_calc as calc
 
 rng = np.random.default_rng(45)
 
@@ -16,14 +16,16 @@ for i in range(200):
     # derm_gamma = rng.uniform(params.derm_lower_bound["gamma"], params.derm_upper_bound["gamma"])
     if(1 - (derm_blood + derm_water) > 0):
         derm_mu_a_sim_set.append(
-            layer.mu_a_derm(
+            calc.derm(
                 B = derm_blood, 
                 S = derm_oxygen_saturation, 
                 W = derm_water, 
                 F = 0, 
                 M = 0,
+                baseline = params.baseline_derm,
                 gamma = params.derm_gamma,
-        )
+                
+        )[0]
         )
 
 for i in range(200):
@@ -34,13 +36,14 @@ for i in range(200):
     # sub_gamma = rng.uniform(params.sub_lower_bound["gamma"], params.sub_upper_bound["gamma"])
     if(1 - (sub_blood + sub_water + sub_fat) > 0): # Remove samples with a negative baseline fraction
         sub_mu_a_sim_set.append(
-            layer.mu_a_sub(
+            calc.sub(
                 B = sub_blood, 
                 S = sub_oxygen_saturation, 
                 W = sub_water, 
                 F = sub_fat, 
                 M = 0,
-        )
+                baseline = params.baseline_sub
+        )[0]
         )
 
 epi_mu_a_sim_df = []

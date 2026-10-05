@@ -1,15 +1,18 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import tissue_model.layer as layer
-import tissue_model.tissue_params as params
-import analysis.error_analysis as err
-import analysis.uncertainty_analysis as uncertain
 from pysr import PySRRegressor as SR
 import physo
 import torch
 from scipy.optimize import least_squares
 from pathlib import Path
+
+import tissue_model.layer_calc as calc
+import tissue_model.tissue_params as params
+import analysis.error_analysis as err
+import analysis.uncertainty_analysis as uncertain
+from photon_sim import monte_carlo
+
 
 plt.rcParams["text.usetex"] = False
 
@@ -17,91 +20,7 @@ csv_path = Path("outputs/PySR_Best_eq.csv")
 
 PySR_runs = range(20)
 
-# For scattering coefficent
-epi_g = 0.9
-derm_g = 0.9
-sub_g = 0.9
 
-epi_mu_s_sim = layer.mu_s_layer("epidermis", epi_g)
-derm_mu_s_sim = layer.mu_s_layer("dermis", derm_g)
-sub_mu_s_sim = layer.mu_s_layer("subcutaneous", sub_g)
-
-# For reduced scattering coefficent
-epi_g_red = 0
-derm_g_red = 0
-sub_g_red = 0
-
-epi_mu_s_red_sim = layer.mu_s_layer("epidermis", epi_g_red)
-derm_mu_s_red_sim = layer.mu_s_layer("dermis", derm_g_red)
-sub_mu_s_red_sim = layer.mu_s_layer("subcutaneous", sub_g_red)
-
-
-epi_n = 1.4
-derm_n = 1.4
-sub_n = 1.4
-
-epi_mu_a_sim = layer.mu_a_epi(params.epi_Jacques["blood"], 
-                                    params.epi_Jacques["oxygen_saturation"], 
-                                    params.epi_Jacques["water"], 
-                                    params.epi_Jacques["fat"], 
-                                    params.epi_Jacques["melanosome"]
-                                    )
-
-epi_mu_a_sim_Jolivot_SPT_II = layer.mu_a_epi(params.epi_Jolivot_SPT_II["blood"], 
-                                    params.epi_Jolivot_SPT_II["oxygen_saturation"], 
-                                    params.epi_Jolivot_SPT_II["water"], 
-                                    params.epi_Jolivot_SPT_II["fat"], 
-                                    params.epi_Jolivot_SPT_II["melanosome"]
-                                    )
-
-epi_mu_a_sim_Jolivot_SPT_III = layer.mu_a_epi(params.epi_Jolivot_SPT_III["blood"], 
-                                    params.epi_Jolivot_SPT_III["oxygen_saturation"], 
-                                    params.epi_Jolivot_SPT_III["water"], 
-                                    params.epi_Jolivot_SPT_III["fat"], 
-                                    params.epi_Jolivot_SPT_III["melanosome"]
-                                    )
-
-epi_mu_a_sim_Jolivot_SPT_IV = layer.mu_a_epi(params.epi_Jolivot_SPT_IV["blood"], 
-                                    params.epi_Jolivot_SPT_IV["oxygen_saturation"], 
-                                    params.epi_Jolivot_SPT_IV["water"], 
-                                    params.epi_Jolivot_SPT_IV["fat"], 
-                                    params.epi_Jolivot_SPT_IV["melanosome"]
-                                    )
-
-epi_mu_a_sim_Jolivot_SPT_V = layer.mu_a_epi(params.epi_Jolivot_SPT_V["blood"], 
-                                    params.epi_Jolivot_SPT_V["oxygen_saturation"], 
-                                    params.epi_Jolivot_SPT_V["water"], 
-                                    params.epi_Jolivot_SPT_V["fat"], 
-                                    params.epi_Jolivot_SPT_V["melanosome"]
-                                    )
-
-epi_mu_a_sim_Jolivot_SPT_VI = layer.mu_a_epi(params.epi_Jolivot_SPT_VI["blood"], 
-                                    params.epi_Jolivot_SPT_VI["oxygen_saturation"], 
-                                    params.epi_Jolivot_SPT_VI["water"], 
-                                    params.epi_Jolivot_SPT_VI["fat"], 
-                                    params.epi_Jolivot_SPT_VI["melanosome"]
-                                    )
-
-derm_mu_a_sim = layer.mu_a_derm(params.derm_Jacques["blood"], 
-                                  params.derm_Jacques["oxygen_saturation"], 
-                                  params.derm_Jacques["water"], 
-                                  params.derm_Jacques["fat"], 
-                                  params.derm_Jacques["melanosome"]
-                                  )
-
-sub_mu_a_sim_Jacques = layer.mu_a_sub(params.sub_Jacques["blood"], 
-                                       params.sub_Jacques["oxygen_saturation"], 
-                                       params.sub_Jacques["water"], 
-                                       params.sub_Jacques["fat"], 
-                                       params.sub_Jacques["melanosome"]
-                                       )
-
-sub_mu_a_sim = layer.mu_a_sub(params.sub_Ganesan["blood"], 
-                                               params.sub_Ganesan["oxygen_saturation"],
-                                               params.sub_Ganesan["water"],
-                                               params.sub_Ganesan["fat"],
-                                               params.sub_Ganesan["melanosome"]
-                                               )
 
 
 
@@ -134,6 +53,12 @@ df_Shimojo_derm_mu_a = (
     .sort_index()
 )
 
+df_Jonasson_derm_mu_a = (
+    pd.read_csv("Exp_Absorption/jonasson_lower_dermis_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
 df_Ganesan_sub_mu_a = (
     pd.read_csv("Exp_Absorption/ganesan_subcutaneous_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
@@ -141,12 +66,12 @@ df_Ganesan_sub_mu_a = (
 )
 mu_a_sub_Ganesan = df_Ganesan_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength, "mu_a_mm^-1"]
 
-df_Simpson_sub_mu_a = (
-    pd.read_csv("Exp_Absorption/simpson_subcutaneous_absorption.csv", comment = "#")
-    .set_index("wavelength_nm")
-    .sort_index()
-)
-mu_a_sub_Simpson = df_Simpson_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength, "caucasian_subdermis_mu_a_mm^-1"]
+# df_Simpson_sub_mu_a = (
+#     pd.read_csv("Exp_Absorption/simpson_subcutaneous_absorption.csv", comment = "#")
+#     .set_index("wavelength_nm")
+#     .sort_index()
+# )
+# mu_a_sub_Simpson = df_Simpson_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength, "caucasian_subdermis_mu_a_mm^-1"]
 
 # Scattering Data
 df_Shimojo_epi_red_mu_s = (
@@ -202,43 +127,47 @@ for ax in axes_mu_a:
 
 # Simulated absorption spectra plots
 axes_mu_a[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  epi_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
+                  params.epi_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
                   label = "Analytical Models", 
                   color = "red")
 axes_mu_a[0].text(params.lower_wavelength, 
-                  epi_mu_a_sim[params.lower_wavelength], 
+                  params.epi_mu_a_sim[params.lower_wavelength], 
                   "M=2.5%", 
                   color = "red")
 
 axes_mu_a[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  epi_mu_a_sim_Jolivot_SPT_II[params.lower_wavelength:params.upper_wavelength], 
+                  params.epi_mu_a_sim_Jolivot_SPT_II[params.lower_wavelength:params.upper_wavelength], 
                   color = "red")
 
 
 axes_mu_a[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  epi_mu_a_sim_Jolivot_SPT_III[params.lower_wavelength:params.upper_wavelength], 
+                  params.epi_mu_a_sim_Jolivot_SPT_III[params.lower_wavelength:params.upper_wavelength], 
                   color = "red")
 
 axes_mu_a[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  epi_mu_a_sim_Jolivot_SPT_IV[params.lower_wavelength:params.upper_wavelength], 
+                  params.epi_mu_a_sim_Jolivot_SPT_IV[params.lower_wavelength:params.upper_wavelength], 
                   color = "red")
 
 axes_mu_a[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  epi_mu_a_sim_Jolivot_SPT_V[params.lower_wavelength:params.upper_wavelength], 
+                  params.epi_mu_a_sim_Jolivot_SPT_V[params.lower_wavelength:params.upper_wavelength], 
                   color = "red")
 
 axes_mu_a[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  epi_mu_a_sim_Jolivot_SPT_VI[params.lower_wavelength:params.upper_wavelength], 
+                  params.epi_mu_a_sim_Jolivot_SPT_VI[params.lower_wavelength:params.upper_wavelength], 
                   color = "red")
 axes_mu_a[0].text(params.lower_wavelength - 22, 
-                  epi_mu_a_sim_Jolivot_SPT_VI[params.lower_wavelength], 
+                  params.epi_mu_a_sim_Jolivot_SPT_VI[params.lower_wavelength], 
                   "M=44.7%", 
                   color = "red")
 
 axes_mu_a[0].set_title(r"$\mu_a$ epidermis", fontsize = 18)
 
 axes_mu_a[1].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  derm_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
+                  params.derm_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
+                  color = "red")
+
+axes_mu_a[1].plot(params.norm_wavelength_nm[params.lower_wavelength:850], 
+                  params.Jonasson_derm_mu_a_sim[params.lower_wavelength:850], 
                   color = "red")
 
 axes_mu_a[1].plot(
@@ -251,7 +180,7 @@ axes_mu_a[1].set_title(r"$\mu_a$ dermis",  fontsize = 18)
 
 
 axes_mu_a[2].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  sub_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
+                  params.sub_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
                   color = "red")
 
 axes_mu_a[2].plot(
@@ -277,6 +206,11 @@ axes_mu_a[1].plot(df_Simpson_derm_mu_a.loc[params.lower_wavelength:params.upper_
                   color = "green",
                   linestyle = "--")
 
+axes_mu_a[1].plot(df_Jonasson_derm_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
+                  color = "purple",
+                  label = "Jonasson 2023",
+                  linestyle = "--")
+
 # axes_mu_a[1].plot(df_Shimojo_derm_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
 #                   color = "black",
 #                   linestyle = "--")
@@ -285,10 +219,10 @@ axes_mu_a[2].plot(df_Ganesan_sub_mu_a.loc[params.lower_wavelength:params.upper_w
                   color = "black", 
                   label = "Ganesan 2016", 
                   linestyle = "--")
-axes_mu_a[2].plot(df_Simpson_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
-                  color = "green", 
-                  label = "Simpson 1998", 
-                  linestyle = "--")
+# axes_mu_a[2].plot(df_Simpson_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
+#                   color = "green", 
+#                   label = "Simpson 1998", 
+#                   linestyle = "--")
 axes_mu_a[2].scatter(x = 650, 
                      y = 0.006,
                      color = "pink",
@@ -308,7 +242,7 @@ for ax in axes_mu_s:
 
 # Simulated reduced scattering coefficients
 axes_mu_s[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  epi_mu_s_red_sim[params.lower_wavelength:params.upper_wavelength], 
+                  params.epi_mu_s_red_sim[params.lower_wavelength:params.upper_wavelength], 
                   label = "Jacques 2013 Model", 
                   color = "red")
 axes_mu_s[0].set_title(r"$\mu_s^'$ epidermis", fontsize = 18)
@@ -316,12 +250,12 @@ axes_mu_s[0].set_title(r"$\mu_s^'$ epidermis", fontsize = 18)
 
 
 axes_mu_s[1].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  derm_mu_s_red_sim[params.lower_wavelength:params.upper_wavelength], 
+                  params.derm_mu_s_red_sim[params.lower_wavelength:params.upper_wavelength], 
                   color = "red")
 axes_mu_s[1].set_title(r"$\mu^'_s$ dermis", fontsize = 18)
 
 axes_mu_s[2].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  sub_mu_s_red_sim[params.lower_wavelength:params.upper_wavelength], 
+                  params.sub_mu_s_red_sim[params.lower_wavelength:params.upper_wavelength], 
                   color = "red")
 axes_mu_s[2].set_title(r"$\mu^'_s$ subcutaneous tissue", fontsize = 18)
 
@@ -362,32 +296,32 @@ fig_mu_s.legend(fontsize = 10)
 # print(f"Maximum mu_a_sub_RMSE: {max(mu_a_sub_RMSEs)}")
 # print(f"Minimum mu_a_sub_RMSE: {min(mu_a_sub_RMSEs)}")
 
-# Find tissue compostion which matches Ganesan 2016
-result_Ganesan = least_squares(
-    err.residual_sub, 
-    [params.sub_Ganesan["blood"],
-     params.sub_Ganesan["oxygen_saturation"],
-     params.sub_Ganesan["water"],
-     params.sub_Ganesan["fat"],
-     ],
-    args = (mu_a_sub_Ganesan, layer.mu_a_sub,),
-    bounds =([params.sub_lower_bound[p] for p in params.sub_params],
-             [params.sub_upper_bound[p] for p in params.sub_params])
-    )
+# # Find tissue compostion which matches Ganesan 2016
+# result_Ganesan = least_squares(
+#     err.residual_sub, 
+#     [params.sub_Ganesan["blood"],
+#      params.sub_Ganesan["oxygen_saturation"],
+#      params.sub_Ganesan["water"],
+#      params.sub_Ganesan["fat"],
+#      ],
+#     args = (mu_a_sub_Ganesan, calc.mu_a_sub,),
+#     bounds =([params.sub_lower_bound[p] for p in params.sub_params],
+#              [params.sub_upper_bound[p] for p in params.sub_params])
+#     )
 
 
-mu_a_sub_Ganesan_fitted = layer.mu_a_sub(
-    B = result_Ganesan.x[0], 
-    S = result_Ganesan.x[1],
-    W = result_Ganesan.x[2],
-    F = result_Ganesan.x[3],
-    M = 0.0,
-    )
+# mu_a_sub_Ganesan_fitted = calc.mu_a_sub(
+#     B = result_Ganesan.x[0], 
+#     S = result_Ganesan.x[1],
+#     W = result_Ganesan.x[2],
+#     F = result_Ganesan.x[3],
+#     M = 0.0,
+#     )
 
-axes_mu_a[2].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  mu_a_sub_Ganesan_fitted[params.lower_wavelength:params.upper_wavelength],
-                  label = "Model Prediction",
-                  color = "brown")
+# axes_mu_a[2].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
+#                   mu_a_sub_Ganesan_fitted[params.lower_wavelength:params.upper_wavelength],
+#                   label = "Model Prediction",
+#                   color = "brown")
 
 # # Find tissue compostion which matches Simpson 1998, subcutaneous layer
 # # Simpson 1998 compostion not known so using Ganesan 2016 composition as an initial guess
@@ -399,12 +333,12 @@ axes_mu_a[2].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper
 #      params.sub_Ganesan["fat"],
 #      0.25
 #      ],
-#     args = (mu_a_sub_Simpson, layer.mu_a_sub,),
+#     args = (mu_a_sub_Simpson, calc.mu_a_sub,),
 #     bounds =([params.sub_lower_bound[p] for p in params.sub_params],
 #              [params.sub_upper_bound[p] for p in params.sub_params])
 #     )
 
-# mu_a_sub_Simpson_fitted = layer.mu_a_sub(
+# mu_a_sub_Simpson_fitted = calc.mu_a_sub(
 #     B = result_Simpson_sub.x[0], 
 #     S = result_Simpson_sub.x[1],
 #     W = result_Simpson_sub.x[2],
@@ -427,12 +361,12 @@ axes_mu_a[2].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper
 #      params.derm_Jacques["water"],
 #      params.derm_Jacques["gamma"],
 #      ],
-#     args = (mu_a_derm_Simpson, layer.mu_a_derm,),
+#     args = (mu_a_derm_Simpson, calc.mu_a_derm,),
 #     bounds =([params.derm_lower_bound[p] for p in params.derm_params],
 #              [params.derm_upper_bound[p] for p in params.derm_params])
 #     )
 
-# mu_a_derm_Simpson_fitted = layer.mu_a_derm(
+# mu_a_derm_Simpson_fitted = calc.mu_a_derm(
 #     B = result_Simpson_derm.x[0], 
 #     S = result_Simpson_derm.x[1],
 #     W = result_Simpson_derm.x[2],
@@ -540,28 +474,28 @@ axes_mu_a[2].text(
     fontsize = 10
 )
 
-# Symbolic Regression using Ganesan 2016
-mu_a_sub_Ganesan_align, sub_mu_a_sim_align = mu_a_sub_Ganesan.align(sub_mu_a_sim[params.lower_wavelength:params.upper_wavelength], join = "inner")
-mu_a_sub_Ganesan_align, baseline_sub_align = mu_a_sub_Ganesan.align(params.baseline_sub[params.lower_wavelength:params.upper_wavelength], join = "inner")
+# # Symbolic Regression using Ganesan 2016
+# mu_a_sub_Ganesan_align, sub_mu_a_sim_align = mu_a_sub_Ganesan.align(params.sub_mu_a_sim[params.lower_wavelength:params.upper_wavelength], join = "inner")
+# mu_a_sub_Ganesan_align, baseline_sub_align = mu_a_sub_Ganesan.align(params.baseline_sub[params.lower_wavelength:params.upper_wavelength], join = "inner")
 
-alpha = (mu_a_sub_Ganesan_align -  sub_mu_a_sim_align) / (params.sub_Ganesan["baseline"] * baseline_sub_align)
-beta = (mu_a_sub_Ganesan_align -  sub_mu_a_sim_align) / params.sub_Ganesan["baseline"]
+# alpha = (mu_a_sub_Ganesan_align -  sub_mu_a_sim_align) / (params.sub_Ganesan["baseline"] * baseline_sub_align)
+# beta = (mu_a_sub_Ganesan_align -  sub_mu_a_sim_align) / params.sub_Ganesan["baseline"]
 
-fig_scale, axes_scale = plt.subplots(1, 2)
+# fig_scale, axes_scale = plt.subplots(1, 2)
 
-fig_scale.suptitle("Baseline discrepancy between analytical and experimental\n for $\mu_{a,subcutaneous}$ , Ganesan 2016")
+# fig_scale.suptitle("Baseline discrepancy between analytical and experimental\n for $\mu_{a,subcutaneous}$ , Ganesan 2016")
 
-axes_scale[0].plot(alpha.index, 
-                  alpha.loc[params.lower_wavelength:params.upper_wavelength], 
-                  color = "black")
-axes_scale[1].plot(beta.index, 
-                  beta.loc[params.lower_wavelength:params.upper_wavelength], 
-                  color = "black")
+# axes_scale[0].plot(alpha.index, 
+#                   alpha.loc[params.lower_wavelength:params.upper_wavelength], 
+#                   color = "black")
+# axes_scale[1].plot(beta.index, 
+#                   beta.loc[params.lower_wavelength:params.upper_wavelength], 
+#                   color = "black")
 
 
-fig_symb, axes_symb = plt.subplots(1, 2)
+# fig_symb, axes_symb = plt.subplots(1, 2)
 
-fig_symb.suptitle(r"Physically Implausible $\alpha(\lambda)$ Expressions from PySR")
+# fig_symb.suptitle(r"Physically Implausible $\alpha(\lambda)$ Expressions from PySR")
 
 # Will test later
 # expression, logs = physo.SR(
@@ -591,49 +525,52 @@ fig_symb.suptitle(r"Physically Implausible $\alpha(\lambda)$ Expressions from Py
 #         )
 
 
-correction_1 = np.exp(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength] * 0.008014623) * -0.00020990851
+# correction_1 = np.exp(params.norm_wavelength_nm * 0.008014623) * -0.00020990851
 
-cor_sub_mu_a_sim = layer.mu_a_sub(params.sub_Ganesan["blood"], 
-                                               params.sub_Ganesan["oxygen_saturation"],
-                                               params.sub_Ganesan["water"],
-                                               params.sub_Ganesan["fat"],
-                                               params.sub_Ganesan["melanosome"],
-                                               gamma = correction_1
-                                               )
+# print(f"calc input: {params.baseline_sub}")
 
-
-
-axes_symb[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  sub_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
-                  color = "red",
-                  label = "Analytical Model",)
-axes_symb[0].plot(df_Ganesan_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
-                  color = "black", 
-                  label = "Ganesan 2016", 
-                  linestyle = "--")
-axes_symb[0].set_title(r"$\alpha(\lambda) = 0$")
-
-axes_symb[1].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  cor_sub_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
-                  color = "red")
-axes_symb[1].plot(df_Ganesan_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
-                  color = "black", 
-                  linestyle = "--")
-axes_symb[1].set_title(r"$\alpha(\lambda) < 0$")
-
-
-fig_symb.legend(fontsize = 10)
+# cor_sub_mu_a_sim = calc.sub(params.sub_Ganesan["blood"], 
+#                                                params.sub_Ganesan["oxygen_saturation"],
+#                                                params.sub_Ganesan["water"],
+#                                                params.sub_Ganesan["fat"],
+#                                                params.sub_Ganesan["melanosome"],
+#                                                params.baseline_sub,
+#                                                gamma = correction_1
+#                                                )[0]
 
 
 
-print(
-    f"===Tissue Composition Prediction of Ganesan 2016===\n"
-    f"Blood: {result_Ganesan.x[0]:.4f}\n"
-    f"Oxygen Saturation: {result_Ganesan.x[1]:.4f}\n"
-    f"Water: {result_Ganesan.x[2]:.4f}\n"
-    f"Fat: {result_Ganesan.x[3]:.4f}\n"
-    f"Melanin: 0.0\n"
-    )
+# axes_symb[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
+#                   params.sub_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
+#                   color = "red",
+#                   label = "Analytical Model",)
+# axes_symb[0].plot(df_Ganesan_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
+#                   color = "black", 
+#                   label = "Ganesan 2016", 
+#                   linestyle = "--")
+# axes_symb[0].set_title(r"$\alpha(\lambda) = 0$")
+
+# axes_symb[1].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
+#                   cor_sub_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
+#                   color = "red")
+# axes_symb[1].plot(df_Ganesan_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
+#                   color = "black", 
+#                   linestyle = "--")
+# axes_symb[1].set_title(r"$\alpha(\lambda) < 0$")
+
+
+# fig_symb.legend(fontsize = 10)
+
+
+
+# print(
+#     f"===Tissue Composition Prediction of Ganesan 2016===\n"
+#     f"Blood: {result_Ganesan.x[0]:.4f}\n"
+#     f"Oxygen Saturation: {result_Ganesan.x[1]:.4f}\n"
+#     f"Water: {result_Ganesan.x[2]:.4f}\n"
+#     f"Fat: {result_Ganesan.x[3]:.4f}\n"
+#     f"Melanin: 0.0\n"
+#     )
 
 # print(
 #     f"===Tissue Composition Prediction of Simpson 1998, Subcutaneous===\n"

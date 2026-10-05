@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
+import tissue_model.layer_calc as calc
 
-derm_gamma = 0 # was 0.50
+derm_gamma = 1 # was 0
 sub_gamma = 0
 
 lower_wavelength = 600 # original: 600
@@ -9,7 +10,7 @@ upper_wavelength = 1060
 norm_wavelength_nm = np.arange(0, 2001, 1)
 
 baseline_epi_np = (8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2) + 0.0244)
-baseline_derm_np = (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
+baseline_derm_np = 7.84 * 10**7 * norm_wavelength_nm ** -3.255
 baseline_sub_np = (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
 
 baseline_epi = pd.Series(
@@ -176,7 +177,7 @@ lower_derm_Jonasson = {
     "water" : 0.0, # Jonasson neglects water
     "fat" : 0,
     "melanosome" : 0,
-    "gamma" : derm_gamma,
+    "gamma" : 0,
 }
 lower_derm_Jonasson["baseline"] = (
     1 - 
@@ -254,3 +255,86 @@ sub_lower_bound = {
     "gamma" : 0, #original: 0.2
 
 }
+
+epi_mu_a_sim, epi_mu_s_sim, epi_g_sim, epi_n_sim, epi_mu_s_red_sim = calc.epi(
+    epi_Jacques["blood"], 
+    epi_Jacques["oxygen_saturation"], 
+    epi_Jacques["water"], 
+    epi_Jacques["fat"], 
+    epi_Jacques["melanosome"],
+    baseline_epi,
+    )
+
+epi_mu_a_sim_Jolivot_SPT_II = calc.epi(
+    epi_Jolivot_SPT_II["blood"], 
+    epi_Jolivot_SPT_II["oxygen_saturation"], 
+    epi_Jolivot_SPT_II["water"], 
+    epi_Jolivot_SPT_II["fat"], 
+    epi_Jolivot_SPT_II["melanosome"],
+    baseline_epi,
+    )[0]
+
+epi_mu_a_sim_Jolivot_SPT_III = calc.epi(
+    epi_Jolivot_SPT_III["blood"], 
+    epi_Jolivot_SPT_III["oxygen_saturation"], 
+    epi_Jolivot_SPT_III["water"], 
+    epi_Jolivot_SPT_III["fat"], 
+    epi_Jolivot_SPT_III["melanosome"],
+    baseline_epi,
+    )[0]
+
+epi_mu_a_sim_Jolivot_SPT_IV = calc.epi(
+    epi_Jolivot_SPT_IV["blood"], 
+    epi_Jolivot_SPT_IV["oxygen_saturation"], 
+    epi_Jolivot_SPT_IV["water"], 
+    epi_Jolivot_SPT_IV["fat"], 
+    epi_Jolivot_SPT_IV["melanosome"],
+    baseline_epi
+    )[0]
+
+epi_mu_a_sim_Jolivot_SPT_V = calc.epi(
+    epi_Jolivot_SPT_V["blood"], 
+    epi_Jolivot_SPT_V["oxygen_saturation"], 
+    epi_Jolivot_SPT_V["water"], 
+    epi_Jolivot_SPT_V["fat"], 
+    epi_Jolivot_SPT_V["melanosome"],
+    baseline_epi
+    )[0]
+
+epi_mu_a_sim_Jolivot_SPT_VI = calc.epi(
+    epi_Jolivot_SPT_VI["blood"], 
+    epi_Jolivot_SPT_VI["oxygen_saturation"], 
+    epi_Jolivot_SPT_VI["water"], 
+    epi_Jolivot_SPT_VI["fat"], 
+    epi_Jolivot_SPT_VI["melanosome"],
+    baseline_epi
+    )[0]
+
+derm_mu_a_sim, derm_mu_s_sim, derm_g_sim, derm_n_sim, derm_mu_s_red_sim = calc.derm(
+    derm_Jacques["blood"], 
+    derm_Jacques["oxygen_saturation"], 
+    derm_Jacques["water"], 
+    derm_Jacques["fat"], 
+    derm_Jacques["melanosome"],
+    derm_Jacques["gamma"],
+    baseline_derm,
+    )
+
+Jonasson_derm_mu_a_sim = calc.derm(
+    lower_derm_Jonasson["blood"], 
+    lower_derm_Jonasson["oxygen_saturation"], 
+    lower_derm_Jonasson["water"], 
+    lower_derm_Jonasson["fat"], 
+    lower_derm_Jonasson["melanosome"],
+    lower_derm_Jonasson["gamma"],
+    baseline_derm,
+    )[0]
+
+sub_mu_a_sim, sub_mu_s_sim, sub_g_sim, sub_n_sim, sub_mu_s_red_sim = calc.sub(
+    sub_Ganesan["blood"], 
+    sub_Ganesan["oxygen_saturation"],
+    sub_Ganesan["water"],
+    sub_Ganesan["fat"],
+    sub_Ganesan["melanosome"],
+    baseline_sub
+    )
