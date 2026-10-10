@@ -37,14 +37,14 @@ def epi(
 
 
     # van Gemert 1989
-    g = 0.62 + (0.29 * norm_wavelength_nm[1:] * 10 ** -3)
+    g = 0.62 + (0.29 * norm_wavelength_nm[0: 1060] * 10 ** -3)
     
     # epidermis scattering
-    mu_red_s = 6.87 * (norm_wavelength_nm[1:] / 500) ** -1.161
+    mu_red_s = 6.87 * (norm_wavelength_nm[0: 1060] / 500) ** -1.161
     mu_s = mu_red_s / (1 - g)
 
-    mu_red_s = pd.Series(data = mu_red_s, index = norm_wavelength_nm[1:])
-    mu_s = pd.Series(data = mu_s, index = norm_wavelength_nm[1:])
+    mu_red_s = pd.Series(data = mu_red_s, index = norm_wavelength_nm[0: 1060])
+    mu_s = pd.Series(data = mu_s, index = norm_wavelength_nm[0: 1060])
 
     # Jacques 2013 refractive index
     n = ((1 - W) * n_dry) + W * n_water
@@ -78,14 +78,14 @@ def derm(
 
 
     # van Gemert 1989
-    g = 0.62 + (0.29 * norm_wavelength_nm[1:] * 10 ** -3)
+    g = 0.62 + (0.29 * norm_wavelength_nm[0: 1060] * 10 ** -3)
     
     # dermis scattering
-    mu_red_s = 4.53 * (norm_wavelength_nm[1:] / 500) ** -1.292
+    mu_red_s = 4.53 * (norm_wavelength_nm[0: 1060] / 500) ** -1.292
     mu_s = mu_red_s / (1 - g)
 
-    mu_red_s = pd.Series(data = mu_red_s, index = norm_wavelength_nm[1:])
-    mu_s = pd.Series(data = mu_s, index = norm_wavelength_nm[1:])
+    mu_red_s = pd.Series(data = mu_red_s, index = norm_wavelength_nm[0: 1060])
+    mu_s = pd.Series(data = mu_s, index = norm_wavelength_nm[0: 1060])
 
     # Jacques 2013 refractive index
     n = ((1 - W) * n_dry) + W * n_water
@@ -120,14 +120,14 @@ def sub(
 
 
     # van Gemert 1989
-    g = 0.62 + (0.29 * norm_wavelength_nm[1:] * 10 ** -3)
+    g = 0.62 + (0.29 * norm_wavelength_nm[0: 1060] * 10 ** -3)
     
     # subcutaneous scattering
-    mu_red_s = 1.84 * (norm_wavelength_nm[1:] / 500) ** -0.672
+    mu_red_s = 1.84 * (norm_wavelength_nm[0: 1060] / 500) ** -0.672
     mu_s = mu_red_s / (1 - g)
 
-    mu_red_s = pd.Series(data = mu_red_s, index = norm_wavelength_nm[1:])
-    mu_s = pd.Series(data = mu_s, index = norm_wavelength_nm[1:])
+    mu_red_s = pd.Series(data = mu_red_s, index = norm_wavelength_nm[0: 1060])
+    mu_s = pd.Series(data = mu_s, index = norm_wavelength_nm[0: 1060])
 
     # Jacques 2013 refractive index
     n = ((1 - W) * n_dry) + W * n_water

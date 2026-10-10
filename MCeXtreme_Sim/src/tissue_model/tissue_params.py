@@ -222,6 +222,7 @@ sub_Ganesan["baseline"] = (
     )
 
 
+# Upper bound are provided by Jonasson 2023 (Blood)
 derm_upper_bound = {
     "blood" : 0.015,
     "oxygen_saturation" : 0.65,    
@@ -230,6 +231,7 @@ derm_upper_bound = {
 
 }
 
+# Lower bound are provided by Jacques 2013
 derm_lower_bound = {
     "blood" : 0.002,
     "oxygen_saturation" : 0.39,    
@@ -238,6 +240,7 @@ derm_lower_bound = {
 
 }
 
+# Upper bound are provided by Ganesan 2016
 sub_upper_bound = {
     "blood" : 0.00813,
     "oxygen_saturation" : 0.67,    
@@ -255,6 +258,45 @@ sub_lower_bound = {
     "gamma" : 0, #original: 0.2
 
 }
+
+# ============== MC simulation parameters ==============
+
+epi_thickness_mm = 0.1     
+derm_thickness_mm = 1      
+sub_thickness_mm = 10      
+vox_size_mm = 0.1      
+
+epi_thickness_vox = int(epi_thickness_mm / vox_size_mm)
+derm_thickness_vox = int(derm_thickness_mm / vox_size_mm)
+sub_thickness_vox = int(sub_thickness_mm / vox_size_mm)
+
+bot_epi_depth_vox = epi_thickness_vox
+bot_derm_depth_vox = epi_thickness_vox + derm_thickness_vox
+bot_sub_depth_vox = epi_thickness_vox + derm_thickness_vox + sub_thickness_vox
+
+vox_x = 1000
+vox_y = 1000
+vox_z = bot_sub_depth_vox
+
+SDS_1_mm = 1.7
+SDS_2_mm = 2
+
+SDS_1_vox = SDS_1_mm / vox_size_mm
+SDS_2_vox = SDS_2_mm / vox_size_mm
+
+src_x_vox = vox_x / 4
+src_y_vox = vox_y / 2
+src_z_vox = 0
+
+det1_x_vox = src_x_vox + SDS_1_vox
+det1_y_vox = src_y_vox
+det1_z_vox = src_z_vox
+det1_r_vox = 2
+
+det2_x_vox = src_x_vox + SDS_2_vox
+det2_y_vox = src_y_vox
+det2_z_vox = src_z_vox
+det2_r_vox = 2
 
 epi_mu_a_sim, epi_mu_s_sim, epi_g_sim, epi_n_sim, epi_mu_s_red_sim = calc.epi(
     epi_Jacques["blood"], 

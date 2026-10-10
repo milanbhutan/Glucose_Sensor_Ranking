@@ -11,7 +11,8 @@ import tissue_model.layer_calc as calc
 import tissue_model.tissue_params as params
 import analysis.error_analysis as err
 import analysis.uncertainty_analysis as uncertain
-from photon_sim import monte_carlo
+import photon_sim.monte_carlo as mc
+
 
 
 plt.rcParams["text.usetex"] = False
@@ -66,12 +67,12 @@ df_Ganesan_sub_mu_a = (
 )
 mu_a_sub_Ganesan = df_Ganesan_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength, "mu_a_mm^-1"]
 
-# df_Simpson_sub_mu_a = (
-#     pd.read_csv("Exp_Absorption/simpson_subcutaneous_absorption.csv", comment = "#")
-#     .set_index("wavelength_nm")
-#     .sort_index()
-# )
-# mu_a_sub_Simpson = df_Simpson_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength, "caucasian_subdermis_mu_a_mm^-1"]
+df_Simpson_sub_mu_a = (
+    pd.read_csv("Exp_Absorption/simpson_subcutaneous_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+mu_a_sub_Simpson = df_Simpson_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength, "caucasian_subdermis_mu_a_mm^-1"]
 
 # Scattering Data
 df_Shimojo_epi_red_mu_s = (
@@ -128,12 +129,13 @@ for ax in axes_mu_a:
 # Simulated absorption spectra plots
 axes_mu_a[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
                   params.epi_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
-                  label = "Analytical Models", 
+                  label = "Analytical Model", 
                   color = "red")
-axes_mu_a[0].text(params.lower_wavelength, 
-                  params.epi_mu_a_sim[params.lower_wavelength], 
+axes_mu_a[0].text(600, 
+                  0.2, 
                   "M=2.5%", 
-                  color = "red")
+                  color = "red",
+                  fontsize = 10)
 
 axes_mu_a[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
                   params.epi_mu_a_sim_Jolivot_SPT_II[params.lower_wavelength:params.upper_wavelength], 
@@ -155,33 +157,48 @@ axes_mu_a[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper
 axes_mu_a[0].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
                   params.epi_mu_a_sim_Jolivot_SPT_VI[params.lower_wavelength:params.upper_wavelength], 
                   color = "red")
-axes_mu_a[0].text(params.lower_wavelength - 22, 
-                  params.epi_mu_a_sim_Jolivot_SPT_VI[params.lower_wavelength], 
+axes_mu_a[0].text(713.5, 
+                  9.11, 
                   "M=44.7%", 
-                  color = "red")
+                  color = "red",
+                  fontsize = 10)
 
 axes_mu_a[0].set_title(r"$\mu_a$ epidermis", fontsize = 18)
 
+
 axes_mu_a[1].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
                   params.derm_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
-                  color = "red")
+                  color = "red",
+                  label = "Analytical Model")
 
 axes_mu_a[1].plot(params.norm_wavelength_nm[params.lower_wavelength:850], 
                   params.Jonasson_derm_mu_a_sim[params.lower_wavelength:850], 
-                  color = "red")
+                  color = "red",
+                  )
+axes_mu_a[1].text(850, 
+                  0, 
+                  "Simplified dermis\nabsorption model\n", 
+                  color = "red",
+                  fontsize = 10)
 
 axes_mu_a[1].plot(
     uncertain.derm_mu_a_sim_df[params.lower_wavelength:params.upper_wavelength], 
     color = "red",
     alpha = 0.02
     )
+# axes_mu_a[1].plot(
+#     uncertain.Jonasson_derm_mu_a_sim_df[params.lower_wavelength:params.upper_wavelength], 
+#     color = "red",
+#     alpha = 0.02
+#     )
 axes_mu_a[1].set_title(r"$\mu_a$ dermis",  fontsize = 18)
 
 
 
 axes_mu_a[2].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
                   params.sub_mu_a_sim[params.lower_wavelength:params.upper_wavelength], 
-                  color = "red")
+                  color = "red",
+                  label = "Analytical Model")
 
 axes_mu_a[2].plot(
     uncertain.sub_mu_a_sim_df[params.lower_wavelength:params.upper_wavelength], 
@@ -199,11 +216,12 @@ axes_mu_a[0].plot(df_Wan_epi_mu_a.loc[params.lower_wavelength:params.upper_wavel
                   linestyle = "--")
 axes_mu_a[0].plot(df_Shimojo_epi_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
                   color = "black", 
-                  label = "Shimojo 2020",
+                  label = "Shimojo 2020: Asian Skin",
                   linestyle = "--")
 
 axes_mu_a[1].plot(df_Simpson_derm_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
                   color = "green",
+                  label = "Simpson 1998",
                   linestyle = "--")
 
 axes_mu_a[1].plot(df_Jonasson_derm_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
@@ -219,17 +237,19 @@ axes_mu_a[2].plot(df_Ganesan_sub_mu_a.loc[params.lower_wavelength:params.upper_w
                   color = "black", 
                   label = "Ganesan 2016", 
                   linestyle = "--")
-# axes_mu_a[2].plot(df_Simpson_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
-#                   color = "green", 
-#                   label = "Simpson 1998", 
-#                   linestyle = "--")
+axes_mu_a[2].plot(df_Simpson_sub_mu_a.loc[params.lower_wavelength:params.upper_wavelength], 
+                  color = "green", 
+                  label = "Simpson 1998", 
+                  linestyle = "--")
 axes_mu_a[2].scatter(x = 650, 
                      y = 0.006,
                      color = "pink",
                      label = "Weber 2009",
                      s = 100)
 
-
+axes_mu_a[0].legend(fontsize = 10)
+axes_mu_a[1].legend(fontsize = 10)
+axes_mu_a[2].legend(fontsize = 10)
 
 fig_mu_s, axes_mu_s = plt.subplots(1, 3, layout = "constrained")
 fig_mu_s.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
@@ -251,11 +271,13 @@ axes_mu_s[0].set_title(r"$\mu_s^'$ epidermis", fontsize = 18)
 
 axes_mu_s[1].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
                   params.derm_mu_s_red_sim[params.lower_wavelength:params.upper_wavelength], 
+                  label = "Jacques 2013 Model",
                   color = "red")
 axes_mu_s[1].set_title(r"$\mu^'_s$ dermis", fontsize = 18)
 
 axes_mu_s[2].plot(params.norm_wavelength_nm[params.lower_wavelength:params.upper_wavelength], 
-                  params.sub_mu_s_red_sim[params.lower_wavelength:params.upper_wavelength], 
+                  params.sub_mu_s_red_sim[params.lower_wavelength:params.upper_wavelength],
+                  label = "Jacques 2013 Model", 
                   color = "red")
 axes_mu_s[2].set_title(r"$\mu^'_s$ subcutaneous tissue", fontsize = 18)
 
@@ -266,7 +288,8 @@ axes_mu_s[0].plot(df_Shimojo_epi_red_mu_s.loc[params.lower_wavelength:params.upp
                   linestyle = "--")
 
 axes_mu_s[1].plot(df_Shimojo_derm_red_mu_s.loc[params.lower_wavelength:params.upper_wavelength], 
-                  color = "cyan", 
+                  color = "cyan",
+                  label = "Shimojo 2020", 
                   linestyle = "--")
 axes_mu_s[1].plot(df_Simpson_derm_red_mu_s.loc[params.lower_wavelength:params.upper_wavelength], 
                   color = "green", 
@@ -274,18 +297,22 @@ axes_mu_s[1].plot(df_Simpson_derm_red_mu_s.loc[params.lower_wavelength:params.up
                   linestyle = "--")
 
 axes_mu_s[2].plot(df_Shimojo_sub_red_mu_s.loc[params.lower_wavelength:params.upper_wavelength], 
-                  color = "cyan", 
+                  color = "cyan",
+                  label = "Shimojo 2020", 
                   linestyle = "--")
 axes_mu_s[2].plot(df_Simpson_sub_red_mu_s.loc[params.lower_wavelength:params.upper_wavelength], 
-                  color = "green",  
+                  color = "green",
+                  label = "Simpson 1998",
                   linestyle = "--")
 axes_mu_s[2].plot(df_Ganesan_sub_red_mu_s.loc[params.lower_wavelength:params.upper_wavelength], 
                   color = "purple", 
                   label = "Ganesan 2016", 
                   linestyle = "--")
 
+axes_mu_s[0].legend(fontsize = 10)
+axes_mu_s[1].legend(fontsize = 10)
+axes_mu_s[2].legend(fontsize = 10)
 
-fig_mu_s.legend(fontsize = 10)
 
 # print(f"Maximum mu_a_derm_660nm: {max(mu_a_derm_660)}")
 # print(f"Minimum mu_a_derm_660nm: {min(mu_a_derm_660)}")
@@ -379,7 +406,8 @@ fig_mu_s.legend(fontsize = 10)
 #                   mu_a_derm_Simpson_fitted[params.lower_wavelength:params.upper_wavelength],
 #                   color = "brown")
 
-fig_mu_a.legend(fontsize = 10)
+#fig_mu_a.legend(fontsize = 10) was here but moved up
+
 
 # 930 nm lipid absorption feature
 axes_mu_a[2].vlines(
@@ -440,7 +468,7 @@ axes_mu_a[2].text(
 # Deoxy Hb absorption
 axes_mu_a[1].vlines(
     x = 760,
-    ymin = 0.005,
+    ymin = 0.002,
     ymax = 0.022,
     linestyle=":",
     linewidth=1.5,
@@ -590,5 +618,49 @@ axes_mu_a[2].text(
 #     f"Melanin: 0.0\n"
 #     f"Gamma: {result_Simpson_derm.x[3]:.4f}\n"
 #     )
+
+
+# uncomment to run monte carlo simulation
+
+
+sim_wavelength_nm = 1050
+canidate2_wavelength_nm = 1050
+
+mu_s_values = np.arange(5, 14, 1)
+A = []
+for mu_s in mu_s_values:
+    val_A = mc.run_simulation(
+            [
+            params.epi_mu_a_sim[sim_wavelength_nm], 
+            params.epi_mu_s_sim[sim_wavelength_nm], 
+            params.epi_g_sim[sim_wavelength_nm], 
+            params.epi_n_sim ],
+
+            [
+            params.derm_mu_a_sim[sim_wavelength_nm], 
+            mu_s, 
+            params.derm_g_sim[sim_wavelength_nm], 
+            params.derm_n_sim],
+
+            [
+            params.sub_mu_a_sim[sim_wavelength_nm], 
+            params.sub_mu_s_sim[sim_wavelength_nm], 
+            params.sub_g_sim[sim_wavelength_nm], 
+            params.sub_n_sim]
+    )
+    A.append(val_A)
+
+
+
+
+# np.t
+# np.corrcoef
+plt.figure()
+plt.scatter(mu_s_values, A)
+plt.xlabel("$\mu_s$ $(mm^-1)$")
+plt.ylabel("$A$ $(a.u.)$")
+
+m, b = np.polyfit(mu_s_values, A, 1)
+print(m)
 
 plt.show()

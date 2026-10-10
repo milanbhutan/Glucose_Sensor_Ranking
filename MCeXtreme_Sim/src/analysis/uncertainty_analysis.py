@@ -7,13 +7,13 @@ rng = np.random.default_rng(45)
 
 epi_mu_a_sim_set = []
 derm_mu_a_sim_set = []
+Jonasson_derm_mu_a_sim_set = []
 sub_mu_a_sim_set = []
 
 for i in range(200):
     derm_blood = rng.uniform(params.derm_lower_bound["blood"], params.derm_upper_bound["blood"])
     derm_oxygen_saturation = rng.uniform(params.derm_lower_bound["oxygen_saturation"], params.derm_upper_bound["oxygen_saturation"])
     derm_water = rng.uniform(params.derm_lower_bound["water"], params.derm_upper_bound["water"])
-    # derm_gamma = rng.uniform(params.derm_lower_bound["gamma"], params.derm_upper_bound["gamma"])
     if(1 - (derm_blood + derm_water) > 0):
         derm_mu_a_sim_set.append(
             calc.derm(
@@ -24,6 +24,23 @@ for i in range(200):
                 M = 0,
                 baseline = params.baseline_derm,
                 gamma = params.derm_gamma,
+                
+        )[0]
+        )
+
+for i in range(200):
+    derm_blood = rng.uniform(params.derm_lower_bound["blood"], params.derm_upper_bound["blood"])
+    derm_oxygen_saturation = rng.uniform(params.derm_lower_bound["oxygen_saturation"], params.derm_upper_bound["oxygen_saturation"])
+    if(1 - (derm_blood + derm_water) > 0):
+        Jonasson_derm_mu_a_sim_set.append(
+            calc.derm(
+                B = derm_blood, 
+                S = derm_oxygen_saturation, 
+                W = 0, 
+                F = 0, 
+                M = 0,
+                baseline = 0,
+                gamma = 0,
                 
         )[0]
         )
@@ -48,4 +65,5 @@ for i in range(200):
 
 epi_mu_a_sim_df = []
 derm_mu_a_sim_df = pd.concat(derm_mu_a_sim_set, axis = 1)
+Jonasson_derm_mu_a_sim_df = pd.concat(Jonasson_derm_mu_a_sim_set, axis = 1)
 sub_mu_a_sim_df = pd.concat(sub_mu_a_sim_set, axis = 1)
