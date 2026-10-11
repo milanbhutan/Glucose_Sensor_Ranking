@@ -23,24 +23,20 @@ for i in range(200):
                 F = 0, 
                 M = 0,
                 baseline = params.baseline_derm,
-                gamma = params.derm_gamma,
-                
         )[0]
         )
 
 for i in range(200):
     derm_blood = rng.uniform(params.derm_lower_bound["blood"], params.derm_upper_bound["blood"])
     derm_oxygen_saturation = rng.uniform(params.derm_lower_bound["oxygen_saturation"], params.derm_upper_bound["oxygen_saturation"])
-    if(1 - (derm_blood + derm_water) > 0):
-        Jonasson_derm_mu_a_sim_set.append(
-            calc.derm(
-                B = derm_blood, 
-                S = derm_oxygen_saturation, 
-                W = 0, 
-                F = 0, 
-                M = 0,
-                baseline = 0,
-                gamma = 0,
+    Jonasson_derm_mu_a_sim_set.append(
+        calc.derm(
+            B = derm_blood, 
+            S = derm_oxygen_saturation, 
+            W = 0, 
+            F = 0, 
+            M = 0,
+            baseline = 0,
                 
         )[0]
         )
@@ -50,7 +46,6 @@ for i in range(200):
     sub_oxygen_saturation = rng.uniform(params.sub_lower_bound["oxygen_saturation"], params.sub_upper_bound["oxygen_saturation"])
     sub_water = rng.uniform(params.sub_lower_bound["water"], params.sub_upper_bound["water"])
     sub_fat = rng.uniform(params.sub_lower_bound["fat"], params.sub_upper_bound["fat"])
-    # sub_gamma = rng.uniform(params.sub_lower_bound["gamma"], params.sub_upper_bound["gamma"])
     if(1 - (sub_blood + sub_water + sub_fat) > 0): # Remove samples with a negative baseline fraction
         sub_mu_a_sim_set.append(
             calc.sub(

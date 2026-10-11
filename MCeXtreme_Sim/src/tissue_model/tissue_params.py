@@ -2,9 +2,6 @@ import numpy as np
 import pandas as pd
 import tissue_model.layer_calc as calc
 
-derm_gamma = 1 # was 0
-sub_gamma = 0
-
 lower_wavelength = 600 # original: 600
 upper_wavelength = 1060
 norm_wavelength_nm = np.arange(0, 2001, 1)
@@ -160,7 +157,6 @@ derm_Jacques = {
     "water" : 0.65,
     "fat" : 0,
     "melanosome" : 0,
-    "gamma" : derm_gamma
 }
 derm_Jacques["baseline"] = (
     1 - 
@@ -177,7 +173,6 @@ lower_derm_Jonasson = {
     "water" : 0.0, # Jonasson neglects water
     "fat" : 0,
     "melanosome" : 0,
-    "gamma" : 0,
 }
 lower_derm_Jonasson["baseline"] = (
     1 - 
@@ -194,7 +189,6 @@ sub_Jacques = {
     "water" : 0.11,
     "fat" : 0.69,
     "melanosome" : 0,
-    "gamma" : derm_gamma,
 }
 sub_Jacques["baseline"] = (
     1 - 
@@ -211,7 +205,6 @@ sub_Ganesan = {
     "water" : 0.2184,
     "fat" : 0.6433,
     "melanosome" : 0,
-    "gamma" : sub_gamma,
 }
 sub_Ganesan["baseline"] = (
     1 - 
@@ -227,7 +220,6 @@ derm_upper_bound = {
     "blood" : 0.015,
     "oxygen_saturation" : 0.65,    
     "water" : 0.75,
-    "gamma" : 1 # original: 0.8
 
 }
 
@@ -236,7 +228,6 @@ derm_lower_bound = {
     "blood" : 0.002,
     "oxygen_saturation" : 0.39,    
     "water" : 0.65,
-    "gamma" : 0.1 # original: 0.2
 
 }
 
@@ -246,7 +237,6 @@ sub_upper_bound = {
     "oxygen_saturation" : 0.67,    
     "water" : 0.304,
     "fat" : 0.702,
-    "gamma" : 0, # original: 0.3
 
 }
 
@@ -255,11 +245,12 @@ sub_lower_bound = {
     "oxygen_saturation" : 0.493,    
     "water" : 0.145,
     "fat" : 0.599, 
-    "gamma" : 0, #original: 0.2
 
 }
 
 # ============== MC simulation parameters ==============
+
+
 
 epi_thickness_mm = 0.1     
 derm_thickness_mm = 1      
@@ -358,7 +349,6 @@ derm_mu_a_sim, derm_mu_s_sim, derm_g_sim, derm_n_sim, derm_mu_s_red_sim = calc.d
     derm_Jacques["water"], 
     derm_Jacques["fat"], 
     derm_Jacques["melanosome"],
-    derm_Jacques["gamma"],
     baseline_derm,
     )
 
@@ -368,7 +358,6 @@ Jonasson_derm_mu_a_sim = calc.derm(
     lower_derm_Jonasson["water"], 
     lower_derm_Jonasson["fat"], 
     lower_derm_Jonasson["melanosome"],
-    lower_derm_Jonasson["gamma"],
     baseline_derm,
     )[0]
 

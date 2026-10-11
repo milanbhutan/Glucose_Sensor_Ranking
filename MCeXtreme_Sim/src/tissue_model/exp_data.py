@@ -28,10 +28,16 @@ Bosschaart_2014_mu_a_deoxy_mm = df_Bosschaart_2014["mu_a_deoxy_mm-1"]
 # Notes: 
 # - Absorption coefficient is in (1/m)
 # - Greater measurement uncertainty between 429-750 nm
-df_Veen_2004 = pd.read_csv("Fat_Absorption_Data/Veen_2004_Fat_Absorption_Spectra.csv", comment = "#")
-Veen_2004_wavelength_nm = df_Veen_2004["nm"]
-Veen_2004_mu_a_fat_m = df_Veen_2004["mu_a"]
-Veen_2004_mu_a_fat_mm = Veen_2004_mu_a_fat_m / 1000
+# df_Veen_2004 = pd.read_csv("Fat_Absorption_Data/Veen_2004_Fat_Absorption_Spectra.csv", comment = "#")
+# Veen_2004_wavelength_nm = df_Veen_2004["nm"]
+# Veen_2004_mu_a_fat_m = df_Veen_2004["mu_a"]
+# Veen_2004_mu_a_fat_mm = Veen_2004_mu_a_fat_m / 1000
+
+df_Veen_Anderson = pd.read_csv("Fat_Absorption_Data/fat_429_1700nm.csv", comment = "#")
+Veen_Anderson_wavelength_nm = df_Veen_Anderson["nm"]
+Veen_Anderson_mu_a_fat_mm = df_Veen_Anderson["mu_a"]
+
+
 
 # melanosome absorption spectra from 200 - 2000 from Jacques 1998
 # Need to find lower and upper wavelength range
@@ -66,8 +72,8 @@ if __name__ == "__main__":
     axes[1, 1].set_xlabel("Wavelength (nm)")
     axes[1, 1].set_ylabel("Absorption (1/mm)")
 
-    axes[0, 2].plot(Veen_2004_wavelength_nm, Veen_2004_mu_a_fat_mm)
-    axes[0, 2].set_title(r"$\mu_{a, fat}$ for 429-1100 nm""\nVeen 2004")
+    axes[0, 2].plot(Veen_Anderson_wavelength_nm, Veen_Anderson_mu_a_fat_mm)
+    axes[0, 2].set_title(r"$\mu_{a, fat}$ for Veen 2004, 429-1098 nm""\nAnderson 2006, 1099-2600 nm")
     axes[0, 2].set_xlabel("Wavelength (nm)")
     axes[0, 2].set_ylabel("Absorption (1/mm)")
 
@@ -88,7 +94,7 @@ L_Kou_1993_interp_np = np.interp(norm_wavelength_nm, L_Kou_1993_wavelength_nm, L
 Fewell_2019_interp_np = np.interp(norm_wavelength_nm, Fewell_2019_wavelength_nm, Fewell_2019_mu_a_water_mm, left = 0, right = 0)
 Bosschaart_2014_interp_oxy_np = np.interp(norm_wavelength_nm, Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_oxy_mm, left = 0, right = 0)
 Bosschaart_2014_interp_deoxy_np = np.interp(norm_wavelength_nm, Bosschaart_2014_wavelength_nm, Bosschaart_2014_mu_a_deoxy_mm, left = 0, right = 0)
-Veen_2004_interp_np = np.interp(norm_wavelength_nm, Veen_2004_wavelength_nm, Veen_2004_mu_a_fat_mm, left = 0, right = 0)
+Veen_Anderson_interp_np = np.interp(norm_wavelength_nm, Veen_Anderson_wavelength_nm, Veen_Anderson_mu_a_fat_mm, left = 0, right = 0)
 Jacques_1998_interp_np = np.interp(norm_wavelength_nm, Jacques_1998_wavelength_nm, Jacques_1998_mu_a_melanosome_mm, left = 0, right = 0)
 
 # Converting interpolated absorption values from NumPy to Series objects since we will need to keep track of the wavelength index for each absoprtion value
@@ -96,7 +102,7 @@ L_Kou_1993_interp_ser = pd.Series(data = L_Kou_1993_interp_np, index = norm_wave
 Fewell_2019_interp_ser = pd.Series(data = Fewell_2019_interp_np, index = norm_wavelength_nm)
 Bosschaart_2014_interp_oxy_ser = pd.Series(data = Bosschaart_2014_interp_oxy_np, index = norm_wavelength_nm)
 Bosschaart_2014_interp_deoxy_ser = pd.Series(data = Bosschaart_2014_interp_deoxy_np, index = norm_wavelength_nm)
-Veen_2004_interp_ser = pd.Series(data = Veen_2004_interp_np, index = norm_wavelength_nm)
+Veen_Anderson_interp_ser = pd.Series(data = Veen_Anderson_interp_np, index = norm_wavelength_nm)
 Jacques_1998_interp_ser = pd.Series(data = Jacques_1998_interp_np, index = norm_wavelength_nm)
 
 
@@ -126,7 +132,7 @@ Jacques_1998_interp_ser = pd.Series(data = Jacques_1998_interp_np, index = norm_
 #                  )
 # mu_a_fat_epi = (
 #                params.epi_Jacques["fat"] 
-#                * Veen_2004_interp_ser[params.lower_wavelength : params.upper_wavelength ]
+#                * Veen_Anderson_interp_ser[params.lower_wavelength : params.upper_wavelength ]
 #                )
 # mu_a_melanosome_epi = (
 #                       params.epi_Jacques["melanosome"] 
@@ -153,7 +159,7 @@ Jacques_1998_interp_ser = pd.Series(data = Jacques_1998_interp_np, index = norm_
 #                  )
 # mu_a_fat_derm = (
 #                params.derm_Jacques["fat"] 
-#                * Veen_2004_interp_ser[params.lower_wavelength : params.upper_wavelength ]
+#                * Veen_Anderson_interp_ser[params.lower_wavelength : params.upper_wavelength ]
 #                )
 # mu_a_melanosome_derm = (
 #                       params.derm_Jacques["melanosome"] 
@@ -181,7 +187,7 @@ Jacques_1998_interp_ser = pd.Series(data = Jacques_1998_interp_np, index = norm_
 #                  )
 # mu_a_fat_sub = (
 #                params.sub_Ganesan["fat"] 
-#                * Veen_2004_interp_ser[params.lower_wavelength : params.upper_wavelength ]
+#                * Veen_Anderson_interp_ser[params.lower_wavelength : params.upper_wavelength ]
 #                )
 # mu_a_melanosome_sub = (
 #                       params.sub_Ganesan["melanosome"] 
