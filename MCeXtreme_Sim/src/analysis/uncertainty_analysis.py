@@ -9,8 +9,9 @@ epi_mu_a_sim_set = []
 derm_mu_a_sim_set = []
 Jonasson_derm_mu_a_sim_set = []
 sub_mu_a_sim_set = []
+realizations = 200
 
-for i in range(200):
+for i in range(realizations):
     derm_blood = rng.uniform(params.derm_lower_bound["blood"], params.derm_upper_bound["blood"])
     derm_oxygen_saturation = rng.uniform(params.derm_lower_bound["oxygen_saturation"], params.derm_upper_bound["oxygen_saturation"])
     derm_water = rng.uniform(params.derm_lower_bound["water"], params.derm_upper_bound["water"])
@@ -26,7 +27,7 @@ for i in range(200):
         )[0]
         )
 
-for i in range(200):
+for i in range(realizations):
     derm_blood = rng.uniform(params.derm_lower_bound["blood"], params.derm_upper_bound["blood"])
     derm_oxygen_saturation = rng.uniform(params.derm_lower_bound["oxygen_saturation"], params.derm_upper_bound["oxygen_saturation"])
     Jonasson_derm_mu_a_sim_set.append(
@@ -41,7 +42,7 @@ for i in range(200):
         )[0]
         )
 
-for i in range(200):
+for i in range(realizations):
     sub_blood = rng.uniform(params.sub_lower_bound["blood"], params.sub_upper_bound["blood"])
     sub_oxygen_saturation = rng.uniform(params.sub_lower_bound["oxygen_saturation"], params.sub_upper_bound["oxygen_saturation"])
     sub_water = rng.uniform(params.sub_lower_bound["water"], params.sub_upper_bound["water"])
@@ -54,7 +55,7 @@ for i in range(200):
                 W = sub_water, 
                 F = sub_fat, 
                 M = 0,
-                baseline = params.baseline_sub
+                baseline = 0
         )[0]
         )
 

@@ -9,11 +9,8 @@ import tissue_model.tissue_params as params
 import analysis.uncertainty_analysis as uncertain
 
 
-
-
 plt.rcParams["text.usetex"] = False
 
-# Obtain data for experimental absorption and scattering spectras for three-layer tissue model from Shimojo 2020
 
 # Absorption Data
 df_Wan_epi_mu_a = (
@@ -106,7 +103,7 @@ df_Simpson_sub_red_mu_s = (
 # Note: This subcutaneous spectra is only valid within 429-1100 nm where reliable tissue constituent abosroption data is availible
 fig_mu_a, axes_mu_a = plt.subplots(1, 3, layout = "constrained")
 fig_mu_a.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
-fig_mu_a.suptitle("Absorption Spectras for Layers in Three-Layer Tissue Model", fontsize = 18)
+fig_mu_a.suptitle("Absorption Spectra for Three-Layer Tissue Model", fontsize = 18)
 
 for ax in axes_mu_a:
     ax.set_xlabel("Wavelength (nm)", fontsize = 18)
@@ -241,7 +238,7 @@ axes_mu_a[2].legend(fontsize = 10)
 
 fig_mu_s, axes_mu_s = plt.subplots(1, 3, layout = "constrained")
 fig_mu_s.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
-fig_mu_s.suptitle("Reduced Scattering Spectras for Layers in Three-Layer Tissue Model", fontsize = 18)
+fig_mu_s.suptitle("Reduced Scattering Spectra for Three-Layer Tissue Model", fontsize = 18)
 
 for ax in axes_mu_s:
     ax.set_xlabel("Wavelength (nm)", fontsize = 18)

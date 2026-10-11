@@ -1,3 +1,4 @@
+import pandas as pd
 import sys
 from pathlib import Path
 
@@ -7,6 +8,44 @@ import tissue_model.tissue_params as params
 import matplotlib.pyplot as plt
 import analysis.uncertainty_analysis as uncertain
 
+# Absorption Data
+df_Iino_epi_mu_a = (
+    pd.read_csv("Exp_Absorption/iino_epidermis_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
+df_Iino_derm_mu_a = (
+    pd.read_csv("Exp_Absorption/iino_dermis_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
+df_Iino_sub_mu_a = (
+    pd.read_csv("Exp_Absorption/iino_subcutaneous_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
+# Scattering Data
+df_Iino_epi_red_mu_s = (
+    pd.read_csv("Exp_Scattering/iino_epidermis_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
+df_Iino_derm_red_mu_s = (
+    pd.read_csv("Exp_Scattering/iino_dermis_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
+df_Iino_sub_red_mu_s = (
+    pd.read_csv("Exp_Scattering/iino_subcutaneous_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
 # ===============================================
 # Plotting tissue spectra from 1000 - 1700nm
 # ===============================================
@@ -15,7 +54,7 @@ wavelength_bound_4 = 1701
 
 fig_mu_a, axes_mu_a = plt.subplots(1, 3, layout = "constrained")
 fig_mu_a.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
-fig_mu_a.suptitle("Absorption Spectras for Layers in Three-Layer Tissue Model", fontsize = 18)
+fig_mu_a.suptitle("Absorption Spectra for Three-Layer Tissue Model", fontsize = 18)
 
 for ax in axes_mu_a:
     ax.set_xlabel("Wavelength (nm)", fontsize = 18)
@@ -87,9 +126,22 @@ axes_mu_a[2].plot(
 axes_mu_a[2].set_title(r"$\mu_a$ subcutaneous", fontsize = 18)
 
 
-#
+#Experimental Absorption from Iino 2003
 
+axes_mu_a[0].plot(df_Iino_epi_mu_a.loc[wavelength_bound_3:wavelength_bound_4, "epidermis_mu_a_mm^-1"],
+                  label = "Iino 2003",
+                  linestyle = "--",
+                  color = "black")
 
+axes_mu_a[1].plot(df_Iino_derm_mu_a.loc[wavelength_bound_3:wavelength_bound_4, "dermis_mu_a_mm^-1"],
+                  label = "Iino 2003",
+                  linestyle = "--",
+                  color = "black")
+
+axes_mu_a[2].plot(df_Iino_sub_mu_a.loc[wavelength_bound_3:wavelength_bound_4, "subcutaneous_mu_a_mm^-1"],
+                  label = "Iino 2003",
+                  linestyle = "--",
+                  color = "black")
 
 axes_mu_a[0].legend(fontsize = 10)
 axes_mu_a[1].legend(fontsize = 10)
@@ -97,7 +149,7 @@ axes_mu_a[2].legend(fontsize = 10)
 
 fig_mu_s, axes_mu_s = plt.subplots(1, 3, layout = "constrained")
 fig_mu_s.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
-fig_mu_s.suptitle("Reduced Scattering Spectras for Layers in Three-Layer Tissue Model", fontsize = 18)
+fig_mu_s.suptitle("Reduced Scattering Spectra for Three-Layer Tissue Model", fontsize = 18)
 
 for ax in axes_mu_s:
     ax.set_xlabel("Wavelength (nm)", fontsize = 18)
@@ -125,6 +177,22 @@ axes_mu_s[2].plot(params.norm_wavelength_nm[wavelength_bound_3:wavelength_bound_
                   color = "red")
 axes_mu_s[2].set_title(r"$\mu^'_s$ subcutaneous tissue", fontsize = 18)
 
+#Experimental Scattering from Iino 2003
+
+axes_mu_s[0].plot(df_Iino_epi_red_mu_s.loc[wavelength_bound_3:wavelength_bound_4, "epidermis_mu_s_prime_mm^-1"],
+                  label = "Iino 2003",
+                  linestyle = "--",
+                  color = "black")
+
+axes_mu_s[1].plot(df_Iino_derm_red_mu_s.loc[wavelength_bound_3:wavelength_bound_4, "dermis_mu_s_prime_mm^-1"],
+                  label = "Iino 2003",
+                  linestyle = "--",
+                  color = "black")
+
+axes_mu_s[2].plot(df_Iino_sub_red_mu_s.loc[wavelength_bound_3:wavelength_bound_4, "subcutaneous_mu_s_prime_mm^-1"],
+                  label = "Iino 2003",
+                  linestyle = "--",
+                  color = "black")
 
 axes_mu_s[0].legend(fontsize = 10)
 axes_mu_s[1].legend(fontsize = 10)

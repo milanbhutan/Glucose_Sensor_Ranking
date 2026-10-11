@@ -42,7 +42,7 @@ sub_params = [
 epi_Jacques = {
     "blood" : 0,
     "oxygen_saturation" : 0,
-    "water" : 0,
+    "water" : 0.20, #from Meglinski 2002, was 0
     "fat" : 0,
     "melanosome" : 0.025,
 }
@@ -58,7 +58,7 @@ epi_Jacques["baseline"] = (
 epi_Jolivot_low_mel ={
     "blood" : 0,
     "oxygen_saturation" : 0,
-    "water" : 0,
+    "water" : 0.20,
     "fat" : 0,
     "melanosome": 0.013
 }
@@ -74,7 +74,7 @@ epi_Jolivot_low_mel["baseline"] = (
 epi_Jolivot_SPT_II ={
     "blood" : 0,
     "oxygen_saturation" : 0,
-    "water" : 0,
+    "water" : 0.20,
     "fat" : 0,
     "melanosome": 0.101
 }
@@ -90,7 +90,7 @@ epi_Jolivot_SPT_II["baseline"] = (
 epi_Jolivot_SPT_III ={
     "blood" : 0,
     "oxygen_saturation" : 0,
-    "water" : 0,
+    "water" : 0.20,
     "fat" : 0,
     "melanosome": 0.187
 }
@@ -106,7 +106,7 @@ epi_Jolivot_SPT_III["baseline"] = (
 epi_Jolivot_SPT_IV ={
     "blood" : 0,
     "oxygen_saturation" : 0,
-    "water" : 0,
+    "water" : 0.20,
     "fat" : 0,
     "melanosome": 0.265
 }
@@ -122,7 +122,7 @@ epi_Jolivot_SPT_IV["baseline"] = (
 epi_Jolivot_SPT_V ={
     "blood" : 0,
     "oxygen_saturation" : 0,
-    "water" : 0,
+    "water" : 0.20,
     "fat" : 0,
     "melanosome": 0.358
 }
@@ -138,7 +138,7 @@ epi_Jolivot_SPT_V["baseline"] = (
 epi_Jolivot_SPT_VI = {
     "blood" : 0,
     "oxygen_saturation" : 0,
-    "water" : 0,
+    "water" : 0.20,
     "fat" : 0,
     "melanosome": 0.447
 }
@@ -227,7 +227,7 @@ derm_upper_bound = {
 derm_lower_bound = {
     "blood" : 0.002,
     "oxygen_saturation" : 0.39,    
-    "water" : 0.65,
+    "water" : 0.30, # was 0.65
 
 }
 
@@ -243,7 +243,7 @@ sub_upper_bound = {
 sub_lower_bound = {
     "blood" : 0.00398,
     "oxygen_saturation" : 0.493,    
-    "water" : 0.145,
+    "water" : 0.00, # was 0.145
     "fat" : 0.599, 
 
 }
@@ -358,7 +358,7 @@ Jonasson_derm_mu_a_sim = calc.derm(
     lower_derm_Jonasson["water"], 
     lower_derm_Jonasson["fat"], 
     lower_derm_Jonasson["melanosome"],
-    baseline_derm,
+    0, # No baseline in Jonasson 2023
     )[0]
 
 sub_mu_a_sim, sub_mu_s_sim, sub_g_sim, sub_n_sim, sub_mu_s_red_sim = calc.sub(
@@ -367,5 +367,5 @@ sub_mu_a_sim, sub_mu_s_sim, sub_g_sim, sub_n_sim, sub_mu_s_red_sim = calc.sub(
     sub_Ganesan["water"],
     sub_Ganesan["fat"],
     sub_Ganesan["melanosome"],
-    baseline_sub
+    0, # No baseline applied by Lapitan 2024
     )
