@@ -2,28 +2,14 @@ import numpy as np
 import pandas as pd
 import tissue_model.layer_calc as calc
 
-lower_wavelength = 600 # original: 600
-upper_wavelength = 1060
-norm_wavelength_nm = np.arange(0, 2001, 1)
 
-baseline_epi_np = (8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2) + 0.0244)
-baseline_derm_np = 7.84 * 10**7 * norm_wavelength_nm ** -3.255
-baseline_sub_np = (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
+norm_wavelength_nm_np = np.arange(1, 2001, 1)
+norm_wavelength_nm = pd.Series(data = norm_wavelength_nm_np, index = norm_wavelength_nm_np)
 
-baseline_epi = pd.Series(
-    baseline_epi_np,
-    index = norm_wavelength_nm
-)
+baseline_epi = (8.53 * np.exp(-(norm_wavelength_nm - 154)/66.2) + 0.0244)
+baseline_derm = 7.84 * 10**7 * norm_wavelength_nm ** -3.255
+baseline_sub = (1.682 * np.exp(-(norm_wavelength_nm - 400)/80.5) + 0.0244)
 
-baseline_derm = pd.Series(
-    baseline_derm_np,
-    index = norm_wavelength_nm
-)
-
-baseline_sub = pd.Series(
-    baseline_sub_np,
-    index = norm_wavelength_nm
-)
 
 derm_params = [
     "blood",
@@ -297,6 +283,7 @@ epi_mu_a_sim, epi_mu_s_sim, epi_g_sim, epi_n_sim, epi_mu_s_red_sim = calc.epi(
     epi_Jacques["melanosome"],
     baseline_epi,
     )
+
 
 epi_mu_a_sim_Jolivot_SPT_II = calc.epi(
     epi_Jolivot_SPT_II["blood"], 

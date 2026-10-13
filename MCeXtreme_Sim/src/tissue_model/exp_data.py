@@ -2,7 +2,59 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-norm_wavelength_nm = np.arange(0, 2001, 1)
+wavelength_bound_1 = 600
+wavelength_bound_2 = 1000
+wavelength_bound_3 = 1001
+wavelength_bound_4 = 1700
+
+norm_wavelength_nm_np = np.arange(1, 2001, 1)
+norm_wavelength_nm = pd.Series(data = norm_wavelength_nm_np, index = norm_wavelength_nm_np)
+
+# Absorption Data
+df_Iino_epi_mu_a = (
+    pd.read_csv("Exp_Absorption/iino_epidermis_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+Iino_epidermis_mu_a = df_Iino_epi_mu_a.loc[:, "epidermis_mu_a_mm^-1"]
+
+
+df_Iino_derm_mu_a = (
+    pd.read_csv("Exp_Absorption/iino_dermis_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+Iino_dermis_mu_a = df_Iino_derm_mu_a.loc[:, "dermis_mu_a_mm^-1"]
+
+df_Iino_sub_mu_a = (
+    pd.read_csv("Exp_Absorption/iino_subcutaneous_absorption.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+Iino_subcutaneous_mu_a = df_Iino_sub_mu_a.loc[:, "subcutaneous_mu_a_mm^-1"]
+
+# Scattering Data
+df_Iino_epi_red_mu_s = (
+    pd.read_csv("Exp_Scattering/iino_epidermis_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+Iino_epidermis_mu_red_s = df_Iino_epi_red_mu_s.loc[:, "epidermis_mu_s_prime_mm^-1"]
+
+df_Iino_derm_red_mu_s = (
+    pd.read_csv("Exp_Scattering/iino_dermis_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+Iino_dermis_mu_red_s = df_Iino_derm_red_mu_s.loc[:, "dermis_mu_s_prime_mm^-1"]
+
+df_Iino_sub_red_mu_s = (
+    pd.read_csv("Exp_Scattering/iino_subcutaneous_reduced_scattering.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+Iino_subcutaneous_mu_red_s = df_Iino_sub_red_mu_s.loc[:, "subcutaneous_mu_s_prime_mm^-1"]
+
 
 # Water absorption spectra from 667-2500 nm, L. Kou 1993
 df_L_Kou_1993 = pd.read_csv("Water_Absorption_Data/L_Kou_water_absorption_1993.csv", comment = "#")
@@ -39,6 +91,7 @@ Veen_Anderson_mu_a_fat_mm = df_Veen_Anderson["mu_a"]
 
 
 
+#SHOULD BE A SERIES
 # melanosome absorption spectra from 200 - 2000 from Jacques 1998
 # Need to find lower and upper wavelength range
 Jacques_1998_wavelength_nm = np.arange(200, 2001, 1)
