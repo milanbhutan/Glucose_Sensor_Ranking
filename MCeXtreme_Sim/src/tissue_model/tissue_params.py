@@ -1,5 +1,10 @@
 import numpy as np
 import pandas as pd
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
 import tissue_model.layer_calc as calc
 
 
@@ -236,30 +241,38 @@ sub_lower_bound = {
 
 # ============== MC simulation parameters ==============
 
-
-
+glass_thickness_mm = 0.2
 epi_thickness_mm = 0.1     
 derm_thickness_mm = 1      
 sub_thickness_mm = 10      
 vox_size_mm = 0.1      
 
+glass_thickness_vox = int(glass_thickness_mm / vox_size_mm)
 epi_thickness_vox = int(epi_thickness_mm / vox_size_mm)
 derm_thickness_vox = int(derm_thickness_mm / vox_size_mm)
 sub_thickness_vox = int(sub_thickness_mm / vox_size_mm)
 
-bot_epi_depth_vox = epi_thickness_vox
-bot_derm_depth_vox = epi_thickness_vox + derm_thickness_vox
-bot_sub_depth_vox = epi_thickness_vox + derm_thickness_vox + sub_thickness_vox
+bot_glass_depth_vox = glass_thickness_vox
+bot_epi_depth_vox = epi_thickness_vox + glass_thickness_vox
+bot_derm_depth_vox = epi_thickness_vox + derm_thickness_vox + glass_thickness_vox
+bot_sub_depth_vox = epi_thickness_vox + derm_thickness_vox + sub_thickness_vox + glass_thickness_vox
 
-vox_x = 1000
-vox_y = 1000
+vox_x = 300
+vox_y = 300
 vox_z = bot_sub_depth_vox
 
 SDS_1_mm = 1.7
-SDS_2_mm = 2
+SDS_2_mm = 2.0
+SDS_3_mm = 2.3
+SDS_4_mm = 2.6
+SDS_5_mm = 2.9
 
 SDS_1_vox = SDS_1_mm / vox_size_mm
 SDS_2_vox = SDS_2_mm / vox_size_mm
+SDS_3_vox = SDS_3_mm / vox_size_mm
+SDS_4_vox = SDS_4_mm / vox_size_mm
+SDS_5_vox = SDS_5_mm / vox_size_mm
+
 
 src_x_vox = vox_x / 4
 src_y_vox = vox_y / 2
@@ -268,12 +281,29 @@ src_z_vox = 0
 det1_x_vox = src_x_vox + SDS_1_vox
 det1_y_vox = src_y_vox
 det1_z_vox = src_z_vox
-det1_r_vox = 2
+det1_r_vox = 1
 
 det2_x_vox = src_x_vox + SDS_2_vox
 det2_y_vox = src_y_vox
 det2_z_vox = src_z_vox
-det2_r_vox = 2
+det2_r_vox = 1
+
+det3_x_vox = src_x_vox + SDS_3_vox
+det3_y_vox = src_y_vox
+det3_z_vox = src_z_vox
+det3_r_vox = 1
+
+det4_x_vox = src_x_vox + SDS_4_vox
+det4_y_vox = src_y_vox
+det4_z_vox = src_z_vox
+det4_r_vox = 1
+
+det5_x_vox = src_x_vox + SDS_5_vox
+det5_y_vox = src_y_vox
+det5_z_vox = src_z_vox
+det5_r_vox = 1
+
+glass_mu_a_sim, glass_mu_s_sim, glass_g_sim, glass_n_sim = [0, 0, 1, 1.4]
 
 epi_mu_a_sim, epi_mu_s_sim, epi_g_sim, epi_n_sim, epi_mu_s_red_sim = calc.epi(
     epi_Jacques["blood"], 
@@ -356,3 +386,4 @@ sub_mu_a_sim, sub_mu_s_sim, sub_g_sim, sub_n_sim, sub_mu_s_red_sim = calc.sub(
     sub_Ganesan["melanosome"],
     0, # No baseline applied by Lapitan 2024
     )
+

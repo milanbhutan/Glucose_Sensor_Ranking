@@ -1,57 +1,69 @@
 import pmcx
 import numpy as np
-import tissue_model.tissue_params as params
+import sys
+from pathlib import Path
 import matplotlib.pyplot as plt
 
-def run_simulation(epi_optic_params, derm_optic_params, sub_optic_params):    
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+import tissue_model.tissue_params as params
+
+
+air_optic_params = [
+    0.01, 
+    0.01, 
+    1, 
+    1.4]
+
+Nx, Ny, Nz = params.vox_x, params.vox_y, params.vox_z
+
+vol = np.zeros((Nx, Ny, Nz), dtype = np.uint8)
+vol[:,
+    :,
+    0 : params.bot_epi_depth_vox
+    ] = 1
+
+vol[:,
+    :,
+    params.bot_epi_depth_vox : params.bot_derm_depth_vox] = 2
+
+vol[:,
+    :,
+    params.bot_derm_depth_vox : params.bot_sub_depth_vox] = 3
+
+
+def run_simulation(glass_optic_params, epi_optic_params, derm_optic_params, sub_optic_params):    
     # =========================================
     # MCeXtreme Simulation
     # =========================================
 
     # Format: [mu_a, mu_s, g, n]
-    air_optic_params = [
-        0.01, 
-        0.01, 
-        1, 
-        1]
+
 
     # Define simulation values
     prop = [
         air_optic_params,
+        glass_optic_params,
         epi_optic_params,
         derm_optic_params,
         sub_optic_params
     ]
 
 
-    Nx, Ny, Nz = params.vox_x, params.vox_y, params.vox_z
-
-    vol = np.zeros((Nx, Ny, Nz), dtype = np.uint8)
-    vol[:,
-        :,
-        0 : params.bot_epi_depth_vox
-        ] = 1
-    
-    vol[:,
-        :,
-        params.bot_epi_depth_vox : params.bot_derm_depth_vox] = 2
-    
-    vol[:,
-        :,
-        params.bot_derm_depth_vox : params.bot_sub_depth_vox] = 3
-
-
     sim_config = {
-        "nphoton": 1e7, # 1e9: 57 seconds
+        "nphoton": 1e8, # 1e9: 57 seconds
         "vol": vol,
         "prop": prop,
         "srcpos": [params.src_x_vox, params.src_y_vox, params.src_z_vox],
         "srcdir": [0, 0, 1],
         "detpos": [[params.det1_x_vox, params.det1_y_vox, params.det1_z_vox, params.det1_r_vox], 
-                   [params.det2_x_vox, params.det2_y_vox, params.det2_z_vox, params.det2_r_vox]],
+                   [params.det2_x_vox, params.det2_y_vox, params.det2_z_vox, params.det2_r_vox],
+                   [params.det3_x_vox, params.det3_y_vox, params.det3_z_vox, params.det3_r_vox],
+                   [params.det4_x_vox, params.det4_y_vox, params.det4_z_vox, params.det4_r_vox],
+                   [params.det5_x_vox, params.det5_y_vox, params.det5_z_vox, params.det5_r_vox]],
         "tstart": 0,
         "tend": 10e-9,
-        "tstep": 1e-9,
+        "tstep": 10e-9,
         "unitinmm": params.vox_size_mm,
         "autopilot": 1,
         "gpuid": 1,
@@ -59,13 +71,12 @@ def run_simulation(epi_optic_params, derm_optic_params, sub_optic_params):
         "issavedet": 1,
         "issaveseed": 0,
         "issave2pt": 0,
-        "maxdetphoton": 1e8,
+        "maxdetphoton": 1e7,
         "savedetflag" : "dp"
     }
 
+
     # Run simulation
-
-
     sim_out = pmcx.mcxlab(sim_config)
 
     detp = sim_out["detp"]
@@ -73,13 +84,21 @@ def run_simulation(epi_optic_params, derm_optic_params, sub_optic_params):
 
     mask_1 = detp["detid"] == 1
     mask_2 = detp["detid"] == 2
+    mask_3 = detp["detid"] == 3
+    mask_4 = detp["detid"] == 4
+    mask_5 = detp["detid"] == 5
 
     R_1 = photon_weights[mask_1].sum() / sim_config["nphoton"]
     R_2 = photon_weights[mask_2].sum() / sim_config["nphoton"]
+    R_3 = photon_weights[mask_3].sum() / sim_config["nphoton"]
+    R_4 = photon_weights[mask_4].sum() / sim_config["nphoton"]
+    R_5 = photon_weights[mask_5].sum() / sim_config["nphoton"]
 
-    A = -np.log(R_2 / R_1)
-
-
+    A_1 = -np.log(R_1)
+    A_2 = -np.log(R_2)
+    A_3 = -np.log(R_3)
+    A_4 = -np.log(R_4)
+    A_5 = -np.log(R_5)
 
     # replay_config = sim_config.copy()
     # replay_config["outputtype"] = "jacobian"
@@ -154,4 +173,5 @@ def run_simulation(epi_optic_params, derm_optic_params, sub_optic_params):
     # print(f"DS(%): {PMDF_derm_per:.2f} %")
     # print(f"SS(%): {PMDF_sub_per:.2f} %")
 
-    return A
+    A_array = np.array([A_1, A_2, A_3, A_4, A_5])
+    return A_array

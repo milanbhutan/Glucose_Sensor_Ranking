@@ -1,5 +1,10 @@
 import numpy as np
 import pandas as pd
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
 import tissue_model.exp_data as exp
 
 
@@ -23,7 +28,7 @@ g_200_1000 = 0.62 + (0.29 * norm_wavelength_nm.loc[200: 1000] * 10 ** -3)
 g_1000_1700 = 0.9
 
 g_200_1000_ser = pd.Series(data = g_200_1000, index = norm_wavelength_nm.loc[200: 1000])
-g_1000_1700_ser = pd.Series(data = g_1000_1700, index = norm_wavelength_nm.loc[1000: 1700])
+g_1000_1700_ser = pd.Series(data = g_1000_1700, index = norm_wavelength_nm.loc[1001: 1700])
 
 g = pd.concat([g_200_1000_ser, g_1000_1700_ser])
 
@@ -116,7 +121,7 @@ def sub(
     
     # subcutaneous scattering
     mu_red_s_1 = 1.84 * (norm_wavelength_nm.loc[1: 1000] / 500) ** -0.672
-    mu_red_s_2 = exp.Iino_subcutaneous_mu_red_s.loc[1000:1700]
+    mu_red_s_2 = exp.Iino_subcutaneous_mu_red_s.loc[1001:1700]
     mu_red_s = pd.concat([mu_red_s_1, mu_red_s_2])
 
     mu_s = mu_red_s / (1 - g)
