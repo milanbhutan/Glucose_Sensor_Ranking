@@ -9,30 +9,38 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 import tissue_model.tissue_params as params
 
 
-air_optic_params = [
-    0.01, 
-    0.01, 
-    1, 
-    1.4]
-
 Nx, Ny, Nz = params.vox_x, params.vox_y, params.vox_z
 
 vol = np.zeros((Nx, Ny, Nz), dtype = np.uint8)
 vol[:,
     :,
-    0 : params.bot_epi_depth_vox
+    0 : params.bot_glass_depth_vox
     ] = 1
 
 vol[:,
     :,
-    params.bot_epi_depth_vox : params.bot_derm_depth_vox] = 2
+    params.bot_glass_depth_vox : params.bot_epi_depth_vox
+    ] = 2
 
 vol[:,
     :,
-    params.bot_derm_depth_vox : params.bot_sub_depth_vox] = 3
+    params.bot_epi_depth_vox : params.bot_derm_depth_vox
+    ] = 3
+
+vol[:,
+    :,
+    params.bot_derm_depth_vox : params.bot_sub_depth_vox
+    ] = 4
+
+background_optic_params = [0.0, 0.0, 1.0, 1.0]
 
 
-def run_simulation(glass_optic_params, epi_optic_params, derm_optic_params, sub_optic_params):    
+def run_simulation(
+        glass_optic_params, 
+        epi_optic_params, 
+        derm_optic_params, 
+        sub_optic_params
+        )-> dict:    
     # =========================================
     # MCeXtreme Simulation
     # =========================================
@@ -42,7 +50,7 @@ def run_simulation(glass_optic_params, epi_optic_params, derm_optic_params, sub_
 
     # Define simulation values
     prop = [
-        air_optic_params,
+        background_optic_params,
         glass_optic_params,
         epi_optic_params,
         derm_optic_params,
@@ -56,11 +64,9 @@ def run_simulation(glass_optic_params, epi_optic_params, derm_optic_params, sub_
         "prop": prop,
         "srcpos": [params.src_x_vox, params.src_y_vox, params.src_z_vox],
         "srcdir": [0, 0, 1],
-        "detpos": [[params.det1_x_vox, params.det1_y_vox, params.det1_z_vox, params.det1_r_vox], 
-                   [params.det2_x_vox, params.det2_y_vox, params.det2_z_vox, params.det2_r_vox],
-                   [params.det3_x_vox, params.det3_y_vox, params.det3_z_vox, params.det3_r_vox],
-                   [params.det4_x_vox, params.det4_y_vox, params.det4_z_vox, params.det4_r_vox],
-                   [params.det5_x_vox, params.det5_y_vox, params.det5_z_vox, params.det5_r_vox]],
+        "detpos": [
+            [params.det_x_vox, params.det_y_vox, params.det_z_vox, params.det_r_vox], 
+            ],
         "tstart": 0,
         "tend": 10e-9,
         "tstep": 10e-9,
@@ -71,8 +77,8 @@ def run_simulation(glass_optic_params, epi_optic_params, derm_optic_params, sub_
         "issavedet": 1,
         "issaveseed": 0,
         "issave2pt": 0,
-        "maxdetphoton": 1e7,
-        "savedetflag" : "dp"
+        "maxdetphoton": 1e8,
+        "savedetflag" : "dpx"
     }
 
 
@@ -80,25 +86,68 @@ def run_simulation(glass_optic_params, epi_optic_params, derm_optic_params, sub_
     sim_out = pmcx.mcxlab(sim_config)
 
     detp = sim_out["detp"]
-    photon_weights = pmcx.detweight(detp)
+    positions = np.asarray(detp["p"]) * params.vox_size_mm
+    paths = np.asarray(detp["ppath"]) * params.vox_size_mm
 
-    mask_1 = detp["detid"] == 1
-    mask_2 = detp["detid"] == 2
-    mask_3 = detp["detid"] == 3
-    mask_4 = detp["detid"] == 4
-    mask_5 = detp["detid"] == 5
+    dx = params.src_x_mm - positions[:, 0]
+    dy = params.src_y_mm - positions[:, 1]
+    r = np.sqrt(dx**2 + dy**2)
+    weights = pmcx.detweight(detp)
 
-    R_1 = photon_weights[mask_1].sum() / sim_config["nphoton"]
-    R_2 = photon_weights[mask_2].sum() / sim_config["nphoton"]
-    R_3 = photon_weights[mask_3].sum() / sim_config["nphoton"]
-    R_4 = photon_weights[mask_4].sum() / sim_config["nphoton"]
-    R_5 = photon_weights[mask_5].sum() / sim_config["nphoton"]
 
-    A_1 = -np.log(R_1)
-    A_2 = -np.log(R_2)
-    A_3 = -np.log(R_3)
-    A_4 = -np.log(R_4)
-    A_5 = -np.log(R_5)
+    
+    ring_1 = (r >= params.ring_1_inner_rad) & (r <= params.ring_1_outer_rad)
+    ring_2 = (r >= params.ring_2_inner_rad) & (r <= params.ring_2_outer_rad)
+    ring_3 = (r >= params.ring_3_inner_rad) & (r <= params.ring_3_outer_rad)
+    ring_4 = (r >= params.ring_4_inner_rad) & (r <= params.ring_4_outer_rad)
+    ring_5 = (r >= params.ring_5_inner_rad) & (r <= params.ring_5_outer_rad)
+
+    rings = [ring_1, ring_2, ring_3, ring_4, ring_5]
+    metrics = {
+        "absorbance": np.zeros(5),
+        "mean_path": 
+            {
+                "epi_mean_path": np.zeros(5),
+                "derm_mean_path": np.zeros(5),
+                "sub_mean_path": np.zeros(5),
+            },
+        "sensitivity": 
+            {
+                "epi_sensitivity": np.zeros(5),
+                "derm_sensitivity": np.zeros(5),
+                "sub_sensitivity": np.zeros(5),
+            },
+        "power_dB": np.zeros(5)
+    }
+
+    SDS_idx = 0
+    for ring in rings:
+        R = weights[ring].sum() / sim_config["nphoton"]
+        power_dB = 10 * np.log10(R)
+        A = -np.log(R)
+
+        epi_mean_path = (weights[ring] * paths[ring, 1]).sum() / weights[ring].sum()
+        derm_mean_path = (weights[ring] * paths[ring, 2]).sum() / weights[ring].sum()
+        sub_mean_path = (weights[ring] * paths[ring, 3]).sum() / weights[ring].sum()
+        total_path = epi_mean_path + derm_mean_path + sub_mean_path
+
+        epi_sensitivity = epi_mean_path / total_path
+        derm_sensitivity = derm_mean_path / total_path
+        sub_sensitivity = sub_mean_path / total_path
+
+        metrics["absorbance"][SDS_idx] = A
+        metrics["power_dB"][SDS_idx] = power_dB
+
+        metrics["mean_path"]["epi_mean_path"][SDS_idx] = epi_mean_path
+        metrics["mean_path"]["derm_mean_path"][SDS_idx] = derm_mean_path
+        metrics["mean_path"]["sub_mean_path"][SDS_idx] = sub_mean_path
+
+        metrics["sensitivity"]["epi_sensitivity"][SDS_idx] = epi_sensitivity
+        metrics["sensitivity"]["derm_sensitivity"][SDS_idx] = derm_sensitivity
+        metrics["sensitivity"]["sub_sensitivity"][SDS_idx] = sub_sensitivity
+        SDS_idx += 1
+
+
 
     # replay_config = sim_config.copy()
     # replay_config["outputtype"] = "jacobian"
@@ -173,5 +222,4 @@ def run_simulation(glass_optic_params, epi_optic_params, derm_optic_params, sub_
     # print(f"DS(%): {PMDF_derm_per:.2f} %")
     # print(f"SS(%): {PMDF_sub_per:.2f} %")
 
-    A_array = np.array([A_1, A_2, A_3, A_4, A_5])
-    return A_array
+    return metrics

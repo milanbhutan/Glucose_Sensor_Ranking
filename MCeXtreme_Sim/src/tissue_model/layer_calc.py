@@ -15,6 +15,7 @@ import tissue_model.exp_data as exp
 # where B, S, W, F, and M represent blood, oxygen, water, fat, and melanosome compostion of tissue respectively
 # ==========================================================
 
+
 norm_wavelength_nm_np = np.arange(1, 2001, 1)
 norm_wavelength_nm = pd.Series(data = norm_wavelength_nm_np, index = norm_wavelength_nm_np)
 
@@ -44,21 +45,28 @@ def epi(
     
     if(R < 0):
         R = 0
-    mu_a = ( 
+    mu_a_1 = ( 
     (B * S * exp.Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * exp.Bosschaart_2014_interp_deoxy_ser)
     + (W * exp.Fewell_2019_interp_ser) 
     + (F * exp.Veen_Anderson_interp_ser) 
     + (M * exp.Jacques_1998_interp_ser)
     + (R * baseline) # baseline tissue absorption
-    )
+    ).loc[1:1000]
+    mu_a_2 = exp.Iino_epidermis_mu_a.loc[1001:1700]
+
+    mu_a = pd.concat([mu_a_1, mu_a_2])
 
     # epidermis scattering
-    mu_red_s = 6.87 * (norm_wavelength_nm.loc[1: 1700] / 500) ** -1.161
+    mu_red_s_1 = 6.87 * (norm_wavelength_nm.loc[1: 1000] / 500) ** -1.161
+    mu_red_s_2 = exp.Iino_epidermis_mu_red_s.loc[1001:1700]
+    mu_red_s = pd.concat([mu_red_s_1, mu_red_s_2])
+
     mu_s = mu_red_s / (1 - g)
 
     # Jacques 2013 refractive index
-    n = ((1 - W) * n_dry) + W * n_water
+    n = 1.4
+    # n = ((1 - W) * n_dry) + W * n_water
     
     return mu_a, mu_s, g, n, mu_red_s
 
@@ -75,22 +83,29 @@ def derm(
 
     if(R < 0):
         R = 0
-    mu_a = ( 
+    mu_a_1 = ( 
     (B * S * exp.Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * exp.Bosschaart_2014_interp_deoxy_ser)
     + (W * exp.Fewell_2019_interp_ser) 
     + (F * exp.Veen_Anderson_interp_ser) 
     + (M * exp.Jacques_1998_interp_ser)
     + (R * baseline) # baseline tissue absorption
-    )
+    ).loc[1:1000]
+    mu_a_2 = exp.Iino_dermis_mu_a.loc[1001:1700]
+
+    mu_a = pd.concat([mu_a_1, mu_a_2])
 
     # dermis scattering
-    mu_red_s = 4.53 * (norm_wavelength_nm.loc[1: 1700] / 500) ** -1.292
+    mu_red_s_1 = 4.53 * (norm_wavelength_nm.loc[1: 1000] / 500) ** -1.292
+    mu_red_s_2 = exp.Iino_dermis_mu_red_s.loc[1001:1700]
+    mu_red_s = pd.concat([mu_red_s_1, mu_red_s_2])
+
     mu_s = mu_red_s / (1 - g)
 
 
     # Jacques 2013 refractive index
-    n = ((1 - W) * n_dry) + W * n_water
+    n = 1.4
+    # n = ((1 - W) * n_dry) + W * n_water
     
     return mu_a, mu_s, g, n, mu_red_s
 
@@ -108,14 +123,17 @@ def sub(
     
     if(R < 0):
         R = 0
-    mu_a = ( 
+    mu_a_1 = ( 
     (B * S * exp.Bosschaart_2014_interp_oxy_ser)
     + (B * (1-S) * exp.Bosschaart_2014_interp_deoxy_ser)
     + (W * exp.Fewell_2019_interp_ser) 
     + (F * exp.Veen_Anderson_interp_ser) 
     + (M * exp.Jacques_1998_interp_ser)
     + (R * baseline) # baseline tissue absorption
-    )
+    ).loc[1:1000]
+    mu_a_2 = exp.Iino_subcutaneous_mu_a.loc[1001:1700]
+
+    mu_a = pd.concat([mu_a_1, mu_a_2])
 
 
     
@@ -128,6 +146,7 @@ def sub(
 
 
     # Jacques 2013 refractive index
-    n = ((1 - W) * n_dry) + W * n_water
+    n = 1.4
+    # n = ((1 - W) * n_dry) + W * n_water
     
     return mu_a, mu_s, g, n, mu_red_s

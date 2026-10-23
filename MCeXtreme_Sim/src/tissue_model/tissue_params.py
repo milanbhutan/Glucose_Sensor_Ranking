@@ -278,30 +278,30 @@ src_x_vox = vox_x / 4
 src_y_vox = vox_y / 2
 src_z_vox = 0
 
-det1_x_vox = src_x_vox + SDS_1_vox
-det1_y_vox = src_y_vox
-det1_z_vox = src_z_vox
-det1_r_vox = 1
+src_x_mm = src_x_vox * vox_size_mm
+src_y_mm = src_y_vox * vox_size_mm
+src_z_mm = src_z_vox * vox_size_mm
 
-det2_x_vox = src_x_vox + SDS_2_vox
-det2_y_vox = src_y_vox
-det2_z_vox = src_z_vox
-det2_r_vox = 1
+# Create one large circular detector which will be divided into 5 concentric ring detectors
+det_x_vox = src_x_vox
+det_y_vox = src_y_vox
+det_z_vox = src_z_vox
+det_r_vox = 31
 
-det3_x_vox = src_x_vox + SDS_3_vox
-det3_y_vox = src_y_vox
-det3_z_vox = src_z_vox
-det3_r_vox = 1
+ring_1_inner_rad = SDS_1_mm - 0.1
+ring_1_outer_rad = SDS_1_mm + 0.1
 
-det4_x_vox = src_x_vox + SDS_4_vox
-det4_y_vox = src_y_vox
-det4_z_vox = src_z_vox
-det4_r_vox = 1
+ring_2_inner_rad = SDS_2_mm - 0.1
+ring_2_outer_rad = SDS_2_mm + 0.1
 
-det5_x_vox = src_x_vox + SDS_5_vox
-det5_y_vox = src_y_vox
-det5_z_vox = src_z_vox
-det5_r_vox = 1
+ring_3_inner_rad = SDS_3_mm - 0.1
+ring_3_outer_rad = SDS_3_mm + 0.1
+
+ring_4_inner_rad = SDS_4_mm - 0.1
+ring_4_outer_rad = SDS_4_mm + 0.1
+
+ring_5_inner_rad = SDS_5_mm - 0.1
+ring_5_outer_rad = SDS_5_mm + 0.1
 
 glass_mu_a_sim, glass_mu_s_sim, glass_g_sim, glass_n_sim = [0, 0, 1, 1.4]
 

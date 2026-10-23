@@ -242,7 +242,7 @@ fig_mu_s, axes_mu_s = plt.subplots(1, 3, layout = "constrained")
 fig_mu_s.get_layout_engine().set(h_pad = 0.1, w_pad = 0.1)
 fig_mu_s.suptitle("Reduced Scattering Spectra for Three-Layer Tissue Model", fontsize = 18)
 
-for ax in axes_mu_s:
+for ax in axes_mu_s.flat:
     ax.set_xlabel("Wavelength (nm)", fontsize = 18)
     ax.set_ylabel("Reduced Scattering (1/mm)", fontsize = 18)
     ax.tick_params(axis = "both", labelsize = 18)
