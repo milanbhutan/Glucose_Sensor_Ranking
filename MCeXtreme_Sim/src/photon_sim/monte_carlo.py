@@ -57,9 +57,10 @@ def run_simulation(
         sub_optic_params
     ]
 
+    photon_count = 5e8
 
     sim_config = {
-        "nphoton": 1e8, # 1e9: 57 seconds
+        "nphoton": photon_count, # 1e9: 57 seconds
         "vol": vol,
         "prop": prop,
         "srcpos": [params.src_x_vox, params.src_y_vox, params.src_z_vox],
@@ -77,7 +78,8 @@ def run_simulation(
         "issavedet": 1,
         "issaveseed": 0,
         "issave2pt": 0,
-        "maxdetphoton": 1e8,
+        "maxdetphoton": photon_count,
+        #"seed": -1,
         "savedetflag" : "dpx"
     }
 

@@ -65,8 +65,7 @@ def epi(
     mu_s = mu_red_s / (1 - g)
 
     # Jacques 2013 refractive index
-    n = 1.4
-    # n = ((1 - W) * n_dry) + W * n_water
+    n = ((1 - W) * n_dry) + W * n_water
     
     return mu_a, mu_s, g, n, mu_red_s
 
@@ -104,8 +103,7 @@ def derm(
 
 
     # Jacques 2013 refractive index
-    n = 1.4
-    # n = ((1 - W) * n_dry) + W * n_water
+    n = ((1 - W) * n_dry) + W * n_water
     
     return mu_a, mu_s, g, n, mu_red_s
 
@@ -146,7 +144,6 @@ def sub(
 
 
     # Jacques 2013 refractive index
-    n = 1.4
-    # n = ((1 - W) * n_dry) + W * n_water
+    n = ((1 - W) * n_dry) + W * n_water
     
     return mu_a, mu_s, g, n, mu_red_s
