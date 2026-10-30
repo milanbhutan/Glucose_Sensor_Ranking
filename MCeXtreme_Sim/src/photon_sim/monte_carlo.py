@@ -57,7 +57,7 @@ def run_simulation(
         sub_optic_params
     ]
 
-    photon_count = 5e8
+    photon_count = 1e8
 
     sim_config = {
         "nphoton": photon_count, # 1e9: 57 seconds
@@ -79,8 +79,8 @@ def run_simulation(
         "issaveseed": 0,
         "issave2pt": 0,
         "maxdetphoton": photon_count,
-        #"seed": -1,
-        "savedetflag" : "dpx"
+        "seed": -1,
+        "savedetflag" : "dspx"
     }
 
 
@@ -95,6 +95,7 @@ def run_simulation(
     dy = params.src_y_mm - positions[:, 1]
     r = np.sqrt(dx**2 + dy**2)
     weights = pmcx.detweight(detp)
+    nscatter = np.asarray(detp["nscat"])
 
 
     
@@ -112,6 +113,12 @@ def run_simulation(
                 "epi_mean_path": np.zeros(5),
                 "derm_mean_path": np.zeros(5),
                 "sub_mean_path": np.zeros(5),
+            },
+        "dA_dmu_s":
+            {
+                "epi_dA_dmu_s": np.zeros(5),
+                "derm_dA_dmu_s": np.zeros(5),
+                "sub_dA_dmu_s": np.zeros(5),
             },
         "sensitivity": 
             {
@@ -133,6 +140,10 @@ def run_simulation(
         sub_mean_path = (weights[ring] * paths[ring, 3]).sum() / weights[ring].sum()
         total_path = epi_mean_path + derm_mean_path + sub_mean_path
 
+        epi_dA_dmu_s = epi_mean_path - ((weights[ring] * nscatter[ring, 1]).sum() / weights[ring].sum()) / epi_optic_params[1]
+        derm_dA_dmu_s = derm_mean_path - ((weights[ring] * nscatter[ring, 2]).sum() / weights[ring].sum()) / derm_optic_params[1]
+        sub_dA_dmu_s = sub_mean_path - ((weights[ring] * nscatter[ring, 3]).sum() / weights[ring].sum()) / sub_optic_params[1]
+
         epi_sensitivity = epi_mean_path / total_path
         derm_sensitivity = derm_mean_path / total_path
         sub_sensitivity = sub_mean_path / total_path
@@ -144,9 +155,15 @@ def run_simulation(
         metrics["mean_path"]["derm_mean_path"][SDS_idx] = derm_mean_path
         metrics["mean_path"]["sub_mean_path"][SDS_idx] = sub_mean_path
 
+        metrics["dA_dmu_s"]["epi_dA_dmu_s"][SDS_idx] = epi_dA_dmu_s
+        metrics["dA_dmu_s"]["derm_dA_dmu_s"][SDS_idx] = derm_dA_dmu_s
+        metrics["dA_dmu_s"]["sub_dA_dmu_s"][SDS_idx] = sub_dA_dmu_s
+
         metrics["sensitivity"]["epi_sensitivity"][SDS_idx] = epi_sensitivity
         metrics["sensitivity"]["derm_sensitivity"][SDS_idx] = derm_sensitivity
         metrics["sensitivity"]["sub_sensitivity"][SDS_idx] = sub_sensitivity
+
+
         SDS_idx += 1
 
 

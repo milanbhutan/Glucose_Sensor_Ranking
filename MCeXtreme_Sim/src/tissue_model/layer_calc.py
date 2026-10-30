@@ -52,20 +52,21 @@ def epi(
     + (F * exp.Veen_Anderson_interp_ser) 
     + (M * exp.Jacques_1998_interp_ser)
     + (R * baseline) # baseline tissue absorption
-    ).loc[1:1000]
-    mu_a_2 = exp.Iino_epidermis_mu_a.loc[1001:1700]
+    ).loc[1:999]
+    mu_a_2 = exp.Iino_epidermis_mu_a.loc[1000:1700]
 
     mu_a = pd.concat([mu_a_1, mu_a_2])
 
     # epidermis scattering
-    mu_red_s_1 = 6.87 * (norm_wavelength_nm.loc[1: 1000] / 500) ** -1.161
-    mu_red_s_2 = exp.Iino_epidermis_mu_red_s.loc[1001:1700]
+    mu_red_s_1 = 6.87 * (norm_wavelength_nm.loc[1: 999] / 500) ** -1.161
+    mu_red_s_2 = exp.Iino_epidermis_mu_red_s.loc[1000:1700]
     mu_red_s = pd.concat([mu_red_s_1, mu_red_s_2])
 
     mu_s = mu_red_s / (1 - g)
 
     # Jacques 2013 refractive index
-    n = ((1 - W) * n_dry) + W * n_water
+    #n = ((1 - W) * n_dry) + W * n_water
+    n = 1.37
     
     return mu_a, mu_s, g, n, mu_red_s
 
@@ -89,21 +90,22 @@ def derm(
     + (F * exp.Veen_Anderson_interp_ser) 
     + (M * exp.Jacques_1998_interp_ser)
     + (R * baseline) # baseline tissue absorption
-    ).loc[1:1000]
-    mu_a_2 = exp.Iino_dermis_mu_a.loc[1001:1700]
+    ).loc[1:999]
+    mu_a_2 = exp.Iino_dermis_mu_a.loc[1000:1700]
 
     mu_a = pd.concat([mu_a_1, mu_a_2])
 
     # dermis scattering
-    mu_red_s_1 = 4.53 * (norm_wavelength_nm.loc[1: 1000] / 500) ** -1.292
-    mu_red_s_2 = exp.Iino_dermis_mu_red_s.loc[1001:1700]
+    mu_red_s_1 = 4.53 * (norm_wavelength_nm.loc[1: 999] / 500) ** -1.292
+    mu_red_s_2 = exp.Iino_dermis_mu_red_s.loc[1000:1700]
     mu_red_s = pd.concat([mu_red_s_1, mu_red_s_2])
 
     mu_s = mu_red_s / (1 - g)
 
 
     # Jacques 2013 refractive index
-    n = ((1 - W) * n_dry) + W * n_water
+    #n = ((1 - W) * n_dry) + W * n_water
+    n = 1.37
     
     return mu_a, mu_s, g, n, mu_red_s
 
@@ -128,22 +130,23 @@ def sub(
     + (F * exp.Veen_Anderson_interp_ser) 
     + (M * exp.Jacques_1998_interp_ser)
     + (R * baseline) # baseline tissue absorption
-    ).loc[1:1000]
-    mu_a_2 = exp.Iino_subcutaneous_mu_a.loc[1001:1700]
+    ).loc[1:999]
+    mu_a_2 = exp.Iino_subcutaneous_mu_a.loc[1000:1700]
 
     mu_a = pd.concat([mu_a_1, mu_a_2])
 
 
     
     # subcutaneous scattering
-    mu_red_s_1 = 1.84 * (norm_wavelength_nm.loc[1: 1000] / 500) ** -0.672
-    mu_red_s_2 = exp.Iino_subcutaneous_mu_red_s.loc[1001:1700]
+    mu_red_s_1 = 1.84 * (norm_wavelength_nm.loc[1: 999] / 500) ** -0.672
+    mu_red_s_2 = exp.Iino_subcutaneous_mu_red_s.loc[1000:1700]
     mu_red_s = pd.concat([mu_red_s_1, mu_red_s_2])
 
     mu_s = mu_red_s / (1 - g)
 
 
     # Jacques 2013 refractive index
-    n = ((1 - W) * n_dry) + W * n_water
+    #n = ((1 - W) * n_dry) + W * n_water
+    n = 1.37
     
     return mu_a, mu_s, g, n, mu_red_s

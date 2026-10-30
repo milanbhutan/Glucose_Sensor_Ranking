@@ -267,11 +267,11 @@ SDS_3_mm = 2.3
 SDS_4_mm = 2.6
 SDS_5_mm = 2.9
 
-SDS_1_vox = SDS_1_mm / vox_size_mm
-SDS_2_vox = SDS_2_mm / vox_size_mm
-SDS_3_vox = SDS_3_mm / vox_size_mm
-SDS_4_vox = SDS_4_mm / vox_size_mm
-SDS_5_vox = SDS_5_mm / vox_size_mm
+SDS_1_vox = round(SDS_1_mm / vox_size_mm)
+SDS_2_vox = round(SDS_2_mm / vox_size_mm)
+SDS_3_vox = round(SDS_3_mm / vox_size_mm)
+SDS_4_vox = round(SDS_4_mm / vox_size_mm)
+SDS_5_vox = round(SDS_5_mm / vox_size_mm)
 
 
 src_x_vox = vox_x / 4
