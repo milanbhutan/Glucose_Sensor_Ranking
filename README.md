@@ -11,9 +11,9 @@ Note: The recommended development tool for running this repo is VSCode. VSCode p
 Download VSCode Here:
 https://code.visualstudio.com/download
 
-1. Clone the repository
+1. In terminal, clone the repository
 ```powershell
-
+git clone "https://github.com/milanbhutan/Glucose_Sensor_Ranking.git"
 ```
 3. Open the repository in VSCode
 ```powershell
