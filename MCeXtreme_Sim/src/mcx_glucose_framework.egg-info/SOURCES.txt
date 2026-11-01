@@ -8,7 +8,11 @@ MCeXtreme_Sim/src/mcx_glucose_framework.egg-info/top_level.txt
 MCeXtreme_Sim/src/paths.py
 MCeXtreme_Sim/src/analysis/error_analysis.py
 MCeXtreme_Sim/src/analysis/uncertainty_analysis.py
+MCeXtreme_Sim/src/mcx_glucose_framework.egg-info/PKG-INFO
 MCeXtreme_Sim/src/mcx_glucose_framework.egg-info/SOURCES.txt
+MCeXtreme_Sim/src/mcx_glucose_framework.egg-info/dependency_links.txt
+MCeXtreme_Sim/src/mcx_glucose_framework.egg-info/requires.txt
+MCeXtreme_Sim/src/mcx_glucose_framework.egg-info/top_level.txt
 MCeXtreme_Sim/src/photon_sim/monte_carlo.py
 MCeXtreme_Sim/src/spectra_plots/1001_1700nm.py
 MCeXtreme_Sim/src/spectra_plots/600_1000nm.py

@@ -22,10 +22,10 @@ dermal_score = normalize(beta_derm_df)
 power_score = normalize(power_dB_df)
 
 
-fig, ax = plt.subplots()
-glucose_score.plot(ax = ax, label = "Glucose Score", color = "red")
-dermal_score.plot(ax = ax, label = "Dermal Sensitivity Score", color = "green")
-power_score.plot(ax = ax, label = "Power Score", color = "black")
+# fig, ax = plt.subplots()
+# glucose_score.plot(ax = ax, label = "Glucose Score", color = "red")
+# dermal_score.plot(ax = ax, label = "Dermal Sensitivity Score", color = "green")
+# power_score.plot(ax = ax, label = "Power Score", color = "black")
 
 # Calculate Wavelength Performance Index
 WPI = (
