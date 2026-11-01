@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 from paths import MCX_DIR
 
 dA_dCg_df = pd.read_csv(MCX_DIR / "sim_results" / "mean_metrics"/ "Metric_Mean_dA_dCg_total.csv", index_col = "wavelength_nm")
