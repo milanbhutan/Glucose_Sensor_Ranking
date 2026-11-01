@@ -1,10 +1,6 @@
 
 import pandas as pd
-import sys
 from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-
 import tissue_model.tissue_params as params
 import matplotlib.pyplot as plt
 import analysis.uncertainty_analysis as uncertain
@@ -26,65 +22,60 @@ for ax in axes_mu_a:
 
 # Simulated absorption spectra plots
 
-axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  params.epi_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  label = "Analytical Model", 
-                  color = "red")
+# axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   params.epi_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   label = "Analytical Model", 
+#                   color = "red")
 
 
-axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  params.epi_mu_a_sim_Jolivot_SPT_II.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  color = "red")
+# axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   params.epi_mu_a_sim_Jolivot_SPT_II.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   color = "red")
 
 
-axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  params.epi_mu_a_sim_Jolivot_SPT_III.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  color = "red")
+# axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   params.epi_mu_a_sim_Jolivot_SPT_III.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   color = "red")
 
-axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  params.epi_mu_a_sim_Jolivot_SPT_IV.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  color = "red")
+# axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   params.epi_mu_a_sim_Jolivot_SPT_IV.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   color = "red")
 
-axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  params.epi_mu_a_sim_Jolivot_SPT_V.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  color = "red")
+# axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   params.epi_mu_a_sim_Jolivot_SPT_V.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   color = "red")
 
-axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  params.epi_mu_a_sim_Jolivot_SPT_VI.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  color = "red")
-axes_mu_a[0].text(713.5, 
-                  9.11, 
-                  "M=44.7%", 
-                  color = "red",
-                  fontsize = 10)
+# axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   params.epi_mu_a_sim_Jolivot_SPT_VI.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   color = "red")
+# axes_mu_a[0].text(713.5, 
+#                   9.11, 
+#                   "M=44.7%", 
+#                   color = "red",
+#                   fontsize = 10)
 
 axes_mu_a[0].set_title(r"$\mu_a$ epidermis", fontsize = 18)
 
 
-axes_mu_a[1].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  params.derm_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  color = "red",
-                  label = "Analytical Model")
+# axes_mu_a[1].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   params.derm_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   color = "red",
+#                   label = "Analytical Model")
 
-axes_mu_a[1].plot(
-    uncertain.derm_mu_a_sim_df[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-    color = "red",
-    alpha = 0.02
-    )
+# axes_mu_a[1].plot(
+#     uncertain.derm_mu_a_sim_df[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#     color = "red",
+#     alpha = 0.02
+#     )
 axes_mu_a[1].set_title(r"$\mu_a$ dermis",  fontsize = 18)
 
 
 
-axes_mu_a[2].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  params.sub_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-                  color = "red",
-                  label = "Analytical Model")
+# axes_mu_a[2].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   params.sub_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
+#                   color = "red",
+#                   label = "Analytical Model")
 
-axes_mu_a[2].plot(
-    uncertain.sub_mu_a_sim_df[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-    color = "red",
-    alpha = 0.02
-    )
 
 axes_mu_a[2].set_title(r"$\mu_a$ subcutaneous", fontsize = 18)
 

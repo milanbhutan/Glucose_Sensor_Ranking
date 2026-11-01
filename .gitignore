@@ -1,14 +1,2 @@
-Misc/
-Microcontroller_NN/
-Thesis_Papers/
-MCeXtreme_sim/.MCVenv
-MCeXtreme_sim/Water_Absorption_Data
-Datasets/
-MCeXtreme_sim/outputs
-MCeXtreme_sim/src/test.py
+.MCVenv/
 
-
-
-LTspice_sims/**/*.log
-LTspice_sims/**/*.raw
-LTspice_sims/**/*.net

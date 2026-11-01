@@ -1,0 +1,3 @@
+from pathlib import Path
+
+MCX_DIR = Path(__file__).resolve().parents[1]

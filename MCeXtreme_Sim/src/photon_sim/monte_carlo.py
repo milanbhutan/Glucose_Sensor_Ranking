@@ -3,9 +3,6 @@ import numpy as np
 import sys
 from pathlib import Path
 import matplotlib.pyplot as plt
-
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-
 import tissue_model.tissue_params as params
 
 

@@ -1,10 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import sys
 from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-
+from paths import MCX_DIR
 import tissue_model.tissue_params as params
 import analysis.uncertainty_analysis as uncertain
 import tissue_model.exp_data as exp
@@ -16,46 +13,46 @@ plt.rcParams["text.usetex"] = False
 
 # Absorption Data
 df_Wan_epi_mu_a = (
-    pd.read_csv("Exp_Absorption/wan_epidermis_absorption.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Absorption" / "wan_epidermis_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 
 df_Shimojo_epi_mu_a = (
-    pd.read_csv("Exp_Absorption/shimojo_epidermis_absorption.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Absorption" / "shimojo_epidermis_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 
 
 df_Simpson_derm_mu_a = (
-    pd.read_csv("Exp_Absorption/simpson_dermis_absorption.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Absorption" / "simpson_dermis_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 mu_a_derm_Simpson = df_Simpson_derm_mu_a.loc[exp.wavelength_bound_1:exp.wavelength_bound_2, "caucasian_dermis_mu_a_mm^-1"]
 
 df_Shimojo_derm_mu_a = (
-    pd.read_csv("Exp_Absorption/shimojo_dermis_absorption.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Absorption" / "shimojo_dermis_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 
 df_Jonasson_derm_mu_a = (
-    pd.read_csv("Exp_Absorption/jonasson_lower_dermis_absorption.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Absorption" / "jonasson_lower_dermis_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 
 df_Ganesan_sub_mu_a = (
-    pd.read_csv("Exp_Absorption/ganesan_subcutaneous_absorption.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Absorption" / "ganesan_subcutaneous_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 mu_a_sub_Ganesan = df_Ganesan_sub_mu_a.loc[exp.wavelength_bound_1:exp.wavelength_bound_2, "mu_a_mm^-1"]
 
 df_Simpson_sub_mu_a = (
-    pd.read_csv("Exp_Absorption/simpson_subcutaneous_absorption.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Absorption" / "simpson_subcutaneous_absorption.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
@@ -63,37 +60,37 @@ mu_a_sub_Simpson = df_Simpson_sub_mu_a.loc[exp.wavelength_bound_1:exp.wavelength
 
 # Scattering Data
 df_Shimojo_epi_red_mu_s = (
-    pd.read_csv("Exp_Scattering/shimojo_epidermis_reduced_scattering.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Scattering" / "shimojo_epidermis_reduced_scattering.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 
 df_Shimojo_derm_red_mu_s = (
-    pd.read_csv("Exp_Scattering/shimojo_dermis_reduced_scattering.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Scattering" / "shimojo_dermis_reduced_scattering.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 
 df_Simpson_derm_red_mu_s = (
-    pd.read_csv("Exp_Scattering/simpson_dermis_reduced_scattering.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Scattering" / "simpson_dermis_reduced_scattering.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 
 df_Shimojo_sub_red_mu_s = (
-    pd.read_csv("Exp_Scattering/shimojo_subcutaneous_reduced_scattering.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Scattering" / "shimojo_subcutaneous_reduced_scattering.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 
 df_Ganesan_sub_red_mu_s = (
-    pd.read_csv("Exp_Scattering/ganesan_subcutaneous_reduced_scattering.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Scattering" / "ganesan_subcutaneous_reduced_scattering.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
 
 df_Simpson_sub_red_mu_s = (
-    pd.read_csv("Exp_Scattering/simpson_subcutaneous_reduced_scattering.csv", comment = "#")
+    pd.read_csv(MCX_DIR / "Exp_Scattering" / "simpson_subcutaneous_reduced_scattering.csv", comment = "#")
     .set_index("wavelength_nm")
     .sort_index()
 )
