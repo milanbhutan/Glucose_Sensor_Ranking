@@ -3,7 +3,7 @@
 This framework simulates photon transport within a three-layer tissue model to determine the optimal wavelength and source-detector spacing for glucose detection. Each wavelength and source-detector spacing is given a wavelength performance index (WPI) based on glucose-sensitivity, signal-to-noise ratio, water interference, and dermal absorption sensitivity.
 
 ## Software Layout
-<img width="1061" height="302" alt="image" src="https://github.com/user-attachments/assets/54c81aad-afe4-4c1a-9e6f-35fbf6c3fb4e" />
+<img width="1066" height="311" alt="image" src="https://github.com/user-attachments/assets/353b5136-5a76-4b43-8a77-f6be7d7efb95" />
 
 
 
