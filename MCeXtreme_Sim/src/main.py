@@ -1,12 +1,28 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from paths import MCX_DIR
+from paths import sim_results_DIR
 
-dA_dCg_df = pd.read_csv(MCX_DIR / "sim_results" / "mean_metrics"/ "Metric_Mean_dA_dCg_total.csv", index_col = "wavelength_nm")
-beta_derm_df = pd.read_csv(MCX_DIR / "sim_results" / "mean_metrics"/ "Metric_Mean_beta_derm.csv", index_col = "wavelength_nm")
-power_dB_df = pd.read_csv(MCX_DIR / "sim_results" / "mean_metrics"/ "Metric_Mean_power_dB.csv", index_col = "wavelength_nm")
+dA_dCg_df = pd.read_csv(MCX_DIR / sim_results_DIR / "mean_metrics"/ "Metric_Mean_dA_dCg_total.csv", index_col = "wavelength_nm")
+beta_derm_df = pd.read_csv(MCX_DIR / sim_results_DIR / "mean_metrics"/ "Metric_Mean_beta_derm.csv", index_col = "wavelength_nm")
+power_dB_df = pd.read_csv(MCX_DIR / sim_results_DIR / "mean_metrics"/ "Metric_Mean_power_dB.csv", index_col = "wavelength_nm")
+
+dA_dCg_df.plot()
+plt.xlabel("Wavelength (nm)", fontsize = 18)
+plt.ylabel("$dA/dC_g$", fontsize = 18)
 
 
+beta_derm_df.plot()
+plt.title(r"$\beta_{derm}$")
+plt.xlabel("Wavelength (nm)", fontsize = 18)
+plt.ylabel("Path Fraction (%)", fontsize = 18)
+plt.tick_params(axis = "both", labelsize = 18)
+
+power_dB_df.plot()
+plt.title("Detected Optical Power")
+plt.xlabel("Wavelength (nm)", fontsize = 18)
+plt.ylabel("Power (dB)", fontsize = 18)
+plt.tick_params(axis = "both", labelsize = 18)
 
 def normalize(df):
     minimum = df.min().min()

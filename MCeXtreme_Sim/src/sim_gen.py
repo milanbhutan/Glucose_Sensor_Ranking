@@ -3,14 +3,15 @@ import numpy as np
 import pandas as pd
 
 from paths import MCX_DIR
+from paths import sim_results_DIR
 import tissue_model.tissue_params as params
 import photon_sim.monte_carlo as mc
 
 
-mean_metrics_path = MCX_DIR / "sim_results" / "mean_metrics"
+mean_metrics_path = MCX_DIR / sim_results_DIR / "mean_metrics"
 mean_metrics_path.mkdir(parents = True, exist_ok = True)
 
-error_metrics_path = MCX_DIR / "sim_results" / "error_metrics"
+error_metrics_path = MCX_DIR / sim_results_DIR / "error_metrics"
 error_metrics_path.mkdir(parents = True, exist_ok = True)
 
 wavelength_range = range(1000, 1701, 10) # was 10
@@ -235,21 +236,29 @@ for batch in range(batches):
 
         dA_dmu_a.loc[sim_wavelength_nm] = (
             baseline["mean_path"]["derm_mean_path"]
+            +
+            baseline["mean_path"]["sub_mean_path"]
             #(base_dmu_a["absorbance"] - baseline["absorbance"])
             )
 
         dA_dmu_s.loc[sim_wavelength_nm] = (
             baseline["dA_dmu_s"]["derm_dA_dmu_s"]
+            +
+            baseline["dA_dmu_s"]["sub_dA_dmu_s"]
             #(base_dmu_s["absorbance"] - baseline["absorbance"])
             )
 
         dA_dCg_mu_a.loc[sim_wavelength_nm] = (
             baseline["mean_path"]["derm_mean_path"] * dmu_a_dCg.loc[sim_wavelength_nm]
+            +
+            baseline["mean_path"]["sub_mean_path"] * dmu_a_dCg.loc[sim_wavelength_nm]
             #(base_dmu_a["absorbance"] - baseline["absorbance"]) * dmu_a_dCg.loc[sim_wavelength_nm]
             )
 
         dA_dCg_mu_s.loc[sim_wavelength_nm] = (
             baseline["dA_dmu_s"]["derm_dA_dmu_s"] * dmu_s_dCg * params.derm_mu_s_sim[sim_wavelength_nm]
+            +
+            baseline["dA_dmu_s"]["sub_dA_dmu_s"] * dmu_s_dCg * params.sub_mu_s_sim[sim_wavelength_nm]
             #(base_dmu_s["absorbance"] - baseline["absorbance"]) * dmu_s_dCg * params.derm_mu_s_sim[sim_wavelength_nm] 
 
             )

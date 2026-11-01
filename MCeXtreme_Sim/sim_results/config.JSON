@@ -1,0 +1,7 @@
+{
+    "photon count" : 1e8,
+    "batch size" : 2,
+    "glucose effect" : ["dermis"],
+    "wavelength range": [1000, 1700, 10],
+    "absorption model": "Iino 2003"
+}
