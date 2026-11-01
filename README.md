@@ -5,8 +5,22 @@ This framework simulates photon transport within a three-layer tissue model to d
 ## Software Layout
 <img width="1061" height="302" alt="image" src="https://github.com/user-attachments/assets/54c81aad-afe4-4c1a-9e6f-35fbf6c3fb4e" />
 
+
+
+## GPU Requirements
+Tested hardware: NVIDIA GeForce RTX 4060.
+
+Generating Monte Carlo simulations using sim_gen.py requires:
+GPU: NVIDIA GPU with CUDA support.
+GPU driver: A compatible, up-to-date NVIDIA graphics driver.
+GPU memory: Sufficient VRAM for the selected tissue volume, time gates, and simulation settings.
+
+
 ## Installing the Framework
 The recommended development tool for running this repo is VS Code. VS Code provides an intuitive way to navigate through directories and run python modules.
+
+
+
 
 Download VS Code Here:
 https://code.visualstudio.com/download
