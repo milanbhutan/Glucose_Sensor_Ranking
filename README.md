@@ -1,3 +1,20 @@
-## Thesis Overview
-This thesis aims to develop a prototype, non-invasive, PPG-based glucose monitoring sensor with firmware for signal preprocessing, 1D convolutional neural networks, and wireless communication. The start of this thesis work will involve validating literature-based near-infrared wavelengths for glucose detection using reflectance and transmission mode experimental setups for comparing wavelength-specific glucose sensitivity and SNR on aqueoeus glucose samples. An ML model will also be developed and trained on public datasets for PPG-glucose datasets like VitalDB to validate ML models before hardware deployment. Using the previously validated NIR wavelength, a wearable prototype PPG sensor will then be developed, along with the firmware for signal preprocssing, ML model blood glucose estimation, and wireless communication. The prototpye will then be tested on blood samples to compare sensor blood glucose estimation against gold-standard invasive methods. Lastly the prototype will be tested under varying subject-dependent conditions such as skin pigmentation, hydration, tissue thickness to ensure robustness of blood glucose estimation in the presence of these variations.
+## Overview
 
+This framework simulates photon transport within a three-layer tissue model to determine the optimal wavelength and source-detector spacing for glucose detection. Each wavelength and source-detector spacing is given a wavelength performance index (WPI) based on glucose-sensitivity, signal-to-noise ratio, water interference, and dermal absorption sensitivity.
+
+## Software Layout
+<img width="1061" height="302" alt="image" src="https://github.com/user-attachments/assets/54c81aad-afe4-4c1a-9e6f-35fbf6c3fb4e" />
+
+## Installing the Framework
+1. Create a virtual environment
+```powershell
+py -3.12 -m venv .MCVenv
+```
+2. Activate the environment
+```powershell
+.\.MCVenv\Scripts\Activate.ps1
+```
+3. Read the .toml file. This will install all the necessary libraries
+```powershell
+python -m pip install -e .
+```
