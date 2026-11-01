@@ -30,7 +30,7 @@ git clone "https://github.com/milanbhutan/Glucose_Sensor_Ranking.git"
 ```powershell
 code Glucose_Sensor_Ranking
 ```
-3. Open the VSCode terminal with, Ctrl + `, and create a virtual environment
+3. Open the VS Code terminal with, Ctrl + `, and create a virtual environment
 ```powershell
 py -3.12 -m venv .MCVenv
 ```
