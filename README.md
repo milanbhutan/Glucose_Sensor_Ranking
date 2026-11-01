@@ -53,7 +53,7 @@ This will generate plots of the inputs for the WPI, and plot the WPI for a range
 This will run photon transport simulations and regenerate the inputs used for the WPI. These inputs depend on the selected tissue layer thicknesses, tissue optical properties, photon count, and batch size. Currently this module will take about 1.5 hours to run. The runtime can be reduced by decreasing photon count and batch size, but this will reduce the accuracy of the simulation.
 
 ### 600_1000nm.py
-This will plot the absorption and reduced scattering spectra within 600 - 1000 nm. The absorption spectra are modeled from Jacques 2013[1] and Lapitan 2024[2]. The scattering spectra is provided by Jacques 2013[1]
+This will plot the absorption and reduced scattering spectra within 600 - 1000 nm. The absorption spectra are modeled from Jacques 2013 [1] and Lapitan 2024 [2]. The scattering spectra is provided by Jacques 2013 [1]
 
 ### 1001_1700nm.py
 This will plot the absorption and reduced scattering spectra within 1001 - 1700 nm, both of which are provided by Iino 2003[3].
