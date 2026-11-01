@@ -11,12 +11,12 @@ This framework simulates photon transport within a three-layer tissue model to d
 Tested hardware: NVIDIA GeForce RTX 4060.
 
 Generating Monte Carlo simulations using sim_gen.py requires:
-GPU: NVIDIA GPU with CUDA support.
-GPU driver: A compatible, up-to-date NVIDIA graphics driver.
-GPU memory: Sufficient VRAM for the selected tissue volume, time gates, and simulation settings.
+- GPU: NVIDIA GPU with CUDA support.
+- GPU driver: A compatible, up-to-date NVIDIA graphics driver.
+- GPU memory: Sufficient VRAM for the selected tissue volume, time gates, and simulation settings.
 
 
-## Installing the Framework
+## Running the Repo
 The recommended development tool for running this repo is VS Code. VS Code provides an intuitive way to navigate through directories and run python modules.
 
 
@@ -46,16 +46,19 @@ py -3.12 -m venv .MCVenv
 python -m pip install -e .
 ```
 
-Now you have everything you need to run the python modules. To run a module in VS code, click the play button in the top right.
+Now you have everything you need to run the .py files. To run a module in VS code, click the play button in the top right.
 
-### Option 1: Run main.py
+### main.py
 This will generate a plots of the inputs for the WPI, aswell as a plot of the WPI for a range of wavelengths and source detector spacings.
 
-### Option 2: Run sim_gen.py
+### sim_gen.py
 This will run photon transport simulations and regenerate the inputs used for the WPI. These inputs depend on the selected tissue layer thicknesses, tissue optical properties, photon count, and batch size. Currently this module will ran for apporximately one hour. The run time can be reduced by decreasing photon count and batch size but this will reduce the accuracy of the simulation.
 
-### Option 3: Run 600_1000nm.py or 1001_1700nm.py
-This will plot the absorption and reduced scattering spectra within the given wavelength ranges
+### 600_1000nm.py
+This will plot the absorption and reduced scattering spectra within 600 - 1000 nm. The absorption spectra is modeled from Jacques 2013[] and Laptian 2024[]. The scattering spectra is provided by Jacques 2013[]
 
-### Option 4: Run exp_data.py
+### 1001_1700nm.py
+This will plot the absorption and reduced scattering spectra within 1001 - 1700 nm, both of which are provided by Iino 2003.
+
+### exp_data.py
 This will plot the tissue constituent absorption spectra
