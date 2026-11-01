@@ -7,10 +7,10 @@ import tissue_model.tissue_params as params
 import photon_sim.monte_carlo as mc
 
 
-mean_metrics_path = MCX_DIR / "results" / "mean_metrics"
+mean_metrics_path = MCX_DIR / "sim_results" / "mean_metrics"
 mean_metrics_path.mkdir(parents = True, exist_ok = True)
 
-error_metrics_path = MCX_DIR / "results" / "error_metrics"
+error_metrics_path = MCX_DIR / "sim_results" / "error_metrics"
 error_metrics_path.mkdir(parents = True, exist_ok = True)
 
 wavelength_range = range(1000, 1701, 10) # was 10
