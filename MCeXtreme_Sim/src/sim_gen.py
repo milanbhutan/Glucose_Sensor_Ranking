@@ -14,24 +14,37 @@ mean_metrics_path.mkdir(parents = True, exist_ok = True)
 error_metrics_path = MCX_DIR / sim_results_DIR / "error_metrics"
 error_metrics_path.mkdir(parents = True, exist_ok = True)
 
-wavelength_range = range(1000, 1701, 10) # was 10
+wavelength_range = range(600, 1701, 25) # was 10
 batches = 2
 sds = ["SDS_1.7mm", "SDS_2.0mm", "SDS_2.3mm", "SDS_2.6mm", "SDS_2.9mm"]
+
+# Glucose Effects
 dmu_s_dCg = -0.0029
 
-df_dmu_a_dCg = (
+df_dmu_a_dCg_600_999 = (
+    pd.read_csv(MCX_DIR / "Glucose_Absorption_Data" / "haque2021_linear_glucose_absorption_600_999nm.csv")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+
+df_dmu_a_dCg_1000_1700 = (
     pd.read_csv(MCX_DIR / "Glucose_Absorption_Data" / "ge2024_dmu_a_dCg.csv")
     .set_index("wavelength_nm")
     .sort_index()
 )
+
+df_dmu_a_dCg = pd.concat([df_dmu_a_dCg_600_999, df_dmu_a_dCg_1000_1700])
+
 dmu_a_dCg = df_dmu_a_dCg.loc[:, "dmu_a_dCg_mm_inv_per_mmol_L"]
+
+
 
 
 
 
 plt.figure()
 plt.plot(df_dmu_a_dCg)
-plt.title("$d\mu_a/dC_g$ from Ge 2024", fontsize = 18)
+plt.title("$d\mu_a/dC_g$ from Haque 2021 (600 - 999nm)\nand Ge 2024 (1000 - 1700nm)", fontsize = 18)
 plt.xlabel("Wavelength (nm)", fontsize = 18)
 plt.xticks(fontsize = 18)
 plt.ylabel("$d\mu_a/dC_g$", fontsize = 18)
@@ -60,7 +73,6 @@ batch_metrics = {
 mean_df = dict.fromkeys(batch_metrics, None)
 stderr_df = dict.fromkeys(batch_metrics, None)
 
-sim_count = 0
 for batch in range(batches):
     # Create dataframes for one batch
     dA_dCg_total = pd.DataFrame(
@@ -147,7 +159,8 @@ for batch in range(batches):
         columns = sds
     )
     for sim_wavelength_nm in wavelength_range:
-    #Following Ge 2024 procedure for computing dA/dCg
+        print(f"Simulating {sim_wavelength_nm} in batch {batch}")
+        #Following Ge 2024 procedure for computing dA/dCg
         baseline = mc.run_simulation(
             [
             params.glass_mu_a_sim,
@@ -175,64 +188,6 @@ for batch in range(batches):
             params.sub_n_sim]
         )
 
-        # #Increment mu_a by 1
-        # base_dmu_a = mc.run_simulation(
-        #     [
-        #     params.glass_mu_a_sim,
-        #     params.glass_mu_s_sim,
-        #     params.glass_g_sim,
-        #     params.glass_n_sim
-        #     ],
-
-        #     [
-        #     params.epi_mu_a_sim[sim_wavelength_nm], 
-        #     params.epi_mu_s_sim[sim_wavelength_nm], 
-        #     params.epi_g_sim[sim_wavelength_nm], 
-        #     params.epi_n_sim ],
-
-        #     [
-        #     params.derm_mu_a_sim[sim_wavelength_nm] + 1, 
-        #     params.derm_mu_s_sim[sim_wavelength_nm], 
-        #     params.derm_g_sim[sim_wavelength_nm], 
-        #     params.derm_n_sim],
-
-        #     [
-        #     params.sub_mu_a_sim[sim_wavelength_nm], 
-        #     params.sub_mu_s_sim[sim_wavelength_nm], 
-        #     params.sub_g_sim[sim_wavelength_nm], 
-        #     params.sub_n_sim]
-        # )
-
-        # #Increment mu_s by 1
-        # base_dmu_s = mc.run_simulation(
-        #     [
-        #     params.glass_mu_a_sim,
-        #     params.glass_mu_s_sim,
-        #     params.glass_g_sim,
-        #     params.glass_n_sim
-        #     ],
-            
-        #     [
-        #     params.epi_mu_a_sim[sim_wavelength_nm], 
-        #     params.epi_mu_s_sim[sim_wavelength_nm], 
-        #     params.epi_g_sim[sim_wavelength_nm], 
-        #     params.epi_n_sim 
-        #     ],
-
-        #     [
-        #     params.derm_mu_a_sim[sim_wavelength_nm], 
-        #     params.derm_mu_s_sim[sim_wavelength_nm] + 1, 
-        #     params.derm_g_sim[sim_wavelength_nm], 
-        #     params.derm_n_sim
-        #     ],
-
-        #     [
-        #     params.sub_mu_a_sim[sim_wavelength_nm], 
-        #     params.sub_mu_s_sim[sim_wavelength_nm], 
-        #     params.sub_g_sim[sim_wavelength_nm], 
-        #     params.sub_n_sim
-        #     ]
-        # )
 
         dA_dmu_a.loc[sim_wavelength_nm] = (
             baseline["mean_path"]["derm_mean_path"]
@@ -280,6 +235,7 @@ for batch in range(batches):
         beta_sub.loc[sim_wavelength_nm] = baseline["sensitivity"]["sub_sensitivity"]
 
         power_dB.loc[sim_wavelength_nm] = baseline["power_dB"]
+        
 
     #Add wavelength sweep results as a batch entry
     batch_metrics["dA_dCg_total"][batch] = dA_dCg_total

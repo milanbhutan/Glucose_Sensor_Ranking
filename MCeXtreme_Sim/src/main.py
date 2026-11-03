@@ -12,10 +12,10 @@ plt.xlabel("Wavelength (nm)", fontsize = 18)
 plt.ylabel("$dA/dC_g$", fontsize = 18)
 
 
-beta_derm_df.plot()
+(100 * beta_derm_df).plot()
 plt.title(r"$\beta_{derm}$")
 plt.xlabel("Wavelength (nm)", fontsize = 18)
-plt.ylabel("Path Fraction (%)", fontsize = 18)
+plt.ylabel("Path Fraction", fontsize = 18)
 plt.tick_params(axis = "both", labelsize = 18)
 
 power_dB_df.plot()

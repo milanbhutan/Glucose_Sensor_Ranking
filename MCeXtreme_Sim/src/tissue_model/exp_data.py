@@ -57,6 +57,29 @@ df_Iino_sub_red_mu_s = (
 Iino_subcutaneous_mu_red_s = df_Iino_sub_red_mu_s.loc[:, "subcutaneous_mu_s_prime_mm^-1"]
 
 
+
+df_Salomatina_epi_red_mu_s = (
+    pd.read_csv(MCX_DIR / "Exp_Scattering" / "salomatina_2006_epidermis_reduced_scattering_extended_1700nm.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+Salomatina_epidermis_mu_red_s = df_Salomatina_epi_red_mu_s.loc[:, "mu_s_prime_mm^-1"]
+
+df_Salomatina_derm_red_mu_s = (
+    pd.read_csv(MCX_DIR / "Exp_Scattering" / "salomatina_2006_dermis_reduced_scattering_extended_1700nm.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+Salomatina_dermis_mu_red_s = df_Salomatina_derm_red_mu_s.loc[:, "mu_s_prime_mm^-1"]
+
+df_Salomatina_sub_red_mu_s = (
+    pd.read_csv(MCX_DIR / "Exp_Scattering" / "salomatina_2006_subcutaneous_fat_reduced_scattering_extended_1700nm.csv", comment = "#")
+    .set_index("wavelength_nm")
+    .sort_index()
+)
+Salomatina_subcutaneous_mu_red_s = df_Salomatina_sub_red_mu_s.loc[:, "mu_s_prime_mm^-1"]
+
+
 # Water absorption spectra from 667-2500 nm, L. Kou 1993
 df_L_Kou_1993 = pd.read_csv(MCX_DIR / "Water_Absorption_Data" / "L_Kou_water_absorption_1993.csv", comment = "#")
 df_L_Kou_1993_wav_sorted = df_L_Kou_1993.sort_values("lambda (nm)")
@@ -77,14 +100,7 @@ Bosschaart_2014_wavelength_nm = df_Bosschaart_2014["wavelength_nm"]
 Bosschaart_2014_mu_a_oxy_mm  = df_Bosschaart_2014["mu_a_oxy_mm-1"]
 Bosschaart_2014_mu_a_deoxy_mm = df_Bosschaart_2014["mu_a_deoxy_mm-1"]
 
-# Fat absorption spectra from Veen 2004
-# Notes: 
-# - Absorption coefficient is in (1/m)
-# - Greater measurement uncertainty between 429-750 nm
-# df_Veen_2004 = pd.read_csv("Fat_Absorption_Data/Veen_2004_Fat_Absorption_Spectra.csv", comment = "#")
-# Veen_2004_wavelength_nm = df_Veen_2004["nm"]
-# Veen_2004_mu_a_fat_m = df_Veen_2004["mu_a"]
-# Veen_2004_mu_a_fat_mm = Veen_2004_mu_a_fat_m / 1000
+
 
 df_Veen_Anderson = pd.read_csv(MCX_DIR / "Fat_Absorption_Data" / "fat_429_1700nm.csv", comment = "#")
 Veen_Anderson_wavelength_nm = df_Veen_Anderson["nm"]

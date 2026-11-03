@@ -80,20 +80,20 @@ axes_mu_a[1].set_title(r"$\mu_a$ dermis",  fontsize = 18)
 axes_mu_a[2].set_title(r"$\mu_a$ subcutaneous", fontsize = 18)
 
 
-#Experimental Absorption from Iino 2003
+#Experimental Absorption from this works analytical model
 
-axes_mu_a[0].plot(exp.Iino_epidermis_mu_a.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
-                  label = "Iino 2003",
+axes_mu_a[0].plot(params.epi_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
+                  label = "Analytical Model",
                   linestyle = "--",
                   color = "black")
 
-axes_mu_a[1].plot(exp.Iino_dermis_mu_a.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
-                  label = "Iino 2003",
+axes_mu_a[1].plot(params.derm_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
+                  label = "Analytical Model",
                   linestyle = "--",
                   color = "black")
 
-axes_mu_a[2].plot(exp.Iino_subcutaneous_mu_a.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
-                  label = "Iino 2003",
+axes_mu_a[2].plot(params.sub_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
+                  label = "Analytical Model",
                   linestyle = "--",
                   color = "black")
 
@@ -110,20 +110,20 @@ for ax in axes_mu_s:
     ax.set_ylabel("Reduced Scattering (1/mm)", fontsize = 18)
     ax.tick_params(axis = "both", labelsize = 18)
 
-#Experimental Scattering from Iino 2003
+#Experimental Scattering from Salomatina 2006, extrapolated between 1585 - 1700nm
 
-axes_mu_s[0].plot(exp.Iino_epidermis_mu_red_s.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
-                  label = "Iino 2003",
+axes_mu_s[0].plot(exp.Salomatina_epidermis_mu_red_s.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
+                  label = "Salomatina 2006",
                   linestyle = "--",
                   color = "black")
 
-axes_mu_s[1].plot(exp.Iino_dermis_mu_red_s.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
-                  label = "Iino 2003",
+axes_mu_s[1].plot(exp.Salomatina_dermis_mu_red_s.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
+                  label = "Salomatina 2006",
                   linestyle = "--",
                   color = "black")
 
-axes_mu_s[2].plot(exp.Iino_subcutaneous_mu_red_s.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
-                  label = "Iino 2003",
+axes_mu_s[2].plot(exp.Salomatina_subcutaneous_mu_red_s.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
+                  label = "Salomatina 2006",
                   linestyle = "--",
                   color = "black")
 
