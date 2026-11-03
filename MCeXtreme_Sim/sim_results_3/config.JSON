@@ -1,0 +1,8 @@
+{
+    "photon count" : 1e8,
+    "batch size" : 2,
+    "glucose effect" : ["dermis", "subcutanoues"],
+    "wavelength range": [600, 1700, 25],
+    "absorption model": "This Work",
+    "scattering model": "Salomatina 2006"
+}
