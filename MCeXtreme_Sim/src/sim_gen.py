@@ -267,117 +267,11 @@ for key, value in batch_metrics.items():
     )
 
 
-fig_gluc, axes_gluc = plt.subplots(2, 3, layout = "constrained")
-
-for ax in axes_gluc.flat:
-    ax.set_xlabel("Wavelength (nm)", fontsize = 18)
-    ax.tick_params(axis = "both", labelsize = 18)
-
-# keys = ["dA_dmu_a","dA_dmu_s","dA_dCg_mu_a","dA_dCg_mu_s","dA_dCg_total"]
-# for ax, key in zip(axes_gluc.flat, keys):
-#     ax.errorbar(
-#         x = mean_df[key].index,
-#         y = mean_df[key]["SDS_1.7_mm"],
-#         width = stderr_df[key],
-#         color = "blue"
-
-#     )
-
-
-    
-
-mean_df["dA_dmu_a"].plot(ax = axes_gluc[0, 0])
-axes_gluc[0, 0].set_ylabel("$\delta A/\delta\mu_a$", fontsize = 18)
-
-
-mean_df["dA_dmu_s"].plot(ax = axes_gluc[1, 0])
-axes_gluc[1, 0].set_ylabel("$\delta A/\delta\mu_s$", fontsize = 18)
-
-mean_df["dA_dCg_mu_a"].plot(ax = axes_gluc[0, 1])
-axes_gluc[0, 1].set_ylabel("$(\delta A/\delta\mu_a)*(d\mu_a /dC_g)$", fontsize = 18)
-
-
-mean_df["dA_dCg_mu_s"].plot(ax = axes_gluc[1, 1])
-axes_gluc[1, 1].set_ylabel("$(\delta A/\delta\mu_s)*(d\mu_s /dC_g)$", fontsize = 18)
-
-
-mean_df["dA_dCg_total"].plot(ax = axes_gluc[0, 2])
-axes_gluc[0, 2].set_ylabel("$dA/dC_g$", fontsize = 18)
-
-
-
-fig_mpath, axes_mpath = plt.subplots(1, 3, layout = "constrained")
-for ax in axes_mpath:
-    ax.set_xlabel("Wavelength (nm)", fontsize = 18)
-    ax.tick_params(axis = "both", labelsize = 18)
-    ax.set_ylabel("Distance (mm)", fontsize = 18)
-
-mean_df["mean_path_epi"].plot(ax = axes_mpath[0])
-axes_mpath[0].set_title("Mean Pathlength: Epidermis")
-
-
-
-mean_df["mean_path_derm"].plot(ax = axes_mpath[1])
-axes_mpath[1].set_title("Mean Pathlength: Dermis")
-
-
-mean_df["mean_path_sub"].plot(ax = axes_mpath[2])
-axes_mpath[2].set_title("Mean Pathlength: Subcutaneous")
-
-
-fig_dA_dmu_s, axes_dA_dmu_s = plt.subplots(1, 3, layout = "constrained")
-for ax in axes_dA_dmu_s:
-    ax.set_xlabel("Wavelength (nm)", fontsize = 18)
-    ax.tick_params(axis = "both", labelsize = 18)
-    ax.set_ylabel("$\delta A/\delta\mu_s$", fontsize = 18)
-
-mean_df["epi_dA_dmu_s"].plot(ax = axes_dA_dmu_s[0])
-axes_dA_dmu_s[0].set_title("Epidermis")
-
-
-
-mean_df["derm_dA_dmu_s"].plot(ax = axes_dA_dmu_s[1])
-axes_dA_dmu_s[1].set_title("Dermis")
-
-
-mean_df["sub_dA_dmu_s"].plot(ax = axes_dA_dmu_s[2])
-axes_dA_dmu_s[2].set_title("Subcutaneous")
-
-
-
-
-fig_sens, axes_sens = plt.subplots(1, 3, layout = "constrained")
-for ax in axes_sens:
-    ax.set_xlabel("Wavelength (nm)", fontsize = 18)
-    ax.tick_params(axis = "both", labelsize = 18)
-    ax.set_ylabel("Path Fraction (%)", fontsize = 18)
-
-
-(100 * mean_df["beta_epi"]).plot(ax = axes_sens[0])
-axes_sens[0].set_title(r"$\beta_{epi}$")
-
-
-(100 * mean_df["beta_derm"]).plot(ax = axes_sens[1])
-axes_sens[1].set_title(r"$\beta_{derm}$")
-
-
-(100 * mean_df["beta_sub"]).plot(ax = axes_sens[2])
-axes_sens[2].set_title(r"$\beta_{sub}$")
-
-
-mean_df["power_dB"].plot()
-plt.title("Detected Optical Power")
-plt.xlabel("Wavelength (nm)", fontsize = 18)
-plt.ylabel("Power (dB)", fontsize = 18)
-plt.tick_params(axis = "both", labelsize = 18)
-plt.legend(["SDS_1.7mm", "SDS_2.0mm", "SDS_2.3mm", "SDS_2.6mm", "SDS_2.9mm"])
-
-
 for metric, df in mean_df.items():
-    df.to_csv(mean_metrics_path / f"Metric_Mean_{metric}.csv", index = True, index_label = "wavelength_nm")
+    df.to_csv(mean_metrics_path / f"Metric_Mean_{metric}.csv", index = True, index_label = "Wavelength (nm)")
 
 for metric, df in stderr_df.items():
-    df.to_csv(error_metrics_path / f"Metric_Error_{metric}.csv", index = True, index_label = "wavelength_nm")
+    df.to_csv(error_metrics_path / f"Metric_Error_{metric}.csv", index = True, index_label = "Wavelength (nm)")
 
 
 plt.show()

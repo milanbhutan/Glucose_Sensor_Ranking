@@ -28,7 +28,7 @@ sub_params = [
 epi_Jacques = {
     "blood" : 0,
     "oxygen_saturation" : 0,
-    "water" : 0.20, #from Meglinski 2002, was 0
+    "water" : 0.20, #from Meglinski 2002
     "fat" : 0,
     "melanosome" : 0.025,
 }
