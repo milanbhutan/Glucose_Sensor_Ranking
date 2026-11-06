@@ -147,9 +147,9 @@ ax_WPI[0, 0].tick_params(axis = "both", labelsize = 18)
 ax_WPI[0, 0].tick_params(axis = "x", labelbottom = False)
 
 beta_derm_df.plot(ax = ax_WPI[0, 1], legend = False)
-ax_WPI[0, 1].set_title("Raw Input 2: Dermal Aborption Sensitivity")
+ax_WPI[0, 1].set_title("Raw Input 2: Dermal Absorption Sensitivity")
 ax_WPI[0, 1].set_xlabel("")
-ax_WPI[0, 1].set_ylabel("Path Fraction (%)", fontsize = 18)
+ax_WPI[0, 1].set_ylabel("Dermal Path Fraction (%)", fontsize = 18)
 ax_WPI[0, 1].tick_params(axis = "both", labelsize = 18)
 ax_WPI[0, 1].tick_params(axis = "x", labelbottom = False)
 

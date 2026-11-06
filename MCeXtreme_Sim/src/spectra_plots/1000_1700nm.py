@@ -16,15 +16,16 @@ fig_mu_a.suptitle("Absorption Spectra for Three-Layer Tissue Model", fontsize = 
 
 for ax in axes_mu_a:
     ax.set_xlabel("Wavelength (nm)", fontsize = 18)
-    ax.set_ylabel("Absorption (1/mm)", fontsize = 18)
+    ax.set_ylabel(r"Absorption $\mu_a$ (mm$^{-1}$)", fontsize = 18)
     ax.tick_params(axis = "both", labelsize = 18)
+    ax.grid(True, alpha=0.3)
 
 
 # Simulated absorption spectra plots
 
 # axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
 #                   params.epi_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
-#                   label = "Analytical Model", 
+#                   label = "Constituent-Based Model", 
 #                   color = "red")
 
 
@@ -54,48 +55,48 @@ for ax in axes_mu_a:
 #                   color = "red",
 #                   fontsize = 10)
 
-axes_mu_a[0].set_title(r"$\mu_a$ epidermis", fontsize = 18)
+axes_mu_a[0].set_title("Epidermis", fontsize = 18)
 
 
 # axes_mu_a[1].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
 #                   params.derm_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
 #                   color = "red",
-#                   label = "Analytical Model")
+#                   label = "Constituent-Based Model")
 
 # axes_mu_a[1].plot(
 #     uncertain.derm_mu_a_sim_df[exp.wavelength_bound_3:exp.wavelength_bound_4], 
 #     color = "red",
 #     alpha = 0.02
 #     )
-axes_mu_a[1].set_title(r"$\mu_a$ dermis",  fontsize = 18)
+axes_mu_a[1].set_title("Dermis", fontsize = 18)
 
 
 
 # axes_mu_a[2].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
 #                   params.sub_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4], 
 #                   color = "red",
-#                   label = "Analytical Model")
+#                   label = "Constituent-Based Model")
 
 
-axes_mu_a[2].set_title(r"$\mu_a$ subcutaneous", fontsize = 18)
+axes_mu_a[2].set_title("Subcutaneous", fontsize = 18)
 
 
 #Experimental Absorption from this works analytical model
 
 axes_mu_a[0].plot(params.epi_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
-                  label = "Analytical Model",
-                  linestyle = "--",
-                  color = "black")
+                  label = "Constituent-Based Model",
+                  color = "red"
+                  )
 
 axes_mu_a[1].plot(params.derm_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
-                  label = "Analytical Model",
-                  linestyle = "--",
-                  color = "black")
+                  label = "Constituent-Based Model",
+                  color = "red"
+                  )
 
 axes_mu_a[2].plot(params.sub_mu_a_sim.loc[exp.wavelength_bound_3:exp.wavelength_bound_4],
-                  label = "Analytical Model",
-                  linestyle = "--",
-                  color = "black")
+                  label = "Constituent-Based Model",
+                  color = "red"
+                  )
 
 axes_mu_a[0].legend(fontsize = 10)
 axes_mu_a[1].legend(fontsize = 10)
@@ -107,8 +108,13 @@ fig_mu_s.suptitle("Reduced Scattering Spectra for Three-Layer Tissue Model", fon
 
 for ax in axes_mu_s:
     ax.set_xlabel("Wavelength (nm)", fontsize = 18)
-    ax.set_ylabel("Reduced Scattering (1/mm)", fontsize = 18)
+    ax.set_ylabel(r"Reduced Scattering $\mu_s'$ (mm$^{-1}$)", fontsize = 18)
     ax.tick_params(axis = "both", labelsize = 18)
+    ax.grid(True, alpha=0.3)
+
+axes_mu_s[0].set_title("Epidermis", fontsize = 18)
+axes_mu_s[1].set_title("Dermis", fontsize = 18)
+axes_mu_s[2].set_title("Subcutaneous", fontsize = 18)
 
 #Experimental Scattering from Salomatina 2006, extrapolated between 1585 - 1700nm
 

@@ -5,7 +5,7 @@ from paths import MCX_DIR
 
 wavelength_bound_1 = 600
 wavelength_bound_2 = 999
-wavelength_bound_3 = 1001
+wavelength_bound_3 = 1000
 wavelength_bound_4 = 1700
 
 norm_wavelength_nm_np = np.arange(1, 2001, 1)

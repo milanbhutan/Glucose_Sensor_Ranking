@@ -106,14 +106,15 @@ fig_mu_a.suptitle("Absorption Spectra for Three-Layer Tissue Model", fontsize = 
 
 for ax in axes_mu_a:
     ax.set_xlabel("Wavelength (nm)", fontsize = 18)
-    ax.set_ylabel("Absorption (1/mm)", fontsize = 18)
+    ax.set_ylabel(r"Absorption $\mu_a$ (mm$^{-1}$)", fontsize = 18)
     ax.tick_params(axis = "both", labelsize = 18)
+    ax.grid(True, alpha=0.3)
 
 
 # Simulated absorption spectra plots
-axes_mu_a[0].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.epi_mu_a_sim[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  label = "Analytical Model", 
+axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+                  params.epi_mu_a_sim.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+                  label = "Constituent-Based Model (Adopted)", 
                   color = "red")
 axes_mu_a[0].text(600, 
                   0.2, 
@@ -121,25 +122,25 @@ axes_mu_a[0].text(600,
                   color = "red",
                   fontsize = 10)
 
-axes_mu_a[0].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.epi_mu_a_sim_Jolivot_SPT_II[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+                  params.epi_mu_a_sim_Jolivot_SPT_II.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
                   color = "red")
 
 
-axes_mu_a[0].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.epi_mu_a_sim_Jolivot_SPT_III[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+                  params.epi_mu_a_sim_Jolivot_SPT_III.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
                   color = "red")
 
-axes_mu_a[0].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.epi_mu_a_sim_Jolivot_SPT_IV[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+                  params.epi_mu_a_sim_Jolivot_SPT_IV.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
                   color = "red")
 
-axes_mu_a[0].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.epi_mu_a_sim_Jolivot_SPT_V[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+                  params.epi_mu_a_sim_Jolivot_SPT_V.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
                   color = "red")
 
-axes_mu_a[0].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.epi_mu_a_sim_Jolivot_SPT_VI[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+axes_mu_a[0].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+                  params.epi_mu_a_sim_Jolivot_SPT_VI.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
                   color = "red")
 axes_mu_a[0].text(713.5, 
                   9.11, 
@@ -147,16 +148,16 @@ axes_mu_a[0].text(713.5,
                   color = "red",
                   fontsize = 10)
 
-axes_mu_a[0].set_title(r"$\mu_a$ epidermis", fontsize = 18)
+axes_mu_a[0].set_title("Epidermis", fontsize = 18)
 
 
-axes_mu_a[1].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.derm_mu_a_sim[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+axes_mu_a[1].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+                  params.derm_mu_a_sim.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
                   color = "red",
-                  label = "Analytical Model")
+                  label = "Constituent-Based Model (Adopted)")
 
-axes_mu_a[1].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:850], 
-                  params.Jonasson_derm_mu_a_sim[exp.wavelength_bound_1:850], 
+axes_mu_a[1].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_1:850], 
+                  params.Jonasson_derm_mu_a_sim.loc[exp.wavelength_bound_1:850], 
                   color = "red",
                   )
 axes_mu_a[1].text(850, 
@@ -166,31 +167,31 @@ axes_mu_a[1].text(850,
                   fontsize = 10)
 
 axes_mu_a[1].plot(
-    uncertain.derm_mu_a_sim_df[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+    uncertain.derm_mu_a_sim_df.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
     color = "red",
     alpha = 0.02
     )
 # axes_mu_a[1].plot(
-#     uncertain.Jonasson_derm_mu_a_sim_df[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+#     uncertain.Jonasson_derm_mu_a_sim_df.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
 #     color = "red",
 #     alpha = 0.02
 #     )
-axes_mu_a[1].set_title(r"$\mu_a$ dermis",  fontsize = 18)
+axes_mu_a[1].set_title("Dermis", fontsize = 18)
 
 
 
-axes_mu_a[2].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.sub_mu_a_sim[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+axes_mu_a[2].plot(params.norm_wavelength_nm.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+                  params.sub_mu_a_sim.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
                   color = "red",
-                  label = "Analytical Model")
+                  label = "Constituent-Based Model (Adopted)")
 
 axes_mu_a[2].plot(
-    uncertain.sub_mu_a_sim_df[exp.wavelength_bound_1:exp.wavelength_bound_2], 
+    uncertain.sub_mu_a_sim_df.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
     color = "red",
     alpha = 0.02
     )
 
-axes_mu_a[2].set_title(r"$\mu_a$ subcutaneous", fontsize = 18)
+axes_mu_a[2].set_title("Subcutaneous", fontsize = 18)
 
 
 # Experimental absorption spectra plots
@@ -241,57 +242,25 @@ fig_mu_s.suptitle("Reduced Scattering Spectra for Three-Layer Tissue Model", fon
 
 for ax in axes_mu_s.flat:
     ax.set_xlabel("Wavelength (nm)", fontsize = 18)
-    ax.set_ylabel("Reduced Scattering (1/mm)", fontsize = 18)
+    ax.set_ylabel(r"Reduced Scattering $\mu_s'$ (mm$^{-1}$)", fontsize = 18)
     ax.tick_params(axis = "both", labelsize = 18)
-
-# Simulated reduced scattering coefficients
-axes_mu_s[0].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.epi_mu_s_red_sim[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  label = "Jacques 2013 Model", 
-                  color = "red")
-axes_mu_s[0].set_title(r"$\mu_s^'$ epidermis", fontsize = 18)
+    ax.grid(True, alpha=0.3)
 
 
+axes_mu_s[0].plot(exp.Salomatina_epidermis_mu_red_s.loc[exp.wavelength_bound_1:exp.wavelength_bound_2],
+                  label = "Salomatina 2006 (Adopted)",
+                  linestyle = "--",
+                  color = "black")
 
-axes_mu_s[1].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.derm_mu_s_red_sim[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  label = "Jacques 2013 Model",
-                  color = "red")
-axes_mu_s[1].set_title(r"$\mu^'_s$ dermis", fontsize = 18)
+axes_mu_s[1].plot(exp.Salomatina_dermis_mu_red_s.loc[exp.wavelength_bound_1:exp.wavelength_bound_2],
+                  label = "Salomatina 2006 (Adopted)",
+                  linestyle = "--",
+                  color = "black")
 
-axes_mu_s[2].plot(params.norm_wavelength_nm[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  params.sub_mu_s_red_sim[exp.wavelength_bound_1:exp.wavelength_bound_2],
-                  label = "Jacques 2013 Model", 
-                  color = "red")
-axes_mu_s[2].set_title(r"$\mu^'_s$ subcutaneous tissue", fontsize = 18)
-
-# Experimental reduced scattering coefficients
-axes_mu_s[0].plot(df_Shimojo_epi_red_mu_s.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  color = "cyan", 
-                  label = "Shimojo 2020", 
-                  linestyle = "--")
-
-axes_mu_s[1].plot(df_Shimojo_derm_red_mu_s.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  color = "cyan",
-                  label = "Shimojo 2020", 
-                  linestyle = "--")
-axes_mu_s[1].plot(df_Simpson_derm_red_mu_s.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  color = "green", 
-                  label = "Simpson 1998", 
-                  linestyle = "--")
-
-axes_mu_s[2].plot(df_Shimojo_sub_red_mu_s.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  color = "cyan",
-                  label = "Shimojo 2020", 
-                  linestyle = "--")
-axes_mu_s[2].plot(df_Simpson_sub_red_mu_s.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  color = "green",
-                  label = "Simpson 1998",
-                  linestyle = "--")
-axes_mu_s[2].plot(df_Ganesan_sub_red_mu_s.loc[exp.wavelength_bound_1:exp.wavelength_bound_2], 
-                  color = "purple", 
-                  label = "Ganesan 2016", 
-                  linestyle = "--")
+axes_mu_s[2].plot(exp.Salomatina_subcutaneous_mu_red_s.loc[exp.wavelength_bound_1:exp.wavelength_bound_2],
+                  label = "Salomatina 2006 (Adopted)",
+                  linestyle = "--",
+                  color = "black")
 
 axes_mu_s[0].legend(fontsize = 10)
 axes_mu_s[1].legend(fontsize = 10)
