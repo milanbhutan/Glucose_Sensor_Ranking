@@ -14,8 +14,8 @@ mean_metrics_path.mkdir(parents = True, exist_ok = True)
 error_metrics_path = MCX_DIR / sim_results_DIR / "error_metrics"
 error_metrics_path.mkdir(parents = True, exist_ok = True)
 
-wavelength_range = range(600, 1701, 25) # was 10
-batches = 2
+wavelength_range = range(600, 1701, 10)
+batches = 5
 sds = ["SDS_1.7mm", "SDS_2.0mm", "SDS_2.3mm", "SDS_2.6mm", "SDS_2.9mm"]
 
 # Glucose Effects
@@ -159,7 +159,7 @@ for batch in range(batches):
         columns = sds
     )
     for sim_wavelength_nm in wavelength_range:
-        print(f"Simulating {sim_wavelength_nm} in batch {batch}")
+        print(f"Simulating {sim_wavelength_nm} nm in batch {batch}")
         #Following Ge 2024 procedure for computing dA/dCg
         baseline = mc.run_simulation(
             [

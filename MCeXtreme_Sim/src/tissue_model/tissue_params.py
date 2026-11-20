@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import tissue_model.exp_data as exp
 import tissue_model.layer_calc as calc
 
 
@@ -256,17 +257,7 @@ vox_x = 300
 vox_y = 300
 vox_z = bot_sub_depth_vox
 
-SDS_1_mm = 1.7
-SDS_2_mm = 2.0
-SDS_3_mm = 2.3
-SDS_4_mm = 2.6
-SDS_5_mm = 2.9
 
-SDS_1_vox = round(SDS_1_mm / vox_size_mm)
-SDS_2_vox = round(SDS_2_mm / vox_size_mm)
-SDS_3_vox = round(SDS_3_mm / vox_size_mm)
-SDS_4_vox = round(SDS_4_mm / vox_size_mm)
-SDS_5_vox = round(SDS_5_mm / vox_size_mm)
 
 
 src_x_vox = vox_x / 4
@@ -283,6 +274,19 @@ det_y_vox = src_y_vox
 det_z_vox = src_z_vox
 det_r_vox = 31
 
+## Ring Detectors
+SDS_1_mm = 1.7
+SDS_2_mm = 2.0
+SDS_3_mm = 2.3
+SDS_4_mm = 2.6
+SDS_5_mm = 2.9
+
+SDS_1_vox = round(SDS_1_mm / vox_size_mm)
+SDS_2_vox = round(SDS_2_mm / vox_size_mm)
+SDS_3_vox = round(SDS_3_mm / vox_size_mm)
+SDS_4_vox = round(SDS_4_mm / vox_size_mm)
+SDS_5_vox = round(SDS_5_mm / vox_size_mm)
+
 ring_1_inner_rad = SDS_1_mm - 0.1
 ring_1_outer_rad = SDS_1_mm + 0.1
 
@@ -298,7 +302,10 @@ ring_4_outer_rad = SDS_4_mm + 0.1
 ring_5_inner_rad = SDS_5_mm - 0.1
 ring_5_outer_rad = SDS_5_mm + 0.1
 
+
+# Tissue optics calculations
 glass_mu_a_sim, glass_mu_s_sim, glass_g_sim, glass_n_sim = [0, 0, 1, 1.4]
+
 
 epi_mu_a_sim, epi_mu_s_sim, epi_g_sim, epi_n_sim, epi_mu_s_red_sim = calc.epi(
     epi_Jacques["blood"], 

@@ -21,7 +21,7 @@ n_water = 1.33
 
 # van Gemert 1989, valid for 200nm - 1000nm
 g_200_1000 = 0.62 + (0.29 * norm_wavelength_nm.loc[200: 1000] * 10 ** -3)
-g_1000_1700 = 0.9
+g_1000_1700 = 0.91
 
 g_200_1000_ser = pd.Series(data = g_200_1000, index = norm_wavelength_nm.loc[200: 1000])
 g_1000_1700_ser = pd.Series(data = g_1000_1700, index = norm_wavelength_nm.loc[1001: 1700])
