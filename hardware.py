@@ -7,8 +7,6 @@ MG_DL_PER_MMOL_L_GLUCOSE = 18.01559
 
 
 
-#confounders
-
 
 #Thorlabs LED1200L
 

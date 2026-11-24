@@ -2,8 +2,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tissue_model.layer_calc as calc
 import tissue_model.tissue_params as params
+import numpy as np
 from paths import MCX_DIR
 from paths import sim_results_DIR
+
+P_LED = 5e-3          # W
+responsivity = 0.75   # A/W
+I_dark = 50e-9        # A
+R = 10_000            # ohms
+T = 298.15            
+bandwidth = 10        # Hz
+
+q = 1.602176634e-19
+kB = 1.380649e-23
 
 mean_path_epi_df = pd.read_csv(MCX_DIR / sim_results_DIR / "mean_metrics"/ "Metric_Mean_mean_path_epi.csv", index_col = "Wavelength (nm)")
 mean_path_derm_df = pd.read_csv(MCX_DIR / sim_results_DIR / "mean_metrics"/ "Metric_Mean_mean_path_derm.csv", index_col = "Wavelength (nm)")
@@ -121,9 +132,29 @@ derm_dA_dB_dmu_s = derm_dA_dmu_s.mul(
     derm_dmu_s_dB,
     axis = 0)
 
+dA_dB_df = derm_dA_dB_dmu_a + derm_dA_dB_dmu_s
 
-#dA_dB_df = derm_dA_dB_dmu_a + derm_dA_dB_dmu_s
-dA_dB_df = derm_dA_dB_dmu_s
+P_det = P_LED * 10**(power_dB_df / 10)
+I_det = responsivity * P_det
+
+i_thermal = np.sqrt(4 * kB * T * bandwidth / R)
+i_dark = np.sqrt(2 * q * I_dark * bandwidth)
+i_shot = np.sqrt(2 * q * I_det * bandwidth)
+
+i_noise = np.sqrt(i_thermal**2 + i_dark**2 + i_shot**2)
+
+delta_Cg = 1.0  # mmol/L
+
+S_g = dA_dCg_df
+
+#i_signal = I_det * np.expm1(-S_g * delta_Cg)
+
+
+SNR_G = abs(I_det) / i_noise
+
+
+
+# ============== PLOTTING ==============
 
 
 
@@ -155,15 +186,7 @@ axes_gluc[1, 2].set_xlabel("Wavelength (nm)", fontsize = 18)
 
 fig_gluc.delaxes(axes_gluc[0, 2])
 
-# keys = ["dA_dmu_a","dA_dmu_s","dA_dCg_mu_a","dA_dCg_mu_s","dA_dCg_total"]
-# for ax, key in zip(axes_gluc.flat, keys):
-#     ax.errorbar(
-#         x = mean_df[key].index,
-#         y = mean_df[key]["SDS_1.7_mm"],
-#         width = stderr_df[key],
-#         color = "blue"
 
-#     )
 
 for ax in axes_gluc.flat:
     ax.tick_params(axis = "both", labelsize = 18)
@@ -210,13 +233,13 @@ ax_WPI[0, 2].tick_params(axis = "both", labelsize = 18)
 ax_WPI[0, 2].tick_params(axis = "x", labelbottom = False)
 
 dA_dW_df.plot(ax = ax_WPI[0, 3], legend = False)
-ax_WPI[0, 3].set_title("Raw Input 4: Water Fraction Sensitivity")
+ax_WPI[0, 3].set_title("Raw Input 4: Water Interference")
 ax_WPI[0, 3].set_xlabel("")
 ax_WPI[0, 3].set_ylabel("$dA/dW$", fontsize = 18)
 ax_WPI[0, 3].tick_params(axis = "x", labelbottom = False)
 
 dA_dB_df.plot(ax = ax_WPI[0, 4], legend = False)
-ax_WPI[0, 4].set_title("Raw Input 5: Blood Fraction Sensitivity")
+ax_WPI[0, 4].set_title("Raw Input 5: Blood Interference")
 ax_WPI[0, 4].set_xlabel("")
 ax_WPI[0, 4].set_ylabel("$dA/dB$", fontsize = 18)
 ax_WPI[0, 4].tick_params(axis = "x", labelbottom = False)
@@ -241,25 +264,29 @@ ax_WPI[1, 2].set_ylabel("Power Score", fontsize = 18)
 ax_WPI[1, 2].tick_params(axis = "both", labelsize = 18)
 
 water_score.plot(ax = ax_WPI[1, 3], legend = False)
-ax_WPI[1, 3].set_title("Normalized Input 4:\nWater Fraction Sensitivity")
+ax_WPI[1, 3].set_title("Normalized Input 4:\nWater Interference")
 ax_WPI[1, 3].set_xlabel("Wavelength (nm)", fontsize = 18)
 ax_WPI[1, 3].set_ylabel("Water Interference Score", fontsize = 18)
 ax_WPI[1, 3].tick_params(axis = "both", labelsize = 18)
 
 blood_score.plot(ax = ax_WPI[1, 4], legend = False)
-ax_WPI[1, 4].set_title("Normalized Input 5:\nBlood Fraction Sensitivity")
+ax_WPI[1, 4].set_title("Normalized Input 5:\nBlood Interference")
 ax_WPI[1, 4].set_xlabel("Wavelength (nm)", fontsize = 18)
 ax_WPI[1, 4].set_ylabel("Blood Interference Score", fontsize = 18)
 ax_WPI[1, 4].tick_params(axis = "both", labelsize = 18)
 
-# dA_dB_df.plot(legend = False)
-# plt.title("Raw Input 5: Blood Fraction Sensitivity")
-# plt.xlabel("Wavelength (nm)")
-# plt.ylabel("$dA/dB$", fontsize = 18)
-# plt.grid(visible = True)
+dA_dB_df.plot(legend = False)
+plt.title("Raw Input 5: Blood Interference")
+plt.xlabel("Wavelength (nm)", fontsize = 18)
+plt.ylabel("$dA/dB$", fontsize = 18)
+plt.grid(visible = True)
 
+SNR_G.plot()
+plt.title("Baseline Signal to Noise Ratio")
+plt.xlabel("Wavelength (nm)", fontsize = 18)
+plt.ylabel("$SNR$", fontsize = 18)
+plt.grid(visible = True)
 
-plt.show()
 
 for ax in ax_WPI.flat:
     ax.grid(True)
