@@ -6,15 +6,21 @@ import numpy as np
 from paths import MCX_DIR
 from paths import sim_results_DIR
 
-P_LED = 5e-3          # W
-responsivity = 0.75   # A/W
-I_dark = 50e-9        # A
-R = 10_000            # ohms
+## ======== HARDWARE VALUES ========
+P_LED = 5e-3                                    # W
+I_dark = 50e-9                                  # A
+R = 10000                                       # ohms
 T = 298.15            
-bandwidth = 10        # Hz
+bandwidth = 10                                  # Hz
+k_fluc = [1e-3, 1e-4, 1e-5, 1e-6]               # 0.1% - 0.00001% LED Fluctuation assumption
+responsivity =  (pd.read_csv(MCX_DIR / "Photodiodes" / "G10899-02K_responsivity.csv")
+                  .set_index("wavelength_nm")
+                  )     # A/W
+q = 1.602176634e-19                             # Coloumb charge
+kB = 1.380649e-23                               # Boltzmann constant
 
-q = 1.602176634e-19
-kB = 1.380649e-23
+
+## ======== SIMULATION METRICS ======== 
 
 mean_path_epi_df = pd.read_csv(MCX_DIR / sim_results_DIR / "mean_metrics"/ "Metric_Mean_mean_path_epi.csv", index_col = "Wavelength (nm)")
 mean_path_derm_df = pd.read_csv(MCX_DIR / sim_results_DIR / "mean_metrics"/ "Metric_Mean_mean_path_derm.csv", index_col = "Wavelength (nm)")
@@ -31,7 +37,7 @@ dA_dCg_df = pd.read_csv(MCX_DIR / sim_results_DIR / "mean_metrics"/ "Metric_Mean
 beta_derm_df = 100 * pd.read_csv(MCX_DIR / sim_results_DIR / "mean_metrics"/ "Metric_Mean_beta_derm.csv", index_col = "Wavelength (nm)")
 power_dB_df = pd.read_csv(MCX_DIR / sim_results_DIR / "mean_metrics"/ "Metric_Mean_power_dB.csv", index_col = "Wavelength (nm)")
 
-#Calculate Water Interference per layer
+## ======= WATER INTEFERENCE ========
 dW = 0.05
 epi_dmu_a_dW = (
     - params.epi_mu_a_sim 
@@ -91,6 +97,7 @@ sub_dA_dW = mean_path_sub_df.mul(
 
 dA_dW_df = epi_dA_dW + derm_dA_dW + sub_dA_dW
 
+## ======= BLOOD INTERFERENCE ========
 # Calculate Blood Interference per layer, following Ge 2025
 # 50% increase in blood volume so multiply original blood fraction by 1.5
 B_multiplier = 1.50
@@ -119,10 +126,11 @@ derm_dmu_a_dB = derm_dmu_a_dB.reindex(
     mean_path_derm_df.index
 )
 
-
 derm_dmu_s_dB = derm_dmu_s_dB.reindex(
     derm_dA_dmu_s.index
 )
+
+
 
 derm_dA_dB_dmu_a = mean_path_derm_df.mul(
     derm_dmu_a_dB,
@@ -134,8 +142,16 @@ derm_dA_dB_dmu_s = derm_dA_dmu_s.mul(
 
 dA_dB_df = derm_dA_dB_dmu_a + derm_dA_dB_dmu_s
 
+
+## ======= SNR CALCULATION ========
 P_det = P_LED * 10**(power_dB_df / 10)
-I_det = responsivity * P_det
+
+responsivity = responsivity["responsivity_A_per_W"]
+responsivity = responsivity.reindex(P_det.index)
+
+I_det = P_det.mul(
+    responsivity, 
+    axis = 0)
 
 i_thermal = np.sqrt(4 * kB * T * bandwidth / R)
 i_dark = np.sqrt(2 * q * I_dark * bandwidth)
@@ -147,16 +163,27 @@ delta_Cg = 1.0  # mmol/L
 
 S_g = dA_dCg_df
 
-#i_signal = I_det * np.expm1(-S_g * delta_Cg)
 
 
 SNR_G = abs(I_det) / i_noise
 
+##  ============== WPI NORMALIZATION FUNCTION ==============
+def normalize(df):
+    minimum = df.min().min()
+    maximum = df.max().max()
 
 
-# ============== PLOTTING ==============
+    return (df - minimum) / (maximum - minimum)
 
 
+
+glucose_score = normalize(abs(dA_dCg_df))
+dermal_score = normalize(beta_derm_df)
+power_score = normalize(power_dB_df)
+water_score = normalize(abs(dA_dW_df))
+blood_score = normalize(abs(dA_dB_df))
+
+## ============== PLOTTING ==============
 
 fig_gluc, axes_gluc = plt.subplots(2, 3, layout = "constrained")
 
@@ -192,21 +219,6 @@ for ax in axes_gluc.flat:
     ax.tick_params(axis = "both", labelsize = 18)
     ax.grid(True)
 
-
-def normalize(df):
-    minimum = df.min().min()
-    maximum = df.max().max()
-
-
-    return (df - minimum) / (maximum - minimum)
-
-
-
-glucose_score = normalize(abs(dA_dCg_df))
-dermal_score = normalize(beta_derm_df)
-power_score = normalize(power_dB_df)
-water_score = normalize(abs(dA_dW_df))
-blood_score = normalize(abs(dA_dB_df))
 
 fig_WPI, ax_WPI = plt.subplots(2, 5, layout = "constrained")
 fig_WPI.suptitle("WPI Inputs", fontsize = 18)
@@ -274,12 +286,6 @@ ax_WPI[1, 4].set_title("Normalized Input 5:\nBlood Interference")
 ax_WPI[1, 4].set_xlabel("Wavelength (nm)", fontsize = 18)
 ax_WPI[1, 4].set_ylabel("Blood Interference Score", fontsize = 18)
 ax_WPI[1, 4].tick_params(axis = "both", labelsize = 18)
-
-dA_dB_df.plot(legend = False)
-plt.title("Raw Input 5: Blood Interference")
-plt.xlabel("Wavelength (nm)", fontsize = 18)
-plt.ylabel("$dA/dB$", fontsize = 18)
-plt.grid(visible = True)
 
 SNR_G.plot()
 plt.title("Baseline Signal to Noise Ratio")

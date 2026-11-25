@@ -1,4 +1,3 @@
-"""Plot the adopted three-layer optical model, marking modeled scattering tails."""
 from pathlib import Path
 
 import matplotlib.pyplot as plt
