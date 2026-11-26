@@ -131,7 +131,6 @@ derm_dmu_s_dB = derm_dmu_s_dB.reindex(
 )
 
 
-
 derm_dA_dB_dmu_a = mean_path_derm_df.mul(
     derm_dmu_a_dB,
     axis = 0)
@@ -161,31 +160,36 @@ i_noise = np.sqrt(i_thermal**2 + i_dark**2 + i_shot**2)
 
 delta_Cg = 1.0  # mmol/L
 
-S_g = dA_dCg_df
+
+SNR = abs(I_det) / i_noise
+
+# Glucose Detection Limit w/o confounders
+C_gmin = 1 / (abs(dA_dCg_df) * SNR)
 
 
-
-SNR_G = abs(I_det) / i_noise
-
-##  ============== WPI NORMALIZATION FUNCTION ==============
-def normalize(df):
-    minimum = df.min().min()
-    maximum = df.max().max()
-
-
-    return (df - minimum) / (maximum - minimum)
-
-
-
-glucose_score = normalize(abs(dA_dCg_df))
-dermal_score = normalize(beta_derm_df)
-power_score = normalize(power_dB_df)
-water_score = normalize(abs(dA_dW_df))
-blood_score = normalize(abs(dA_dB_df))
+# Glucose Detection Limit w/ confouders
+E_blood = (dA_dB_df * 0.001) / dA_dCg_df
+E_water = (dA_dW_df * 0.01) / dA_dCg_df
+C_gmin_tot = np.sqrt(C_gmin**2 + E_water**2 + E_blood**2)
 
 ## ============== PLOTTING ==============
 
-fig_gluc, axes_gluc = plt.subplots(2, 3, layout = "constrained")
+fig_gluc = plt.figure(layout="constrained")
+fig_gluc.get_layout_engine().set(
+    hspace=0,
+    h_pad=0.01
+)
+gs = fig_gluc.add_gridspec(4, 3)
+
+axes_gluc = np.empty((2, 3), dtype=object)
+
+axes_gluc[0, 0] = fig_gluc.add_subplot(gs[0:2, 0])
+axes_gluc[0, 1] = fig_gluc.add_subplot(gs[0:2, 1])
+
+axes_gluc[1, 0] = fig_gluc.add_subplot(gs[2:4, 0])
+axes_gluc[1, 1] = fig_gluc.add_subplot(gs[2:4, 1])
+
+axes_gluc[1, 2] = fig_gluc.add_subplot(gs[1:3, 2])
 
 dA_dmu_a_df.plot(ax = axes_gluc[0, 0])
 axes_gluc[0, 0].set_ylabel("$\delta A/\delta\mu_a$", fontsize = 18)
@@ -211,108 +215,69 @@ dA_dCg_df.plot(ax = axes_gluc[1, 2], legend = False)
 axes_gluc[1, 2].set_ylabel("$dA/dC_g$", fontsize = 18)
 axes_gluc[1, 2].set_xlabel("Wavelength (nm)", fontsize = 18)
 
-fig_gluc.delaxes(axes_gluc[0, 2])
 
 
 
-for ax in axes_gluc.flat:
-    ax.tick_params(axis = "both", labelsize = 18)
+
+for ax in fig_gluc.axes:
+    ax.tick_params(axis="both", labelsize=18)
     ax.grid(True)
 
 
-fig_WPI, ax_WPI = plt.subplots(2, 5, layout = "constrained")
-fig_WPI.suptitle("WPI Inputs", fontsize = 18)
+fig_WPI, ax_WPI = plt.subplots(2, 3, layout = "constrained")
+fig_WPI.suptitle("Simulation Metrics", fontsize = 18)
 
 dA_dCg_df.plot(ax = ax_WPI[0, 0])
-ax_WPI[0 ,0].set_title("Raw Input 1: Glucose Sensitivity")
+ax_WPI[0, 0].set_title("Glucose Sensitivity")
 ax_WPI[0, 0].set_xlabel("")
 ax_WPI[0, 0].set_ylabel("$dA/dC_g$", fontsize = 18)
-ax_WPI[0, 0].tick_params(axis = "both", labelsize = 18)
 ax_WPI[0, 0].tick_params(axis = "x", labelbottom = False)
 
-beta_derm_df.plot(ax = ax_WPI[0, 1], legend = False)
-ax_WPI[0, 1].set_title("Raw Input 2: Dermal Absorption Sensitivity")
+beta_derm_df.plot(ax = ax_WPI[1, 0], legend = False)
+ax_WPI[1, 0].set_title("Dermal Absorption Sensitivity")
+ax_WPI[1, 0].set_xlabel("Wavelength (nm)", fontsize = 18)
+ax_WPI[1, 0].set_ylabel("Dermal Path Fraction (%)", fontsize = 18)
+
+
+power_dB_df.plot(ax = ax_WPI[0, 1], legend = False)
+ax_WPI[0, 1].set_title("Detected Optical Power")
 ax_WPI[0, 1].set_xlabel("")
-ax_WPI[0, 1].set_ylabel("Dermal Path Fraction (%)", fontsize = 18)
-ax_WPI[0, 1].tick_params(axis = "both", labelsize = 18)
+ax_WPI[0, 1].set_ylabel("Power (dB)", fontsize = 18)
 ax_WPI[0, 1].tick_params(axis = "x", labelbottom = False)
 
-power_dB_df.plot(ax = ax_WPI[0, 2], legend = False)
-ax_WPI[0, 2].set_title("Raw Input 3: Detected Optical Power")
-ax_WPI[0, 2].set_xlabel("")
-ax_WPI[0, 2].set_ylabel("Power (dB)", fontsize = 18)
-ax_WPI[0, 2].tick_params(axis = "both", labelsize = 18)
-ax_WPI[0, 2].tick_params(axis = "x", labelbottom = False)
 
-dA_dW_df.plot(ax = ax_WPI[0, 3], legend = False)
-ax_WPI[0, 3].set_title("Raw Input 4: Water Interference")
-ax_WPI[0, 3].set_xlabel("")
-ax_WPI[0, 3].set_ylabel("$dA/dW$", fontsize = 18)
-ax_WPI[0, 3].tick_params(axis = "x", labelbottom = False)
-
-dA_dB_df.plot(ax = ax_WPI[0, 4], legend = False)
-ax_WPI[0, 4].set_title("Raw Input 5: Blood Interference")
-ax_WPI[0, 4].set_xlabel("")
-ax_WPI[0, 4].set_ylabel("$dA/dB$", fontsize = 18)
-ax_WPI[0, 4].tick_params(axis = "x", labelbottom = False)
-
-
-glucose_score.plot(ax = ax_WPI[1, 0], legend = False)
-ax_WPI[1, 0].set_title("Normalized Input 1:\nGlucose Sensitivity")
-ax_WPI[1, 0].set_xlabel("Wavelength (nm)", fontsize = 18)
-ax_WPI[1, 0].set_ylabel("Glucose Sensitivity Score", fontsize = 18)
-ax_WPI[1, 0].tick_params(axis = "both", labelsize = 18)
-
-dermal_score.plot(ax = ax_WPI[1, 1], legend = False)
-ax_WPI[1, 1].set_title("Normalized Input 2:\nDermal Aborption Sensitivity")
+dA_dW_df.plot(ax = ax_WPI[1, 1], legend = False)
+ax_WPI[1, 1].set_title("Water Interference")
 ax_WPI[1, 1].set_xlabel("Wavelength (nm)", fontsize = 18)
-ax_WPI[1, 1].set_ylabel("Dermal Absorption Score", fontsize = 18)
-ax_WPI[1, 1].tick_params(axis = "both", labelsize = 18)
+ax_WPI[1, 1].set_ylabel("$dA/dW$", fontsize = 18)
 
-power_score.plot(ax = ax_WPI[1, 2], legend = False)
-ax_WPI[1, 2].set_title("Normalized Input 3:\nDetected Optical Power")
-ax_WPI[1, 2].set_xlabel("Wavelength (nm)", fontsize = 18)
-ax_WPI[1, 2].set_ylabel("Power Score", fontsize = 18)
-ax_WPI[1, 2].tick_params(axis = "both", labelsize = 18)
 
-water_score.plot(ax = ax_WPI[1, 3], legend = False)
-ax_WPI[1, 3].set_title("Normalized Input 4:\nWater Interference")
-ax_WPI[1, 3].set_xlabel("Wavelength (nm)", fontsize = 18)
-ax_WPI[1, 3].set_ylabel("Water Interference Score", fontsize = 18)
-ax_WPI[1, 3].tick_params(axis = "both", labelsize = 18)
+dA_dB_df.plot(ax = ax_WPI[0, 2], legend = False)
+ax_WPI[0, 2].set_title("Blood Interference")
+ax_WPI[0, 2].set_xlabel("Wavelength (nm)")
+ax_WPI[0, 2].set_ylabel("$dA/dB$", fontsize = 18)
 
-blood_score.plot(ax = ax_WPI[1, 4], legend = False)
-ax_WPI[1, 4].set_title("Normalized Input 5:\nBlood Interference")
-ax_WPI[1, 4].set_xlabel("Wavelength (nm)", fontsize = 18)
-ax_WPI[1, 4].set_ylabel("Blood Interference Score", fontsize = 18)
-ax_WPI[1, 4].tick_params(axis = "both", labelsize = 18)
-
-SNR_G.plot()
-plt.title("Baseline Signal to Noise Ratio")
-plt.xlabel("Wavelength (nm)", fontsize = 18)
-plt.ylabel("$SNR$", fontsize = 18)
-plt.grid(visible = True)
+fig_WPI.delaxes(ax_WPI[1, 2])
 
 
 for ax in ax_WPI.flat:
     ax.grid(True)
+    ax.tick_params(axis = "both", labelsize = 18)
+ 
 
-# Calculate Wavelength Performance Index
-WPI = (
-    0.25 * glucose_score
-    + 0.25 * dermal_score
-    + 0.25 * power_score
-    - 0.25 * water_score
-)
-
-
-
-# Plot WPI
-WPI.plot(figsize=(10, 6))
-
+C_gmin.plot()
+plt.title("Glucose Detection Limit Without Confounders")
 plt.xlabel("Wavelength (nm)", fontsize = 18)
-plt.ylabel("WPI", fontsize = 18)
-plt.title("Wavelength Performance Index", fontsize = 18)
-plt.tick_params(axis = "both", labelsize = 18)
-plt.grid(True)
+plt.ylabel("$C_{g,min}$", fontsize = 18)
+plt.yscale("log")
+plt.grid(visible = True)
+
+C_gmin_tot.plot()
+plt.title("Glucose Detection Limit With Confounders")
+plt.xlabel("Wavelength (nm)", fontsize = 18)
+plt.ylabel("$C_{g,min}$", fontsize = 18)
+plt.yscale("log")
+plt.grid(visible = True)
+
+
 plt.show()
