@@ -12,7 +12,7 @@ I_dark = 50e-9                                  # A
 R = 10000                                       # ohms
 T = 298.15            
 bandwidth = 10                                  # Hz
-k_fluc = [1e-3, 1e-4, 1e-5, 1e-6]               # 0.1% - 0.00001% LED Fluctuation assumption
+k_fluc = [0, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2]      # 0.1% - 0.00001% LED Fluctuation assumption
 responsivity =  (pd.read_csv(MCX_DIR / "Photodiodes" / "G10899-02K_responsivity.csv")
                   .set_index("wavelength_nm")
                   )     # A/W
@@ -142,7 +142,7 @@ derm_dA_dB_dmu_s = derm_dA_dmu_s.mul(
 dA_dB_df = derm_dA_dB_dmu_a + derm_dA_dB_dmu_s
 
 
-## ======= SNR CALCULATION ========
+## ======= GlUCOSE DETECTION LIMIT CALCULATION ========
 P_det = P_LED * 10**(power_dB_df / 10)
 
 responsivity = responsivity["responsivity_A_per_W"]
@@ -156,21 +156,21 @@ i_thermal = np.sqrt(4 * kB * T * bandwidth / R)
 i_dark = np.sqrt(2 * q * I_dark * bandwidth)
 i_shot = np.sqrt(2 * q * I_det * bandwidth)
 
-i_noise = np.sqrt(i_thermal**2 + i_dark**2 + i_shot**2)
-
-delta_Cg = 1.0  # mmol/L
-
-
-SNR = abs(I_det) / i_noise
-
-# Glucose Detection Limit w/o confounders
-C_gmin = 1 / (abs(dA_dCg_df) * SNR)
-
-
-# Glucose Detection Limit w/ confouders
 E_blood = (dA_dB_df * 0.001) / dA_dCg_df
 E_water = (dA_dW_df * 0.01) / dA_dCg_df
-C_gmin_tot = np.sqrt(C_gmin**2 + E_water**2 + E_blood**2)
+#For different values of LED flucuations
+C_gmin = []
+C_gmin_tot = []
+
+for k in k_fluc:
+    i_noise = np.sqrt(i_thermal**2 + i_dark**2 + i_shot**2 + (k * I_det)**2) # Noise which accounts for a range of LED fluctation constants
+    SNR = abs(I_det) / i_noise
+
+    # Glucose Detection Limit w/o confounders
+    C_gmin.append(1 / (abs(dA_dCg_df) * SNR))
+
+    # Glucose Detection Limit w/ confouders
+    C_gmin_tot.append(np.sqrt(C_gmin[-1]**2 + E_water**2 + E_blood**2))
 
 ## ============== PLOTTING ==============
 
@@ -216,16 +216,27 @@ axes_gluc[1, 2].set_ylabel("$dA/dC_g$", fontsize = 18)
 axes_gluc[1, 2].set_xlabel("Wavelength (nm)", fontsize = 18)
 
 
-
-
-
 for ax in fig_gluc.axes:
     ax.tick_params(axis="both", labelsize=18)
     ax.grid(True)
 
 
-fig_WPI, ax_WPI = plt.subplots(2, 3, layout = "constrained")
-fig_WPI.suptitle("Simulation Metrics", fontsize = 18)
+fig_WPI = plt.figure(layout="constrained")
+fig_WPI.get_layout_engine().set(
+    hspace=0,
+    h_pad=0.01
+)
+gs = fig_WPI.add_gridspec(4, 3)
+
+ax_WPI = np.empty((2, 3), dtype=object)
+
+ax_WPI[0, 0] = fig_WPI.add_subplot(gs[0:2, 0])
+ax_WPI[0, 1] = fig_WPI.add_subplot(gs[0:2, 1])
+
+ax_WPI[1, 0] = fig_WPI.add_subplot(gs[2:4, 0])
+ax_WPI[1, 1] = fig_WPI.add_subplot(gs[2:4, 1])
+
+ax_WPI[1, 2] = fig_WPI.add_subplot(gs[1:3, 2])
 
 dA_dCg_df.plot(ax = ax_WPI[0, 0])
 ax_WPI[0, 0].set_title("Glucose Sensitivity")
@@ -252,27 +263,81 @@ ax_WPI[1, 1].set_xlabel("Wavelength (nm)", fontsize = 18)
 ax_WPI[1, 1].set_ylabel("$dA/dW$", fontsize = 18)
 
 
-dA_dB_df.plot(ax = ax_WPI[0, 2], legend = False)
-ax_WPI[0, 2].set_title("Blood Interference")
-ax_WPI[0, 2].set_xlabel("Wavelength (nm)")
-ax_WPI[0, 2].set_ylabel("$dA/dB$", fontsize = 18)
-
-fig_WPI.delaxes(ax_WPI[1, 2])
+dA_dB_df.plot(ax = ax_WPI[1, 2], legend = False)
+ax_WPI[1, 2].set_title("Blood Interference")
+ax_WPI[1, 2].set_xlabel("Wavelength (nm)", fontsize = 18)
+ax_WPI[1, 2].set_ylabel("$dA/dB$", fontsize = 18)
 
 
-for ax in ax_WPI.flat:
+
+for ax in fig_WPI.axes:
     ax.grid(True)
     ax.tick_params(axis = "both", labelsize = 18)
+
+fig_fluc = plt.figure(layout="constrained")
+fig_fluc.get_layout_engine().set(
+    hspace=0,
+    h_pad=0.01
+)
+gs = fig_fluc.add_gridspec(4, 3)
+
+ax_fluc = np.empty((2, 3), dtype=object)
+
+ax_fluc[0, 0] = fig_fluc.add_subplot(gs[0:2, 0])
+ax_fluc[0, 1] = fig_fluc.add_subplot(gs[0:2, 1])
+
+ax_fluc[1, 0] = fig_fluc.add_subplot(gs[2:4, 0])
+ax_fluc[1, 1] = fig_fluc.add_subplot(gs[2:4, 1])
+
+ax_fluc[1, 2] = fig_fluc.add_subplot(gs[1:3, 2])
+
+C_gmin[0].plot(ax = ax_fluc[0, 0])
+ax_fluc[0, 0].set_title("K =")
+ax_fluc[0, 0].set_xlabel("")
+ax_fluc[0, 0].set_ylabel("$C_{g,min}$", fontsize = 18)
+ax_fluc[0, 0].tick_params(axis = "x", labelbottom = False)
+
+C_gmin[1].plot(ax = ax_fluc[1, 0], legend = False)
+ax_fluc[1, 0].set_title("K =")
+ax_fluc[1, 0].set_xlabel("Wavelength (nm)", fontsize = 18)
+ax_fluc[1, 0].set_ylabel("$C_{g,min}$", fontsize = 18)
+
+
+
+C_gmin[2].plot(ax = ax_fluc[0, 1], legend = False)
+ax_fluc[0, 1].set_title("K =")
+ax_fluc[0, 1].set_xlabel("")
+ax_fluc[0, 1].tick_params(axis = "x", labelbottom = False)
+
+
+C_gmin[3].plot(ax = ax_fluc[1, 1], legend = False)
+ax_fluc[1, 1].set_title("K =")
+ax_fluc[1, 1].set_xlabel("Wavelength (nm)", fontsize = 18)
+
+
+
+C_gmin[4].plot(ax = ax_fluc[1, 2], legend = False)
+ax_fluc[1, 2].set_title("K =")
+ax_fluc[1, 2].set_xlabel("Wavelength (nm)", fontsize = 18)
+
+
+
+
+for ax in fig_fluc.axes:
+    ax.grid(True)
+    ax.tick_params(axis = "both", labelsize = 18)
+    ax.set_yscale("log")
+
  
 
-C_gmin.plot()
+C_gmin[-1].plot()
 plt.title("Glucose Detection Limit Without Confounders")
 plt.xlabel("Wavelength (nm)", fontsize = 18)
 plt.ylabel("$C_{g,min}$", fontsize = 18)
 plt.yscale("log")
 plt.grid(visible = True)
 
-C_gmin_tot.plot()
+C_gmin_tot[-1].plot()
 plt.title("Glucose Detection Limit With Confounders")
 plt.xlabel("Wavelength (nm)", fontsize = 18)
 plt.ylabel("$C_{g,min}$", fontsize = 18)
